@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "title": "가족의 다양성",
+        "description": "모든 형태의 가족을 존중하고 인정하는 문화 확산",
+        "features": [
+            "한부모가족 인식개선",
+            "가족형태다양성인정",
+            "상호 이해와 공감"
+        ],
+        "gradient": "from-purple-400 via-pink-400 to-red-400"
+    },
+    {
+        "id": 2,
+        "title": "시민참여",
+        "description": "시민이 주체가되어 함께 만들어가는 축제",
+        "features": [
+            "자원봉사 참여",
+            "프로그램 기획 참여",
+            "온라인 캠페인"
+        ],
+        "gradient": "from-blue-400 via-cyan-400 to-teal-400"
+    },
+    {
+        "id": 3,
+        "title": "자조모임",
+        "description": "한부모가족 자조모임이 중심이 되는 연대의 장",
+        "features": [
+            "자조모임 부스 운영",
+            "경험 나눔",
+            "네트워킹"
+        ],
+        "gradient": "from-green-400 via-teal-400 to-cyan-400"
+    },
+    {
+        "id": 4,
+        "title": "연대",
+        "description": "지역사회와 함께하는 포용적 공동체 실현",
+        "features": [
+            "기관 협력",
+            "시민사회 연대",
+            "지속가능한 지원체계"
+        ],
+        "gradient": "from-indigo-400 via-purple-400 to-pink-400"
+    }
+]

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Search, Home, ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 export default function NotFound() {
   return (
@@ -53,21 +52,19 @@ export default function NotFound() {
         
         {/* 액션 버튼들 */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild className="bg-blue-600 hover:bg-blue-700 px-6">
+          <button className="bg-blue-600 hover:bg-blue-700 px-6">
             <Link href="/">
               <Home className="w-4 h-4 mr-2" />
               홈으로 가기
             </Link>
-          </Button>
+          </button>
           
-          <Button 
-            onClick={() => window.history.back()} 
-            variant="outline" 
+          <button 
             className="px-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             이전 페이지로
-          </Button>
+          </button>
         </div>
         
         {/* 검색 제안 */}

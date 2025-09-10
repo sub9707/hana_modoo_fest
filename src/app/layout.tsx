@@ -4,8 +4,6 @@ import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
-import AccessibilitySkipLink from '@/components/common/AccessibilitySkipLink'
-import BackToTop from '@/components/common/BackToTop'
 import Script from 'next/script'
 
 const inter = Inter({ 
@@ -88,7 +86,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="ko" className={`${inter.variable} ${notoSansKR.variable}`}>
       <body className="min-h-screen bg-background font-noto-sans antialiased">
         {/* Google Analytics */}
-        <Script
+        {/*<Script
           src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"
           strategy="afterInteractive"
         />
@@ -99,10 +97,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             gtag('js', new Date());
             gtag('config', 'GA_TRACKING_ID');
           `}
-        </Script>
-
-        {/* 접근성 스킵 링크 */}
-        <AccessibilitySkipLink />
+        </Script>*/}
         
         {/* 메인 레이아웃 */}
         <div className="flex min-h-screen flex-col">
@@ -119,7 +114,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <QuickBar />
         
         {/* 맨 위로 버튼 */}
-        <BackToTop />
 
         {/* 구조화 데이터 */}
         <Script

@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -52,20 +51,20 @@ export default function Error({ error, reset }: ErrorProps) {
         
         {/* 액션 버튼들 */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
+          <button 
             onClick={reset}
             className="bg-blue-600 hover:bg-blue-700 px-6"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             다시 시도
-          </Button>
+          </button>
           
-          <Button asChild variant="outline" className="px-6">
+          <button className="px-6">
             <Link href="/">
               <Home className="w-4 h-4 mr-2" />
               홈으로 돌아가기
             </Link>
-          </Button>
+          </button>
         </div>
         
         {/* 문의 안내 */}

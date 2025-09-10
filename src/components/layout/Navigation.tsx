@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
 
 interface NavigationItem {
   name: string
@@ -28,15 +27,14 @@ export default function Navigation({ items, className }: NavigationProps) {
 
         if (isPrimary) {
           return (
-            <Button
+            <button
               key={item.name}
-              asChild
               className="ml-4 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
             >
               <Link href={item.href} title={item.description}>
                 {item.name}
               </Link>
-            </Button>
+            </button>
           )
         }
 
