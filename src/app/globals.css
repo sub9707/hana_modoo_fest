@@ -1,21 +1,81 @@
-@import "tailwindcss";
+@import "tailwindcss"; 
 
-@theme inline {
-  /* 모두하나대축제 커스텀 컬러 */
-  --color-festival-blue: #2563eb;
-  --color-festival-blue-light: #3b82f6;
-  --color-festival-green: #059669;
-  --color-festival-purple: #7c3aed;
-  --color-festival-pink: #db2777;
-  --color-festival-orange: #ea580c;
+@theme inline { 
+ /* 모두하나대축제 커스텀 컬러 */
+ --color-festival-blue: #2563eb; 
+ --color-festival-blue-light: #3b82f6; 
+ --color-festival-green: #059669; 
+ --color-festival-purple: #7c3aed; 
+ --color-festival-pink: #db2777; 
+ --color-festival-orange: #ea580c; 
+ } 
+
+:root { 
+ /* 모두하나대축제 브랜드 컬러 */
+ --festival-blue: #2563eb; 
+ --festival-blue-light: #3b82f6; 
+ --festival-green: #059669; 
+ --festival-purple: #7c3aed; 
+ --festival-pink: #db2777; 
+ --festival-orange: #ea580c; 
+ } 
+
+
+ /************************* 유틸리티 *************************/
+ /* 스크롤바 숨김 클래스 */
+
+ .scrollbar-hide { 
+ -webkit-overflow-scrolling: touch; 
+ } 
+ .scrollbar-hide::-webkit-scrollbar { 
+ display: none; 
+ } 
+
+
+/************************* 애니메이션 *************************/
+
+.swipe-hint-container {
+  position: relative;
+  width: 140px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-:root {
-  /* 모두하나대축제 브랜드 컬러 */
-  --festival-blue: #2563eb;
-  --festival-blue-light: #3b82f6;
-  --festival-green: #059669;
-  --festival-purple: #7c3aed;
-  --festival-pink: #db2777;
-  --festival-orange: #ea580c;
+.swipe-arrows {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swipe-finger {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: swipeBackAndForth 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+.swipe-finger img {
+  filter: grayscale(100%) opacity(0.7);
+}
+
+/* 좌우 왕복 애니메이션 키프레임 - 더 넓은 범위 */
+@keyframes swipeBackAndForth {
+  0% {
+    transform: translate(-50%, -50%) translateX(-35px);
+  }
+  
+  50% {
+    transform: translate(-50%, -50%) translateX(35px);
+  }
+  
+  100% {
+    transform: translate(-50%, -50%) translateX(-35px);
+  }
 }
