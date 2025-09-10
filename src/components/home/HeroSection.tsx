@@ -22,7 +22,7 @@ export default function HeroSection() {
           </p>
 
           {/* 행사 정보 카드 */}
-          <div className="w-full bg-gradient-to-r from-purple-200 via-blue-200 to-green-200 rounded-2xl p-6 mb-8">
+          <div className="w-full bg-gradient-to-r from-purple-200 via-blue-200 to-green-200 rounded-2xl p-6 mb-8 border-4 border-white shadow-lg">
             <div className="flex text-center">
               <div className="flex-1 pr-4">
                 <h3 className="font-bold text-gray-900 mb-2">행사 일정</h3>

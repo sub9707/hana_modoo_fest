@@ -1,0 +1,101 @@
+"use client"
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import campaigns from "@/data/Campaigns.json";
+
+function CampaignSection() {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    return (
+        <section className="pt-10 py-40 px-4">
+            <div className="mx-auto w-[90vw] sm:w-[85vw] md:w-[75vw] lg:w-[65vw] xl:w-[70vw] 2xl:w-[75vw] max-w-screen-2xl">
+                {/* 모바일: 세로 배치, 데스크톱: 가로 배치 */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                    {campaigns.map((item, index) => {
+                        const flexGrow = hoveredIndex === index ? 5 : hoveredIndex === null ? 1 : 1.5;
+
+                        return (
+                            <div
+                                key={item.id}
+                                className="group relative h-64 sm:h-90 bg-gray-200 rounded-2xl overflow-hidden transition-all duration-500 ease-in-out cursor-pointer"
+                                style={!isMobile ? { flex: flexGrow } : {}}
+                                onMouseEnter={() => !isMobile && setHoveredIndex(index)}
+                                onMouseLeave={() => !isMobile && setHoveredIndex(null)}
+                            >
+                                <Image
+                                    src={item.img}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover transition-transform duration-500 sm:group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-black/40 sm:group-hover:bg-black/60 transition-colors" />
+                                
+                                {/* 모바일용 타이틀 - 왼쪽 위에 고정 */}
+                                <div
+                                    className="
+                                        block sm:hidden
+                                        absolute top-3 left-3 text-white text-lg font-semibold
+                                    "
+                                >
+                                    {item.title}
+                                </div>
+
+                                {/* 데스크톱용 기본 타이틀 - 하단에 표시, 호버 시 사라짐 */}
+                                <div
+                                    className="
+                                        hidden sm:block
+                                        absolute bottom-3 left-3 right-3 text-white text-lg font-semibold 
+                                        transition-all duration-500
+                                        group-hover:opacity-0 group-hover:-translate-y-5
+                                    "
+                                >
+                                    {item.title}
+                                </div>
+
+                                {/* 데스크톱용 호버 타이틀 - 상단에 호버 시 나타남 */}
+                                <div
+                                    className="
+                                        hidden sm:block
+                                        absolute top-3 left-3 text-white text-lg font-semibold
+                                        opacity-0 -translate-y-3
+                                        group-hover:opacity-100 group-hover:translate-y-0
+                                        transition-all duration-500
+                                    "
+                                >
+                                    {item.title}
+                                </div>
+
+                                {/* 설명 텍스트 - 모바일에서는 항상 표시, 데스크톱에서는 호버 시 표시 */}
+                                <div
+                                    className="
+                                        absolute bottom-0 left-0 right-0 
+                                        bg-black/80 text-white text-sm px-4 py-3
+                                        sm:opacity-0 sm:translate-y-full
+                                        sm:group-hover:opacity-100 sm:group-hover:translate-y-0
+                                        transition-all duration-500
+                                    "
+                                >
+                                    {item.desc}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+    );
+}
+
+export default CampaignSection;

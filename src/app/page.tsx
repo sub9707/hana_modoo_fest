@@ -2,6 +2,9 @@ import { Metadata } from 'next'
 import HeroSection from '@/components/home/HeroSection'
 import Introduction from '@/components/home/Introduction'
 import ProgramCardSection from '@/components/home/ProgramCardSection'
+import CampaignOverview from '@/components/home/CampaignOverview'
+import JoinCampaignsSection from '@/components/home/JoinCampaignsSection'
+import CampaignSection from '@/components/home/CampaignSection'
 
 
 export const metadata: Metadata = {
@@ -35,8 +38,17 @@ export default async function HomePage() {
         {/* 히어로 섹션 */}
         <Introduction />
       </div>
-      <div className="min-h-screen">
+      <div>
         <ProgramCardSection/>
+      </div>
+      <div>
+        <CampaignOverview/>
+      </div>
+      <div>
+        <JoinCampaignsSection/>
+      </div>
+      <div>
+        <CampaignSection/>
       </div>
     </>
   )
