@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
 import Script from 'next/script'
+import Providers from '@/components/provider/Provider'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ko" className={`${inter.variable} ${notoSansKR.variable}`}>
       <body className="min-h-screen bg-background font-noto-sans antialiased">
+        <Providers>
         {/* Google Analytics */}
         {/*<Script
           src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"
@@ -151,6 +153,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             })
           }}
         />
+        </Providers>
       </body>
     </html>
   )
