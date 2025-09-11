@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import LanguageSelect from '../ui/LanguageSelect'
 
 const navigation = [
   { name: '축제 소개', href: '/festival' },
@@ -92,14 +93,10 @@ export default function Header() {
               <button>
                사전참가 신청하기
               </button>
-              <button className='hidden lg:flex'>
+              <Link href={'/login'} className='hidden lg:flex cursor-pointer'>
                 로그인/회원가입
-              </button>
-              <select className='hidden lg:flex'>
-                <option>한국어</option>
-                <option>중국어</option>
-                <option>일본어</option>
-              </select>
+              </Link>
+              <LanguageSelect/>
             </div>
 
             {/* 모바일 메뉴 버튼 */}
