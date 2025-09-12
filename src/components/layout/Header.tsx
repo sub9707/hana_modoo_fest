@@ -10,12 +10,12 @@ import LogoutButton from '../auth/LogoutButton'
 import { useAuth } from '@/contexts/AuthContext'
 
 const navigation = [
-  { name: '축제 소개', href: '/festival' },
-  { name: '기관 소개', href: '/about' },
+  { name: '축제 소개', href: '/about' },
+  { name: '기관 소개', href: '/organization' },
   { name: '온라인 축제', href: '/online-festival' },
   { name: '행사 프로그램', href: '/programs' },
   { name: '공지/소식', href: '/news' },
-  { name: '오시는 길', href: '/location' },
+  { name: '오시는 길', href: '/directions' },
   { name: '갤러리', href: '/gallery' },
   { name: '함께하는 기관', href: '/partners' },
 ]
@@ -40,6 +40,7 @@ export default function Header() {
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
+  
 
   return (
     <>
@@ -95,9 +96,9 @@ export default function Header() {
 
             {/* CTA 버튼 그룹 */}
             <div className='flex items-center gap-8'>
-              <button className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
+              <Link href={'/registration'} className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
                 사전참가 신청하기
-              </button>
+              </Link>
 
               {/* 로그인 상태에 따른 분기 처리 */}
               <div className='hidden lg:flex items-center'>

@@ -135,24 +135,26 @@ export async function middleware(request: NextRequest) {
   }
 
   // 사용자 활동 시간 업데이트 (5분마다)
-  const lastActivity = request.cookies.get('last-activity')?.value
-  const now = Date.now()
+  if (user) {
+    const lastActivity = request.cookies.get('last-activity')?.value
+    const now = Date.now()
 
-  if (!lastActivity || now - parseInt(lastActivity) > 5 * 60 * 1000) {
-    try {
-      await supabase
-        .from('users')
-        .update({ last_activity_at: new Date().toISOString() })
-        .eq('id', user!.id)
+    if (!lastActivity || now - parseInt(lastActivity) > 5 * 60 * 1000) {
+      try {
+        await supabase
+          .from('users')
+          .update({ last_activity_at: new Date().toISOString() })
+          .eq('id', user.id)
 
-      response.cookies.set('last-activity', now.toString(), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/'
-      })
-    } catch (error) {
-      console.error('Activity update error:', error)
+        response.cookies.set('last-activity', now.toString(), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/'
+        })
+      } catch (error) {
+        console.error('Activity update error:', error)
+      }
     }
   }
 

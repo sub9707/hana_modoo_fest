@@ -1,32 +1,32 @@
 [
   {
     "id": 1,
-    "title": "쇠부리",
-    "desc": "전통 제철 과정을 직접 볼 수 있는 체험형 프로그램입니다.",
-    "img":"/images/main/sample1.jpg"
+    "title": "사전 접수",
+    "desc": "미리 참가를 신청하고 일정과 안내를 확인하세요.",
+    "img": "/images/main/sample1.jpg"
   },
   {
     "id": 2,
-    "title": "공연",
-    "desc": "불꽃과 함께하는 화려한 공연 무대를 즐겨보세요.",
-    "img":"/images/main/sample2.jpg"
+    "title": "퀴즈 이벤트",
+    "desc": "흥미로운 주간 퀴즈에 도전하고 다양한 경품을 받아보세요.",
+    "img": "/images/main/sample2.jpg"
   },
   {
     "id": 3,
-    "title": "전시",
-    "desc": "눈을 사로잡는 독창적인 작품들로 가득한 전시 공간을 경험하세요.",
-    "img":"/images/main/sample1.jpg"
+    "title": "응원 댓글",
+    "desc": "따뜻한 응원 메시지를 남기며 함께 축제의 분위기를 즐기세요.",
+    "img": "/images/main/sample1.jpg"
   },
   {
     "id": 4,
-    "title": "체험",
-    "desc": "아이부터 어른까지 즐길 수 있는 다양한 체험 활동이 준비되어 있습니다.",
-    "img":"/images/main/sample2.jpg"
+    "title": "가족 주제로 글짓기",
+    "desc": "가족을 주제로 한 글을 작성하고 서로의 이야기를 나누어 보세요.",
+    "img": "/images/main/sample2.jpg"
   },
   {
     "id": 5,
-    "title": "부대행사",
-    "desc": "먹거리 장터와 플리마켓 등 즐길거리가 가득합니다.",
-    "img":"/images/main/sample1.jpg"
+    "title": "랜덤 이벤트",
+    "desc": "다양한 미션이 준비돼 있으니 참여하고 깜짝 선물도 받아가세요.",
+    "img": "/images/main/sample1.jpg"
   }
 ]
