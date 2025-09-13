@@ -1,0 +1,104 @@
+{
+  "organizers": [
+    {
+      "id": "seoul-city",
+      "name": "서울특별시",
+      "logo": "/images/partners/seoul-city-logo.svg",
+      "description": "서울시민의 행복한 삶을 위해 함께하는 서울특별시",
+      "website": "https://www.seoul.go.kr",
+      "category": "주최"
+    },
+    {
+      "id": "single-parent-center",
+      "name": "서울특별시한부모가족지원센터",
+      "logo": "/images/partners/single-parent-center-logo.svg",
+      "description": "한부모가족의 자립과 복지 증진을 위한 전문 지원기관",
+      "website": "https://www.seoulsingleparent.or.kr",
+      "category": "주관"
+    }
+  ],
+  "sponsors": [
+    {
+      "id": "korea-telecom",
+      "name": "KT",
+      "logo": "/images/partners/kt-logo.svg",
+      "description": "디지털 혁신을 통한 더 나은 세상을 만들어가는 KT",
+      "website": "https://www.kt.com",
+      "category": "후원"
+    },
+    {
+      "id": "samsung",
+      "name": "삼성전자",
+      "logo": "/images/partners/samsung-logo.svg",
+      "description": "혁신과 상상으로 세상을 바꾸는 삼성전자",
+      "website": "https://www.samsung.com/sec",
+      "category": "후원"
+    },
+    {
+      "id": "lotte",
+      "name": "롯데그룹",
+      "logo": "/images/partners/lotte-logo.svg",
+      "description": "고객과 함께 성장하는 글로벌 기업 롯데그룹",
+      "website": "https://www.lotte.co.kr",
+      "category": "협력"
+    },
+    {
+      "id": "cj",
+      "name": "CJ그룹",
+      "logo": "/images/partners/cj-logo.svg",
+      "description": "문화와 생활의 새로운 가치를 창조하는 CJ그룹",
+      "website": "https://www.cj.net",
+      "category": "협력"
+    }
+  ],
+  "participants": [
+    {
+      "id": "red-cross",
+      "name": "대한적십자사",
+      "logo": "/images/partners/red-cross-logo.svg",
+      "description": "인도주의 실현을 통한 인간 존엄성 구현",
+      "website": "https://www.redcross.or.kr",
+      "category": "참여기관"
+    },
+    {
+      "id": "ymca",
+      "name": "서울YMCA",
+      "logo": "/images/partners/ymca-logo.svg",
+      "description": "시민사회 발전과 평화를 위해 노력하는 서울YMCA",
+      "website": "https://www.ymca.or.kr",
+      "category": "참여기관"
+    },
+    {
+      "id": "volunteer-center",
+      "name": "서울시자원봉사센터",
+      "logo": "/images/partners/volunteer-center-logo.svg",
+      "description": "나눔과 봉사를 통한 따뜻한 서울 만들기",
+      "website": "https://www.volunteer.seoul.kr",
+      "category": "참여기관"
+    },
+    {
+      "id": "welfare-foundation",
+      "name": "서울시복지재단",
+      "logo": "/images/partners/welfare-foundation-logo.svg",
+      "description": "모든 시민이 행복한 포용복지 서울 실현",
+      "website": "https://www.welfare.seoul.kr",
+      "category": "참여기관"
+    },
+    {
+      "id": "youth-center",
+      "name": "서울시립청소년활동진흥센터",
+      "logo": "/images/partners/youth-center-logo.svg",
+      "description": "청소년의 건전한 성장과 활동 지원",
+      "website": "https://www.sy0404.kr",
+      "category": "참여기관"
+    },
+    {
+      "id": "women-center",
+      "name": "서울여성가족재단",
+      "logo": "/images/partners/women-center-logo.svg",
+      "description": "성평등한 서울, 가족친화적 서울 조성",
+      "website": "https://www.seoulwomen.or.kr",
+      "category": "참여기관"
+    }
+  ]
+}

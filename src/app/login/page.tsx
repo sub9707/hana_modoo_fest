@@ -2,17 +2,27 @@
 
 import LoginForm from '@/components/forms/LoginForm'
 import { useAuth } from '@/contexts/AuthContext'
-import { redirect } from 'next/navigation'
+import { redirect, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function LoginPage() {
   const { user, isLoading } = useAuth()
+  const searchParams = useSearchParams()
+  const message = searchParams.get("message")
+  const redirectPath = searchParams.get("redirect") || "/"
 
   useEffect(() => {
     if (!isLoading && user) {
-      redirect('/dashboard')
+      // 로그인 완료 → 원래 요청한 페이지로
+      redirect(redirectPath)
     }
-  }, [user, isLoading])
+  }, [user, isLoading, redirectPath])
+
+  useEffect(() => {
+    if (message) {
+      alert(message)
+    }
+  }, [message])
 
   // 로딩 중이거나 리다이렉트 중이면 로딩 표시
   if (isLoading) {

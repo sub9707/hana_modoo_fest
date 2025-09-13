@@ -18,10 +18,6 @@ export default function NewsHero({ totalNews, latestNews }: NewsHeroProps) {
             <div className="font-bold text-2xl">{totalNews}</div>
             <div className="opacity-90">전체 소식</div>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3">
-            <div className="font-bold text-2xl">{latestNews.split('-').slice(1).join('.')}</div>
-            <div className="opacity-90">최신 업데이트</div>
-          </div>
         </div>
       </div>
     </section>

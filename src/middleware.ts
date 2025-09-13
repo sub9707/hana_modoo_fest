@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Role } from './types/auth'
 
 // 로그인이 필요한 경로들 (명시적으로 정의)
-const protectedPaths = ['/dashboard', '/profile', '/settings', '/my-page']
+const protectedPaths = ['/dashboard', '/profile', '/settings', '/my-page', '/registration']
 
 // 관리자만 접근 가능한 경로들  
 const adminPaths = ['/admin']
@@ -111,6 +111,7 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
+      loginUrl.searchParams.set('message', '로그인이 필요한 접근입니다.')
       return NextResponse.redirect(loginUrl)
     }
   }

@@ -19,6 +19,113 @@
  --festival-pink: #db2777; 
  --festival-orange: #ea580c; 
  } 
+ 
+
+
+ /************************* 컴포넌트 *************************/
+
+ /* 카드 호버 그림자 효과 */
+.hover\:shadow-blue-100:hover { 
+ box-shadow: 0 20px 50px rgba(59, 130, 246, 0.1); 
+ } 
+
+.hover\:shadow-green-100:hover { 
+ box-shadow: 0 20px 50px rgba(5, 150, 105, 0.1); 
+ } 
+
+.hover\:shadow-purple-100:hover { 
+ box-shadow: 0 20px 50px rgba(124, 58, 237, 0.1); 
+ } 
+
+ /* 카드 3D 효과 */
+.card-3d { 
+ transform-style: preserve-3d; 
+ transition: transform 0.3s ease; 
+ } 
+
+ /* 무지개 그림자 효과 */
+.rainbow-shadow { 
+ box-shadow: 
+ 0 0 20px rgba(37, 99, 235, 0.3),
+ 0 0 40px rgba(124, 58, 237, 0.2),
+ 0 0 60px rgba(219, 39, 119, 0.1); 
+ } 
+
+.rainbow-shadow:hover { 
+ box-shadow: 
+ 0 0 30px rgba(37, 99, 235, 0.4),
+ 0 0 60px rgba(124, 58, 237, 0.3),
+ 0 0 90px rgba(219, 39, 119, 0.2); 
+ } 
+
+.card-3d:hover { 
+ transform: rotateY(5deg) rotateX(5deg) translateZ(10px); 
+ } 
+
+
+ /* 파트너 페이지 */
+ 
+ /* 부드러운 그라디언트 마스크 */
+ .gradient-mask-left { 
+ background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%); 
+ } 
+ 
+ .gradient-mask-right { 
+ background: linear-gradient(-90deg, rgba(255,255,255,0.1) 0%, transparent 100%); 
+ } 
+ 
+ .gradient-mask-left { 
+ background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%); 
+ } 
+ 
+ .gradient-mask-right { 
+ background: linear-gradient(-90deg, rgba(255,255,255,0.1) 0%, transparent 100%); 
+ } 
+ 
+ 
+/* about 페이지 */
+
+@media (max-width: 640px) { 
+ .text-festival-hero { 
+ font-size: clamp(2rem, 8vw, 4rem); 
+ line-height: 1.1; 
+ } 
+ } 
+
+@media (min-width: 641px) and (max-width: 1024px) { 
+ .text-festival-hero { 
+ font-size: clamp(3rem, 6vw, 5rem); 
+ line-height: 1.1; 
+ } 
+ } 
+
+@media (min-width: 1025px) { 
+ .text-festival-hero { 
+ font-size: clamp(4rem, 5vw, 6rem); 
+ line-height: 1.1; 
+ } 
+ } 
+
+ /* 버튼 특수 효과 */
+.btn-festival {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-festival::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-festival:hover::before {
+  left: 100%;
+}
 
 
  /************************* 유틸리티 *************************/
@@ -31,51 +138,216 @@
  display: none; 
  } 
 
+ /* 텍스트 줄 제한 */
+.line-clamp-2 { 
+ display: -webkit-box; 
+ -webkit-line-clamp: 2; 
+ -webkit-box-orient: vertical; 
+ overflow: hidden; 
+ } 
+
+ /* 화면 높이 최적화 */
+@media (max-height: 800px) { 
+ /* 높이가 작은 화면에서 더 컴팩트하게 */
+ .space-y-6 { 
+ gap: 1rem; 
+ } 
+ 
+ .xl\:space-y-8 { 
+ gap: 1.5rem; 
+ } 
+ } 
+
+@media (min-height: 1080px) { 
+ /* 높은 화면에서 더 여유있게 */
+ .space-y-6 { 
+ gap: 2rem; 
+ } 
+ 
+ .xl\:space-y-8 { 
+ gap: 2.5rem; 
+ } 
+ } 
+
 
 /************************* 애니메이션 *************************/
 
-.swipe-hint-container {
-  position: relative;
-  width: 140px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.swipe-hint-container { 
+ position: relative; 
+ width: 140px; 
+ height: 32px; 
+ display: flex; 
+ align-items: center; 
+ justify-content: center; 
+ } 
 
-.swipe-arrows {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.swipe-arrows { 
+ position: absolute; 
+ width: 100%; 
+ height: 100%; 
+ display: flex; 
+ align-items: center; 
+ justify-content: center; 
+ } 
 
-.swipe-finger {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: swipeBackAndForth 2s ease-in-out infinite;
-  z-index: 10;
-}
+.swipe-finger { 
+ position: absolute; 
+ top: 50%; 
+ left: 50%; 
+ transform: translate(-50%, -50%); 
+ animation: swipeBackAndForth 2s ease-in-out infinite; 
+ z-index: 10; 
+ } 
 
-.swipe-finger img {
-  filter: grayscale(100%) opacity(0.7);
-}
+.swipe-finger img { 
+ filter: grayscale(100%) opacity(0.7); 
+ } 
+
+ /* 애니메이션 딜레이 */
+.animation-delay-500 { 
+ animation-delay: 500ms; 
+ } 
+
+.animation-delay-1500 { 
+ animation-delay: 1500ms; 
+ } 
+
+.animation-delay-2500 { 
+ animation-delay: 2500ms; 
+ } 
+
+.animation-delay-3000 { 
+ animation-delay: 3000ms; 
+ } 
+ .fade-in-up { 
+ animation: fadeInUp 0.6s ease-out; 
+ } 
+
+.animate-scroll { 
+ animation: scroll 35s linear infinite; 
+ width: calc(200% + 64px); /* 두 세트 + 마진 고려 */
+ } 
+
+ .float-animation { 
+ animation: floatUp 4s ease-in-out infinite; 
+ } 
+
+ .festival-pulse { 
+ animation: festivalPulse 2s ease-in-out infinite; 
+ } 
+
+ .gradient-animate { 
+ background: linear-gradient(-45deg, #2563eb, #7c3aed, #db2777, #ea580c); 
+ background-size: 400% 400%; 
+ animation: gradientShift 4s ease infinite; 
+ -webkit-background-clip: text; 
+ -webkit-text-fill-color: transparent; 
+ background-clip: text; 
+ } 
+
+
+/* 모바일에서 더 빠른 스크롤 */
+@media (max-width: 768px) { 
+ .animate-scroll { 
+ animation: scroll 25s linear infinite; 
+ width: calc(200% + 32px); /* 모바일에서 더 작은 마진 */
+ } 
+ } 
+
+@media (min-width: 1440px) { 
+ .animate-scroll { 
+ animation: scroll 45s linear infinite; /* 와이드 화면에서 더 느리게 */
+ width: calc(200% + 96px); 
+ } 
+ } 
+
+/* 호버 시 애니메이션 일시정지 */
+.animate-scroll:hover { 
+ animation-play-state: paused; 
+ } 
+
+/* 로고 컨테이너 호버 효과 */
+.logo-container:hover { 
+ transform: scale(1.05); 
+ box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15); 
+ } 
+
+
 
 /* 좌우 왕복 애니메이션 키프레임 - 더 넓은 범위 */
-@keyframes swipeBackAndForth {
-  0% {
-    transform: translate(-50%, -50%) translateX(-35px);
-  }
-  
-  50% {
-    transform: translate(-50%, -50%) translateX(35px);
-  }
-  
-  100% {
-    transform: translate(-50%, -50%) translateX(-35px);
-  }
-}
+@keyframes swipeBackAndForth { 
+ 0% { 
+ transform: translate(-50%, -50%) translateX(-35px); 
+ } 
+ 
+ 50% { 
+ transform: translate(-50%, -50%) translateX(35px); 
+ } 
+ 
+ 100% { 
+ transform: translate(-50%, -50%) translateX(-35px); 
+ } 
+ } 
+
+ /* 스크롤 애니메이션 */
+@keyframes fadeInUp { 
+ from { 
+ opacity: 0; 
+ transform: translateY(30px); 
+ } 
+ to { 
+ opacity: 1; 
+ transform: translateY(0); 
+ } 
+ } 
+
+ /* 플로팅 애니메이션 */
+ @keyframes floatUp { 
+ 0% { 
+ transform: translateY(0px); 
+ opacity: 0.2; 
+ } 
+ 50% { 
+ transform: translateY(-20px); 
+ opacity: 0.3; 
+ } 
+ 100% { 
+ transform: translateY(0px); 
+ opacity: 0.2; 
+ } 
+ } 
+
+ /* 펄스 애니메이션 강화 */
+@keyframes festivalPulse { 
+ 0%, 100% { 
+ transform: scale(1); 
+ opacity: 0.8; 
+ } 
+ 50% { 
+ transform: scale(1.05); 
+ opacity: 1; 
+ } 
+ } 
+
+ /* 캐러셀 스크롤 애니메이션 */
+@keyframes scroll { 
+ 0% { 
+ transform: translateX(0); 
+ } 
+ 100% { 
+ transform: translateX(-50%); 
+ } 
+ } 
+
+ /* 그라디언트 텍스트 애니메이션 */
+@keyframes gradientShift { 
+ 0% { 
+ background-position: 0% 50%; 
+ } 
+ 50% { 
+ background-position: 100% 50%; 
+ } 
+ 100% { 
+ background-position: 0% 50%; 
+ } 
+ } 

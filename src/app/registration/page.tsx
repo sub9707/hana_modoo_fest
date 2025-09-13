@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/mysql/server'
 import RegistrationHero from '@/components/registration/RegistrationHero'
 import RegistrationForm from '@/components/forms/RegistrationForm'
 

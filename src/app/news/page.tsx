@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 import NewsHero from '@/components/news/NewsHero'
 import NewsFilters from '@/components/news/NewsFilters'
 import NewsList from '@/components/news/NewsList'
-import NewsSubscription from '@/components/news/NewsSubscription'
 
 export const metadata: Metadata = {
   title: '공지/소식',
@@ -47,7 +46,6 @@ export default async function NewsPage() {
           {/* 사이드바 - 필터 및 구독 */}
           <div className="lg:col-span-1 space-y-6">
             <NewsFilters categories={newsData.categories} />
-            <NewsSubscription />
           </div>
           
           {/* 메인 콘텐츠 - 뉴스 리스트 */}
