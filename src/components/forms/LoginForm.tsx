@@ -6,8 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react'
-import { loginAction, loginWithRedirect } from '@/lib/actions/auth'
+import { loginAction } from '@/lib/actions/auth' // MySQL 버전 import
 import { useAuth } from '@/contexts/AuthContext'
+import { User } from '@/types/auth'
 
 // 로그인 폼 스키마
 const loginSchema = z.object({
@@ -48,26 +49,42 @@ export default function LoginForm() {
       formData.append('username', data.username)
       formData.append('password', data.password)
 
-      const result = await loginAction(formData)
+      try {
+        const result = await loginAction(formData)
 
-      if (result.error) {
-        setError(result.error)
-      } else if (result.success && result.user) {
-        // 로그인 성공 후 전체 사용자 정보 가져오기
-        try {
-          const response = await fetch('/api/auth/me')
-          const { user: fullUserData } = await response.json()
-
-          if (fullUserData) {
-            // Context 상태 업데이트
-            login(fullUserData)
+        if (result.error) {
+          setError(result.error)
+        } else if (result.success && result.user) {
+          // NextJS 15: 로그인 성공 후 전체 사용자 정보 가져오기
+          try {
+            const response = await fetch('/api/auth/me', {
+              method: 'GET',
+              credentials: 'include',
+              cache: 'no-store', // NextJS 15: 캐시 방지
+            })
+            
+            if (response.ok) {
+              const { user: fullUserData } = await response.json()
+              if (fullUserData) {
+                // Context 상태 업데이트
+                login(fullUserData)
+              }
+            }
+          } catch (error) {
+            console.error('Failed to fetch full user data:', error)
+            // 기본 사용자 정보로라도 로그인 진행
+            login(result.user as User)
           }
-        } catch (error) {
-          console.error('Failed to fetch full user data:', error)
-        }
 
-        reset()
-        router.push(redirectTo)
+          reset()
+          
+          // NextJS 15: 라우터 푸시 개선
+          router.push(redirectTo)
+          router.refresh() // 서버 컴포넌트 리프레시
+        }
+      } catch (error) {
+        console.error('Login error:', error)
+        setError('로그인 처리 중 오류가 발생했습니다.')
       }
     })
   }

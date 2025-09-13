@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/mysql/server'
 import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 import LogoutButton from '@/components/auth/LogoutButton'

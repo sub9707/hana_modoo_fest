@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 import { Role } from './types/auth'
 
 // 로그인이 필요한 경로들 (명시적으로 정의)
@@ -18,6 +17,35 @@ const roleHierarchy: Record<Role, number> = {
   'admin': 3
 }
 
+// NextJS 15: 데이터베이스 쿼리 함수 (미들웨어에서 사용)
+async function queryDatabase(sql: string, params: any[] = []) {
+  try {
+    // NextJS 15: 동적 import 사용
+    const mysql = await import('mysql2/promise')
+
+    const connection = await mysql.default.createConnection({
+      host: '192.168.219.102',
+      port: 13306,
+      user: process.env.NEXT_PUBLIC_MYSQL_USER || 'root',
+      password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD || '',
+      database: process.env.NEXT_PUBLIC_MYSQL_DATABASE || 'modohana_festival',
+      charset: 'utf8mb4',
+      timezone: '+09:00',
+      dateStrings: true,
+    })
+
+    try {
+      const [rows] = await connection.execute(sql, params)
+      return Array.isArray(rows) && rows.length > 0 ? rows[0] : null
+    } finally {
+      await connection.end()
+    }
+  } catch (error) {
+    console.error('Middleware database query error:', error)
+    return null
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -25,35 +53,14 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.includes('.')
+    pathname.includes('.') ||
+    pathname.startsWith('/__nextjs_original-stack-frame')
   ) {
     return NextResponse.next()
   }
 
-  // Supabase 클라이언트 생성
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value)
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
+  // NextJS 15: Response 생성 방식 개선
+  const response = NextResponse.next()
 
   // 세션 토큰 확인
   const sessionToken = request.cookies.get('session-token')?.value
@@ -61,25 +68,28 @@ export async function middleware(request: NextRequest) {
   let user = null
   if (sessionToken) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, name, username, role, session_expires_at')
-        .eq('session_token', sessionToken)
-        .single()
+      const userData = await queryDatabase(
+        'SELECT id, name, username, role, session_expires_at FROM users WHERE session_token = ?',
+        [sessionToken]
+      )
 
-      if (!error && data) {
+      if (userData) {
+        const userRow = userData as { id: number; name: string; username: string; role: Role; session_expires_at: string | null }
         // 세션 만료 확인
-        if (data.session_expires_at && new Date(data.session_expires_at) > new Date()) {
-          user = data
+        if (userRow.session_expires_at && new Date(userRow.session_expires_at) > new Date()) {
+          user = userRow
         } else {
           // 만료된 세션 정리
-          await supabase
-            .from('users')
-            .update({ session_token: null, session_expires_at: null })
-            .eq('id', data.id)
+          await queryDatabase(
+            'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
+            [userRow.id]
+          )
 
-          // 쿠키 삭제
-          response.cookies.delete('session-token')
+          // NextJS 15: 쿠키 삭제 개선
+          response.cookies.set('session-token', '', {
+            expires: new Date(0),
+            path: '/',
+          })
         }
       }
     } catch (error) {
@@ -90,25 +100,10 @@ export async function middleware(request: NextRequest) {
   // 로그인 페이지 접근 처리
   if (pathname === '/login') {
     if (user) {
-      // 이미 로그인된 사용자는 홈으로 리다이렉트
+      // 이미 로그인된 사용자는 대시보드로 리다이렉트
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
     return response
-  }
-
-  // 권한 기반 접근 제어 먼저 체크
-  // 관리자 전용 경로
-  if (adminPaths.some(path => pathname.startsWith(path))) {
-    if (!user || roleHierarchy[user.role as Role] < roleHierarchy['admin']) {
-      return NextResponse.redirect(new URL(!user ? '/login' : '/unauthorized', request.url))
-    }
-  }
-
-  // 편집자 이상 전용 경로  
-  if (editorPaths.some(path => pathname.startsWith(path))) {
-    if (!user || roleHierarchy[user.role as Role] < roleHierarchy['editor']) {
-      return NextResponse.redirect(new URL(!user ? '/login' : '/unauthorized', request.url))
-    }
   }
 
   // 로그인 필요한 경로 체크
@@ -120,37 +115,40 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 관리자 전용 경로
-  if (adminPaths.some(path => pathname.startsWith(path))) {
-    if (roleHierarchy[user!.role as Role] < roleHierarchy['admin']) {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
-    }
-  }
-
-  // 편집자 이상 전용 경로
-  if (editorPaths.some(path => pathname.startsWith(path))) {
-    if (roleHierarchy[user!.role as Role] < roleHierarchy['editor']) {
-      return NextResponse.redirect(new URL('/unauthorized', request.url))
-    }
-  }
-
-  // 사용자 활동 시간 업데이트 (5분마다)
+  // 권한 기반 접근 제어
   if (user) {
+    const userRole = (user as any).role
+    // 관리자 전용 경로
+    if (adminPaths.some(path => pathname.startsWith(path))) {
+      if (roleHierarchy[userRole as Role] < roleHierarchy['admin']) {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
+    }
+
+    // 편집자 이상 전용 경로  
+    if (editorPaths.some(path => pathname.startsWith(path))) {
+      if (roleHierarchy[userRole as Role] < roleHierarchy['editor']) {
+        return NextResponse.redirect(new URL('/unauthorized', request.url))
+      }
+    }
+
+    // NextJS 15: 사용자 활동 시간 업데이트 (5분마다)
     const lastActivity = request.cookies.get('last-activity')?.value
     const now = Date.now()
 
     if (!lastActivity || now - parseInt(lastActivity) > 5 * 60 * 1000) {
       try {
-        await supabase
-          .from('users')
-          .update({ last_activity_at: new Date().toISOString() })
-          .eq('id', user.id)
+        await queryDatabase(
+          'UPDATE users SET last_activity_at = ? WHERE id = ?',
+          [new Date().toISOString().slice(0, 19).replace('T', ' '), user.id]
+        )
 
         response.cookies.set('last-activity', now.toString(), {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
-          path: '/'
+          path: '/',
+          maxAge: 60 * 60 * 24 * 7 // 7일
         })
       } catch (error) {
         console.error('Activity update error:', error)
@@ -161,15 +159,20 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
+// NextJS 15: config 개선
 export const config = {
   matcher: [
     /*
+     * NextJS 15: 매처 패턴 개선
      * 다음 경로들을 제외한 모든 요청에 대해 실행:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - 기타 정적 assets
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|__nextjs_original-stack-frame).*)',
   ],
+  runtime: 'nodejs'
 }
+

@@ -1,10 +1,10 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { createHash, randomBytes } from 'crypto'
+import { query, queryOne } from '@/lib/mysql/connection'
 
 // 로그인 스키마
 const loginSchema = z.object({
@@ -37,16 +37,13 @@ export async function loginAction(formData: FormData) {
     }
 
     try {
-        const supabase = await createClient()
-
         // 사용자 조회
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('username', username)
-            .maybeSingle() // single() 대신 maybeSingle() 사용
+        const user = await queryOne(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        )
 
-        if (userError || !user) {
+        if (!user) {
             return {
                 error: '사용자명 또는 비밀번호가 올바르지 않습니다.'
             }
@@ -66,23 +63,21 @@ export async function loginAction(formData: FormData) {
         const expiresAt = new Date()
         expiresAt.setDate(expiresAt.getDate() + 7)
 
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                session_token: sessionToken,
-                session_expires_at: expiresAt.toISOString(),
-                last_login_at: new Date().toISOString()
-            })
-            .eq('id', user.id)
+        await query(
+            `UPDATE users SET 
+             session_token = ?, 
+             session_expires_at = ?, 
+             last_login_at = ?
+             WHERE id = ?`,
+            [
+                sessionToken,
+                expiresAt.toISOString().slice(0, 19).replace('T', ' '),
+                new Date().toISOString().slice(0, 19).replace('T', ' '),
+                user.id
+            ]
+        )
 
-        if (updateError) {
-            console.error('Session update error:', updateError)
-            return {
-                error: '로그인 처리 중 오류가 발생했습니다.'
-            }
-        }
-
-        // 쿠키 설정
+        // NextJS 15: cookies()는 더 이상 async가 아님
         const cookieStore = await cookies()
         cookieStore.set('session-token', sessionToken, {
             httpOnly: true,
@@ -117,16 +112,14 @@ export async function logoutAction() {
         const sessionToken = cookieStore.get('session-token')?.value
 
         if (sessionToken) {
-            const supabase = await createClient()
-
             // 데이터베이스에서 세션 토큰 제거
-            await supabase
-                .from('users')
-                .update({
-                    session_token: null,
-                    session_expires_at: null
-                })
-                .eq('session_token', sessionToken)
+            await query(
+                `UPDATE users SET 
+                 session_token = NULL, 
+                 session_expires_at = NULL
+                 WHERE session_token = ?`,
+                [sessionToken]
+            )
         }
 
         // 쿠키 삭제
@@ -147,12 +140,13 @@ export async function updateUserActivity() {
 
         if (!sessionToken) return
 
-        const supabase = await createClient()
-
-        await supabase
-            .from('users')
-            .update({ last_activity_at: new Date().toISOString() })
-            .eq('session_token', sessionToken)
+        await query(
+            `UPDATE users SET last_activity_at = ? WHERE session_token = ?`,
+            [
+                new Date().toISOString().slice(0, 19).replace('T', ' '),
+                sessionToken
+            ]
+        )
 
     } catch (error) {
         console.error('Update activity error:', error)
@@ -167,16 +161,18 @@ export async function extendSession() {
 
         if (!sessionToken) return false
 
-        const supabase = await createClient()
         const newExpiresAt = new Date()
         newExpiresAt.setDate(newExpiresAt.getDate() + 7)
 
-        const { error } = await supabase
-            .from('users')
-            .update({ session_expires_at: newExpiresAt.toISOString() })
-            .eq('session_token', sessionToken)
+        const result = await query(
+            `UPDATE users SET session_expires_at = ? WHERE session_token = ?`,
+            [
+                newExpiresAt.toISOString().slice(0, 19).replace('T', ' '),
+                sessionToken
+            ]
+        )
 
-        if (error) return false
+        if (!result || result.affectedRows === 0) return false
 
         // 쿠키 갱신
         cookieStore.set('session-token', sessionToken, {

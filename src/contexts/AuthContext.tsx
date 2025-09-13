@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import type { User } from '@/types/auth'
 
 interface AuthContextType {
@@ -20,41 +21,95 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
-  // 사용자 정보 새로고침
-  const refreshUser = async () => {
+  // NextJS 15: useCallback으로 함수 메모이제이션
+  const refreshUser = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/me')
-      const { user: userData } = await response.json()
-      setUser(userData)
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store', // NextJS 15: 캐시 방지
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      })
+      
+      if (response.ok) {
+        const { user: userData } = await response.json()
+        setUser(userData)
+      } else if (response.status === 401) {
+        // 인증 실패 시 사용자 상태 클리어
+        setUser(null)
+      }
     } catch (error) {
       console.error('Auth refresh error:', error)
       setUser(null)
     }
-  }
+  }, [])
 
-  // 로그인 처리
-  const login = (userData: User) => {
+  // NextJS 15: 로그인 처리 개선
+  const login = useCallback((userData: User) => {
     setUser(userData)
-  }
+    // NextJS 15: 서버 컴포넌트 리프레시
+    router.refresh()
+  }, [router])
 
-  // 로그아웃 처리
-  const logout = () => {
+  // NextJS 15: 로그아웃 처리 개선
+  const logout = useCallback(() => {
     setUser(null)
-  }
+    // NextJS 15: 서버 컴포넌트 리프레시
+    router.refresh()
+  }, [router])
 
-  // 초기 인증 상태 확인
+  // NextJS 15: 초기 인증 상태 확인 최적화
   useEffect(() => {
+    let mounted = true
+
     const checkAuthStatus = async () => {
+      if (!mounted) return
+      
       setIsLoading(true)
       await refreshUser()
-      setIsLoading(false)
+      
+      if (mounted) {
+        setIsLoading(false)
+      }
     }
 
     checkAuthStatus()
-  }, [])
 
-  const value = {
+    // NextJS 15: 컴포넌트 언마운트 시 정리
+    return () => {
+      mounted = false
+    }
+  }, [refreshUser])
+
+  // NextJS 15: 브라우저 포커스 시 사용자 정보 리프레시
+  useEffect(() => {
+    const handleFocus = () => {
+      if (!isLoading && document.visibilityState === 'visible') {
+        refreshUser()
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleFocus()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [isLoading, refreshUser])
+
+  // NextJS 15: Context value 메모이제이션
+  const contextValue = {
     user,
     isLoading,
     login,
@@ -63,13 +118,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-// useAuth 훅
+// NextJS 15: useAuth 훅 개선
 export function useAuth() {
   const context = useContext(AuthContext)
   
@@ -78,4 +133,41 @@ export function useAuth() {
   }
   
   return context
+}
+
+// NextJS 15: 추가 훅들
+export function useRequireAuth() {
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, isLoading, router])
+
+  return { user, isLoading }
+}
+
+export function useRequireRole(requiredRole: 'admin' | 'editor' | 'user') {
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
+
+  const roleHierarchy = {
+    'user': 1,
+    'editor': 2,
+    'admin': 3
+  }
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (roleHierarchy[user.role] < roleHierarchy[requiredRole]) {
+        router.push('/unauthorized')
+      }
+    } else if (!isLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, isLoading, requiredRole, router])
+
+  return { user, isLoading, hasPermission: user ? roleHierarchy[user.role] >= roleHierarchy[requiredRole] : false }
 }
