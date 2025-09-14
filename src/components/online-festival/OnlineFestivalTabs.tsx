@@ -1,0 +1,172 @@
+'use client'
+
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import PreRegistration from './PreRegistration'
+import QuizEvent from './QuizEvent'
+import SupportComments from './SupportComments'
+import FamilyWriting from './FamilyWriting'
+import RandomEvent from './RandomEvent'
+
+interface Tab {
+  id: string
+  label: string
+  icon: string
+  description: string
+  color: string
+  bgColor: string
+}
+
+const tabs: Tab[] = [
+  {
+    id: 'registration',
+    label: '사전접수',
+    icon: '✍️',
+    description: '축제 사전참가 신청',
+    color: 'text-festival-blue',
+    bgColor: 'bg-festival-blue'
+  },
+  {
+    id: 'quiz',
+    label: '퀴즈이벤트',
+    icon: '🧩',
+    description: '가족 관련 퀴즈 도전',
+    color: 'text-festival-green',
+    bgColor: 'bg-festival-green'
+  },
+  {
+    id: 'comments',
+    label: '응원댓글',
+    icon: '💬',
+    description: '따뜻한 응원 메시지',
+    color: 'text-festival-purple',
+    bgColor: 'bg-festival-purple'
+  },
+  {
+    id: 'writing',
+    label: '글짓기',
+    icon: '📝',
+    description: '가족 주제 글짓기',
+    color: 'text-festival-pink',
+    bgColor: 'bg-festival-pink'
+  },
+  {
+    id: 'random',
+    label: '랜덤이벤트',
+    icon: '🎰',
+    description: '행운의 룰렛 이벤트',
+    color: 'text-festival-orange',
+    bgColor: 'bg-festival-orange'
+  }
+]
+
+export default function OnlineFestivalTabs() {
+  const [activeTab, setActiveTab] = useState('registration')
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'registration':
+        return <PreRegistration />
+      case 'quiz':
+        return <QuizEvent />
+      case 'comments':
+        return <SupportComments />
+      case 'writing':
+        return <FamilyWriting />
+      case 'random':
+        return <RandomEvent />
+      default:
+        return <PreRegistration />
+    }
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      {/* 탭 네비게이션 */}
+      <div className="mb-8">
+        {/* 데스크톱 탭 */}
+        <div className="hidden md:flex bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 relative px-4 py-4 rounded-xl transition-all duration-300 ${
+                activeTab === tab.id
+                  ? 'bg-white shadow-md transform scale-[1.02]'
+                  : 'hover:bg-white/50'
+              }`}
+            >
+              <div className="text-center">
+                <div className={`text-2xl mb-2 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                  {tab.icon}
+                </div>
+                <div className={`font-semibold mb-1 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
+                  {tab.label}
+                </div>
+                <div className={`text-sm ${activeTab === tab.id ? 'text-gray-700' : 'text-gray-500'}`}>
+                  {tab.description}
+                </div>
+              </div>
+              
+              {/* 활성 탭 인디케이터 */}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-1 ${tab.bgColor} rounded-full`}
+                  transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* 모바일 탭 (스크롤 가능) */}
+        <div className="md:hidden bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+          <div className="flex overflow-x-auto scrollbar-hide space-x-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-shrink-0 px-4 py-3 rounded-xl transition-all duration-300 min-w-[120px] ${
+                  activeTab === tab.id
+                    ? 'bg-white shadow-md'
+                    : 'hover:bg-white/50'
+                }`}
+              >
+                <div className="text-center">
+                  <div className={`text-lg mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    {tab.icon}
+                  </div>
+                  <div className={`font-medium text-sm ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
+                    {tab.label}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 모바일에서 현재 탭 설명 */}
+        <div className="md:hidden mt-4 text-center">
+          <p className="text-gray-600">
+            {tabs.find(tab => tab.id === activeTab)?.description}
+          </p>
+        </div>
+      </div>
+
+      {/* 탭 콘텐츠 */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden"
+        >
+          {renderTabContent()}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
