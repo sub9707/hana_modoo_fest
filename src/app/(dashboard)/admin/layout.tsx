@@ -1,9 +1,14 @@
 import React from 'react'
 import type { Metadata } from 'next'
+import Sidebar from '@/components/admin/Sidebar'
 
 export const metadata: Metadata = {
   title: '백오피스 관리 | 모두하나대축제',
   description: '모두하나대축제 관리자 시스템',
+  robots: {
+    index: false,
+    follow: false,
+  }
 }
 
 export default function AdminLayout({
@@ -13,7 +18,17 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      {children}
+      <div className="flex h-screen">
+        {/* 왼쪽 사이드바 */}
+        <Sidebar />
+        
+        {/* 오른쪽 컨텐츠 영역 */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

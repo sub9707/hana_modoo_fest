@@ -3,13 +3,15 @@ export interface User {
   id: string
   name: string
   username: string
-  gender: 'male' | 'female' | 'other'
+  company?: string
+  gender: 'male' | 'female' | 'none'
   birth_date: string
   phone: string
   role: 'admin' | 'editor' | 'user'
-  created_at: string
   last_login_at?: string
   last_activity_at?: string
+  created_at: string
+  updated_at: string
 }
 
 // 데이터베이스 사용자 타입 (내부 필드 포함)
