@@ -3,30 +3,35 @@
     "id": 1,
     "title": "사전 접수",
     "desc": "미리 참가를 신청하고 일정과 안내를 확인하세요.",
-    "img": "/images/main/sample1.jpg"
+    "img": "/images/main/register_pic.webp",
+    "href": "/registration"
   },
   {
     "id": 2,
     "title": "퀴즈 이벤트",
     "desc": "흥미로운 주간 퀴즈에 도전하고 다양한 경품을 받아보세요.",
-    "img": "/images/main/sample2.jpg"
+    "img": "/images/main/quiz_pic.webp",
+    "href": "/online-festival"
   },
   {
     "id": 3,
     "title": "응원 댓글",
     "desc": "따뜻한 응원 메시지를 남기며 함께 축제의 분위기를 즐기세요.",
-    "img": "/images/main/sample1.jpg"
+    "img": "/images/main/comment_pic.webp",
+    "href": "/online-festival"
   },
   {
     "id": 4,
     "title": "가족 주제로 글짓기",
     "desc": "가족을 주제로 한 글을 작성하고 서로의 이야기를 나누어 보세요.",
-    "img": "/images/main/sample2.jpg"
+    "img": "/images/main/writing_pic.webp",
+    "href": "/online-festival"
   },
   {
     "id": 5,
     "title": "랜덤 이벤트",
     "desc": "다양한 미션이 준비돼 있으니 참여하고 깜짝 선물도 받아가세요.",
-    "img": "/images/main/sample1.jpg"
+    "img": "/images/main/event_pic.webp",
+    "href": "/online-festival"
   }
 ]

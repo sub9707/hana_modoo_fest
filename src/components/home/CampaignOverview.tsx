@@ -1,3 +1,5 @@
+import HeroCTAButton from "./HeroCTAButton"
+
 export default function CampaignOverview() {
   const stats = [
     {
@@ -37,12 +39,8 @@ export default function CampaignOverview() {
 
         {/* 참여 버튼들 */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20">
-          <button className="bg-sky-400 hover:bg-sky-500 text-white font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            사전참가 신청하기
-          </button>
-          <button className="bg-sky-400 hover:bg-sky-500 text-white font-bold py-4 px-8 rounded-full text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            캠페인 신청하기
-          </button>
+          <HeroCTAButton href="/" text="사전참가 신청하기" />
+          <HeroCTAButton href="/" text="캠페인 신청하기" />
         </div>
 
         {/* 통계 섹션 */}

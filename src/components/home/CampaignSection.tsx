@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import campaigns from "@/data/Campaigns.json";
+import Link from "next/link";
 
 function CampaignSection() {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -27,7 +28,8 @@ function CampaignSection() {
                         const flexGrow = hoveredIndex === index ? 5 : hoveredIndex === null ? 1 : 1.5;
 
                         return (
-                            <div
+                            <Link
+                                href={item.href}
                                 key={item.id}
                                 className="group relative h-64 sm:h-90 bg-gray-200 rounded-2xl overflow-hidden transition-all duration-500 ease-in-out cursor-pointer"
                                 style={!isMobile ? { flex: flexGrow } : {}}
@@ -40,7 +42,7 @@ function CampaignSection() {
                                     fill
                                     className="object-cover transition-transform duration-500 sm:group-hover:scale-105"
                                 />
-                                <div className="absolute inset-0 bg-black/40 sm:group-hover:bg-black/60 transition-colors" />
+                                <div className="absolute inset-0 bg-black/50 sm:group-hover:bg-black/10 transition-colors" />
                                 
                                 {/* 모바일용 타이틀 - 왼쪽 위에 고정 */}
                                 <div
@@ -89,7 +91,7 @@ function CampaignSection() {
                                 >
                                     {item.desc}
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })}
                 </div>

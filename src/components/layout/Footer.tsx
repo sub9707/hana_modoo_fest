@@ -1,26 +1,23 @@
 import Link from 'next/link'
 import { Mail, Phone, MapPin, ExternalLink, Instagram, Youtube, Globe } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-purple-50 to-purple-100 text-gray-700 pb-20 lg:pb-0" role="contentinfo">
+    <footer className="font-paper bg-gradient-to-b from-purple-50 to-purple-100 text-gray-700 pb-20 lg:pb-0" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 메인 푸터 콘텐츠 */}
         <div className="py-8 lg:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* 로고 및 기본 정보 */}
             <div className="lg:col-span-1">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-base">모</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800">모두하나대축제 2025</h3>
-                  <p className="text-purple-600 text-sm font-medium">서울시 대표 가족축제</p>
+              <div className="mb-4 flex items-center justify-center sm:justify-start">
+                <div className="relative w-80 h-15 flex items-center justify-center">
+                  <Image src={'/icons/logo.png'} fill alt='logo'/>
                 </div>
               </div>
               
-              <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+              <p className="text-center text-gray-600 mb-4 text-sm leading-relaxed">
                 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장
               </p>
 

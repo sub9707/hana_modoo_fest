@@ -29,13 +29,12 @@ export const metadata: Metadata = {
 export default async function HomePage() {
 
   return (
-    <>
+    <div className='font-paper'>
       <div className="min-h-screen">
         {/* 히어로 섹션 */}
         <HeroSection />
       </div>
-      <div className="bg-purple-400 h-80">
-        {/* 히어로 섹션 */}
+      <div className="h-80">
         <Introduction />
       </div>
       <div>
@@ -50,6 +49,6 @@ export default async function HomePage() {
       <div>
         <CampaignSection/>
       </div>
-    </>
+    </div>
   )
 }

@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils'
 import LanguageSelect from '../ui/LanguageSelect'
 import LogoutButton from '../auth/LogoutButton'
 import { useAuth } from '@/contexts/AuthContext'
+import Image from 'next/image'
+import HeaderCTAButton from './HeaderCTAButton'
 
 const navigation = [
   { name: '축제 소개', href: '/about' },
@@ -46,7 +48,7 @@ export default function Header() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 transition-all duration-200",
+          "font-paper sticky top-0 z-50 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 transition-all duration-200",
           isScrolled && "shadow-sm"
         )}
         role="banner"
@@ -60,10 +62,8 @@ export default function Header() {
                 className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
                 aria-label="모두하나대축제 홈페이지로 이동"
               >
-                <div className="flex">
-                  <h1 className="text-xl lg:text-2xl font-bold text-slate-900">
-                    모두하나대축제
-                  </h1>
+                <div className="relative mt-2 w-35 sm:w-50 h-7 sm:h-10 lg:w-80 lg:h-15 flex">
+                  <Image src={'/icons/logo.png'} fill alt='logo'/>
                 </div>
               </Link>
             </div>
@@ -78,10 +78,10 @@ export default function Header() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "px-3 py-2 text-sm font-medium rounded-md transition-colors relative",
+                      "px-3 py-2 text-md font-medium rounded-md transition-colors relative",
                       isActive
                         ? "text-blue-600 bg-blue-50"
-                        : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                        : "text-slate-700 hover:text-blue-600"
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -95,10 +95,8 @@ export default function Header() {
             </nav>
 
             {/* CTA 버튼 그룹 */}
-            <div className='flex items-center gap-8'>
-              <Link href={'/registration'} className="text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
-                사전참가 신청하기
-              </Link>
+            <div className='flex items-center gap-4 ml-6 sm:ml-0'>
+              <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
 
               {/* 로그인 상태에 따른 분기 처리 */}
               <div className='hidden lg:flex items-center'>
@@ -110,12 +108,7 @@ export default function Header() {
                   <LogoutButton type="link" />
                 ) : (
                   // 로그인되지 않은 상태 - 로그인/회원가입 링크 표시
-                  <Link
-                    href='/login'
-                    className='text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors cursor-pointer'
-                  >
-                    로그인/회원가입
-                  </Link>
+                  <HeaderCTAButton href='login' title='로그인/회원가입' type='secondary' />
                 )}
               </div>
 
@@ -151,7 +144,7 @@ export default function Header() {
                       "block px-3 py-2 text-base font-medium rounded-md transition-colors",
                       isActive
                         ? "text-blue-600 bg-blue-50"
-                        : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                        : "text-slate-700 hover:text-blue-600"
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -162,7 +155,7 @@ export default function Header() {
 
               {/* 모바일 로그인/로그아웃 */}
               <div className="pt-2 border-t border-gray-200">
-                <button className="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors">
+                <button className="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors">
                   사전참가 신청하기
                 </button>
 
@@ -177,7 +170,7 @@ export default function Header() {
                 ) : (
                   <Link
                     href='/login'
-                    className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
+                    className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     로그인/회원가입

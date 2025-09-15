@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter, Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/provider/Provider'
+import { paperlogy } from '@/fonts/Paperlogy'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className={`${inter.variable} ${notoSansKR.variable}`}>
+    <html lang="ko" className={`${inter.variable} ${notoSansKR.variable} ${paperlogy.variable}`}>
       <body className="min-h-screen bg-background font-noto-sans antialiased">
         <Providers>
           {children}

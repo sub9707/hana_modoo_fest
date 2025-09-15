@@ -8,7 +8,12 @@
  --color-festival-purple: #7c3aed; 
  --color-festival-pink: #db2777; 
  --color-festival-orange: #ea580c; 
+
+ /* 폰트 클래스명 */
+ --font-paper: var(--font-paperlogy); 
  } 
+
+
 
 :root { 
  /* 모두하나대축제 브랜드 컬러 */
@@ -107,25 +112,25 @@
  } 
 
  /* 버튼 특수 효과 */
-.btn-festival {
-  position: relative;
-  overflow: hidden;
-}
+.btn-festival { 
+ position: relative; 
+ overflow: hidden; 
+ } 
 
-.btn-festival::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
+.btn-festival::before { 
+ content: ''; 
+ position: absolute; 
+ top: 0; 
+ left: -100%; 
+ width: 100%; 
+ height: 100%; 
+ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); 
+ transition: left 0.5s; 
+ } 
 
-.btn-festival:hover::before {
-  left: 100%;
-}
+.btn-festival:hover::before { 
+ left: 100%; 
+ } 
 
 
  /************************* 유틸리티 *************************/

@@ -25,7 +25,7 @@ function ProgramCardSection() {
             </div>
 
             {/* 모바일 스와이프 힌트 */}
-            <div className="sm:hidden flex flex-col items-center justify-center mt-6 gap-4">
+            <div className="sm:hidden flex flex-col items-center justify-center mt-0 sm:mt-6 gap-4">
                 {/* 텍스트를 위로 */}
                 <span className="text-gray-500 text-sm whitespace-nowrap">좌우로 스와이프</span>
 
