@@ -1,9 +1,5 @@
 import React from 'react'
 import { 
-  LayoutDashboard, 
-  Users, 
-  Calendar, 
-  Camera, 
   TrendingUp,
   Clock,
   Shield,
@@ -11,32 +7,6 @@ import {
 } from 'lucide-react'
 
 export default function AdminPage() {
-  const features = [
-    {
-      icon: LayoutDashboard,
-      title: '대시보드',
-      description: '전체 시스템 현황을 한눈에 확인하고 주요 지표를 모니터링하세요.',
-      color: 'text-blue-600 bg-blue-100'
-    },
-    {
-      icon: Users,
-      title: '회원 관리',
-      description: '축제 참가자들의 정보를 관리하고 활동 현황을 추적하세요.',
-      color: 'text-green-600 bg-green-100'
-    },
-    {
-      icon: Calendar,
-      title: '축제 관리',
-      description: '축제 일정을 등록하고 관리하며 참가자 현황을 확인하세요.',
-      color: 'text-purple-600 bg-purple-100'
-    },
-    {
-      icon: Camera,
-      title: '갤러리 관리',
-      description: '축제 사진과 동영상을 업로드하고 갤러리를 관리하세요.',
-      color: 'text-orange-600 bg-orange-100'
-    }
-  ]
 
   return (
     <div className="min-h-screen flex items-center justify-center">

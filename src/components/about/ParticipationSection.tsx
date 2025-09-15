@@ -10,58 +10,6 @@ interface ParticipationSectionProps {
 }
 
 export default function ParticipationSection({ targets }: ParticipationSectionProps) {
-  const getTargetColorClasses = (color: string) => {
-    switch (color) {
-      case 'blue':
-        return {
-          bg: 'bg-gradient-to-br from-blue-500/10 to-blue-600/20',
-          border: 'border-blue-400/30',
-          iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
-          text: 'text-blue-700',
-          accent: 'text-blue-600'
-        }
-      case 'green':
-        return {
-          bg: 'bg-gradient-to-br from-green-500/10 to-green-600/20',
-          border: 'border-green-400/30',
-          iconBg: 'bg-gradient-to-br from-green-500 to-green-600',
-          text: 'text-green-700',
-          accent: 'text-green-600'
-        }
-      case 'purple':
-        return {
-          bg: 'bg-gradient-to-br from-purple-500/10 to-purple-600/20',
-          border: 'border-purple-400/30',
-          iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600',
-          text: 'text-purple-700',
-          accent: 'text-purple-600'
-        }
-      case 'pink':
-        return {
-          bg: 'bg-gradient-to-br from-pink-500/10 to-pink-600/20',
-          border: 'border-pink-400/30',
-          iconBg: 'bg-gradient-to-br from-pink-500 to-pink-600',
-          text: 'text-pink-700',
-          accent: 'text-pink-600'
-        }
-      case 'yellow':
-        return {
-          bg: 'bg-gradient-to-br from-yellow-500/10 to-yellow-600/20',
-          border: 'border-yellow-400/30',
-          iconBg: 'bg-gradient-to-br from-yellow-500 to-yellow-600',
-          text: 'text-yellow-700',
-          accent: 'text-yellow-600'
-        }
-      default:
-        return {
-          bg: 'bg-gradient-to-br from-gray-500/10 to-gray-600/20',
-          border: 'border-gray-400/30',
-          iconBg: 'bg-gradient-to-br from-gray-500 to-gray-600',
-          text: 'text-gray-700',
-          accent: 'text-gray-600'
-        }
-    }
-  }
 
   return (
     <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
@@ -83,8 +31,6 @@ export default function ParticipationSection({ targets }: ParticipationSectionPr
         {/* 참여 대상 카드들 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {targets.map((target, index) => {
-            const colors = getTargetColorClasses(target.color)
-            
             return (
               <div
                 key={index}

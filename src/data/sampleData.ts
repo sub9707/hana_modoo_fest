@@ -1,29 +1,24 @@
-import { User, Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin';
+import { Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin';
 
-export const sampleUsers: User[] = [
-  { id: '1', name: '김철수', email: 'kim@example.com', phone: '010-1234-5678', registeredAt: '2024-09-10', status: 'active' },
-  { id: '2', name: '이영희', email: 'lee@example.com', phone: '010-2345-6789', registeredAt: '2024-09-11', status: 'active' },
-  { id: '3', name: '박민수', email: 'park@example.com', phone: '010-3456-7890', registeredAt: '2024-09-12', status: 'inactive' }
-];
 
 export const sampleRegistrations: Registration[] = [
-  { 
-    id: '1', 
-    name: '김가족', 
-    email: 'family@example.com', 
-    phone: '010-1111-2222', 
-    companions: 3, 
-    programs: ['공연관람', '체험부스'], 
-    registeredAt: '2024-09-13' 
+  {
+    id: '1',
+    name: '김가족',
+    email: 'family@example.com',
+    phone: '010-1111-2222',
+    companions: 3,
+    programs: ['공연관람', '체험부스'],
+    registeredAt: '2024-09-13'
   },
-  { 
-    id: '2', 
-    name: '이가족', 
-    email: 'lee@example.com', 
-    phone: '010-3333-4444', 
-    companions: 2, 
-    programs: ['자조모임'], 
-    registeredAt: '2024-09-14' 
+  {
+    id: '2',
+    name: '이가족',
+    email: 'lee@example.com',
+    phone: '010-3333-4444',
+    companions: 2,
+    programs: ['자조모임'],
+    registeredAt: '2024-09-14'
   }
 ];
 

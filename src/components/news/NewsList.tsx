@@ -1,145 +1,177 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NewsCard from './NewsCard'
 import NewsDetail from './NewsDetail'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { useInfiniteNews } from '@/hooks/useInfiniteNews'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import { NewsSearchParams, NewsItem } from '@/types/Board'
 
-interface NewsItem {
-  id: string
-  title: string
-  category: string
-  date: string
-  summary: string
-  content: string
-  views: number
-  important: boolean
-  author: string
+interface NewsListProps {
+  searchParams: NewsSearchParams
 }
 
-export default function NewsList() {
+export default function NewsList({ searchParams }: NewsListProps) {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null)
-  
-  // 샘플 뉴스 데이터
-  const newsList: NewsItem[] = [
-    {
-      id: '1',
-      title: '모두하나대축제 2025 사전참가 신청 시작',
-      category: '공지사항',
-      date: '2025-09-12',
-      summary: '10월 18일 개최되는 모두하나대축제 2025의 사전참가 신청을 받습니다.',
-      content: '서울특별시가 주최하고 서울특별시한부모가족지원센터가 주관하는 모두하나대축제 2025가 10월 18일(토) 여의도공원 문화의마당에서 개최됩니다...',
-      views: 1524,
-      important: true,
-      author: '서울특별시한부모가족지원센터'
-    },
-    {
-      id: '2',
-      title: '온라인 포토 챌린지 이벤트 당첨자 발표',
-      category: '당첨자발표',
-      date: '2025-09-10',
-      summary: '#모두하나대축제2025 해시태그 이벤트 당첨자를 발표합니다.',
-      content: '9월 첫째 주 진행된 온라인 포토 챌린지 이벤트의 당첨자를 발표합니다...',
-      views: 892,
-      important: false,
-      author: '서울특별시한부모가족지원센터'
-    },
-    {
-      id: '3',
-      title: '자원봉사자 모집 안내',
-      category: '모집공고',
-      date: '2025-09-08',
-      summary: '축제 당일 함께 도움을 주실 자원봉사자를 모집합니다.',
-      content: '모두하나대축제 2025 성공적 개최를 위해 자원봉사자를 모집합니다...',
-      views: 1205,
-      important: false,
-      author: '서울특별시한부모가족지원센터'
-    },
-    {
-      id: '4',
-      title: '부스 운영 단체 모집',
-      category: '모집공고',
-      date: '2025-09-05',
-      summary: '축제 당일 체험부스 및 홍보부스를 운영할 단체를 모집합니다.',
-      content: '다양한 가족지원 프로그램과 체험활동을 제공할 부스 운영 단체를 모집합니다...',
-      views: 743,
-      important: false,
-      author: '서울특별시한부모가족지원센터'
-    },
-    {
-      id: '5',
-      title: '교통편 및 주차장 이용 안내',
-      category: '현장안내',
-      date: '2025-09-03',
-      summary: '축제 당일 교통편과 주차장 이용에 대한 상세 안내입니다.',
-      content: '여의도공원 문화의마당 오시는 길과 주차장 이용 안내를 드립니다...',
-      views: 2108,
-      important: true,
-      author: '서울특별시한부모가족지원센터'
-    },
-    {
-      id: '6',
-      title: '가족사진 촬영 이벤트 안내',
-      category: '이벤트',
-      date: '2025-09-01',
-      summary: '축제 당일 무료 가족사진 촬영 이벤트를 진행합니다.',
-      content: '전문 사진작가와 함께하는 무료 가족사진 촬영 이벤트를 진행합니다...',
-      views: 1687,
-      important: false,
-      author: '서울특별시한부모가족지원센터'
-    }
-  ]
+  const [loadingDetail, setLoadingDetail] = useState(false)
 
-  if (selectedNews) {
+  const {
+    news,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    totalCount
+  } = useInfiniteNews(searchParams)
+
+  const { targetRef } = useIntersectionObserver({
+    onIntersect: loadMore,
+    enabled: !loading && hasMore && !selectedNews // 상세 화면에서는 무한스크롤 비활성화
+  })
+
+  // 뉴스 카드 클릭 핸들러 (상세 정보 로드)
+  const handleCardClick = async (newsItem: NewsItem) => {
+    setLoadingDetail(true)
+    try {
+      const response = await fetch(`/api/news/${newsItem.id}`)
+      if (response.ok) {
+        const detailData = await response.json()
+        setSelectedNews(detailData)
+      } else {
+        console.error('Failed to load news detail')
+      }
+    } catch (error) {
+      console.error('Error loading news detail:', error)
+    } finally {
+      setLoadingDetail(false)
+    }
+  }
+
+  // 뒤로가기 핸들러
+  const handleBack = () => {
+    setSelectedNews(null)
+  }
+
+  // 검색 조건 변경 시 상세 화면 초기화
+  useEffect(() => {
+    setSelectedNews(null)
+  }, [searchParams.category, searchParams.search, searchParams.sort])
+
+  // 상세 정보 로딩 중일 때
+  if (loadingDetail) {
     return (
-      <NewsDetail 
-        news={selectedNews} 
-        onBack={() => setSelectedNews(null)} 
-      />
+      <div className="flex justify-center py-12">
+        <LoadingSpinner />
+        <span className="ml-2 text-gray-600">뉴스를 불러오는 중...</span>
+      </div>
     )
   }
 
+  // 상세 화면 렌더링
+  if (selectedNews) {
+    return <NewsDetail news={selectedNews} onBack={handleBack} />
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600 mb-4">뉴스를 불러오는 중 오류가 발생했습니다.</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          다시 시도
+        </button>
+      </div>
+    )
+  }
+
+  // 뉴스 리스트 렌더링
+  const importantNews = news.filter(item => item.important)
+  const regularNews = news.filter(item => !item.important)
+
   return (
     <div className="space-y-6">
-      {/* 중요 공지 */}
-      <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-        <div className="font-semibold text-red-800 mb-2">📢 중요 공지</div>
-        <p className="text-red-700">
-          사전참가 신청이 시작되었습니다! 원활한 축제 참여를 위해 사전신청을 권장합니다.
+      {/* 검색 결과 정보 */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {searchParams.search 
+            ? `'${searchParams.search}' 검색 결과` 
+            : searchParams.category && searchParams.category !== 'all'
+              ? `${searchParams.category} 소식`
+              : '전체 소식'
+          }
+        </h2>
+        <p className="text-gray-600">
+          총 {totalCount.toLocaleString()}개의 글
         </p>
       </div>
 
-      {/* 뉴스 리스트 */}
+      {/* 중요 공지 섹션 */}
+      {importantNews.length > 0 && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg">
+          <div className="font-semibold text-red-800 mb-4 flex items-center">
+            📢 중요 공지
+          </div>
+          <div className="space-y-4">
+            {importantNews.map((news) => (
+              <div key={news.id} className="bg-white rounded-lg p-4">
+                <NewsCard 
+                  news={news} 
+                  onClick={() => handleCardClick(news)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 일반 뉴스 리스트 */}
       <div className="space-y-4">
-        {newsList.map((news) => (
-          <NewsCard
-            key={news.id}
-            news={news}
-            onClick={() => setSelectedNews(news)}
+        {regularNews.map((news) => (
+          <NewsCard 
+            key={news.id} 
+            news={news} 
+            onClick={() => handleCardClick(news)}
           />
         ))}
       </div>
 
-      {/* 페이지네이션 */}
-      <div className="flex justify-center items-center space-x-2 mt-8">
-        <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50" disabled>
-          이전
-        </button>
-        {[1, 2, 3, 4, 5].map((page) => (
-          <button
-            key={page}
-            className={`px-3 py-2 rounded-lg ${
-              page === 1
-                ? 'bg-blue-500 text-white'
-                : 'border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            {page}
-          </button>
-        ))}
-        <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-          다음
-        </button>
-      </div>
+      {/* 로딩 상태 */}
+      {loading && (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner />
+        </div>
+      )}
+
+      {/* 무한스크롤 트리거 */}
+      <div ref={targetRef} className="h-4" />
+
+      {/* 더 이상 로드할 뉴스가 없을 때 */}
+      {!hasMore && news.length > 0 && (
+        <div className="text-center py-8 text-gray-500">
+          모든 뉴스를 확인했습니다.
+        </div>
+      )}
+
+      {/* 뉴스가 없을 때 */}
+      {!loading && news.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg mb-4">
+            {searchParams.search 
+              ? '검색 결과가 없습니다.'
+              : '등록된 뉴스가 없습니다.'
+            }
+          </p>
+          {searchParams.search && (
+            <p className="text-gray-400">
+              다른 키워드로 검색해보세요.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

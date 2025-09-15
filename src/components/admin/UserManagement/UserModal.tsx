@@ -112,10 +112,10 @@ export default function UserModal({ user, isOpen, onClose }: UserModalProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">나이</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
               <div className="flex items-center text-gray-900">
                 <Heart className="w-4 h-4 mr-2 text-gray-400" />
-                {calculateAge(user.birth_date)}세
+                {user.birth_date}
               </div>
             </div>
           </div>

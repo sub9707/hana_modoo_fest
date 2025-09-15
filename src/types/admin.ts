@@ -1,14 +1,5 @@
 // types/admin.ts
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  registeredAt: string;
-  status: 'active' | 'inactive';
-}
-
 export interface Registration {
   id: string;
   name: string;

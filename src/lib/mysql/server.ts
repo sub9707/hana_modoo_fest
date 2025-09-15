@@ -38,6 +38,7 @@ export const getCurrentUser = cache(async () => {
     return {
       id: user.id,
       name: user.name,
+      company:user.company,
       username: user.username,
       gender: user.gender,
       birth_date: user.birth_date,
@@ -46,6 +47,7 @@ export const getCurrentUser = cache(async () => {
       created_at: user.created_at,
       last_login_at: user.last_login_at,
       last_activity_at: user.last_activity_at,
+      updated_at:user.updated_at
     }
   } catch (error) {
     console.error('Error getting current user:', error)

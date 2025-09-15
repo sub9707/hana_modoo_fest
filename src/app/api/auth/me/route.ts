@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { queryOne } from '@/lib/mysql/connection'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session-token')?.value
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 }
 
 // NextJS 15: OPTIONS 메서드 지원 추가 (CORS 대응)
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {

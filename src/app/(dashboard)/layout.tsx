@@ -1,6 +1,4 @@
-// app/(dashboard)/layout.tsx - 관리자용 (최소한의 메타데이터)
 import type { Metadata } from 'next'
-import Sidebar from '@/components/admin/Sidebar'
 
 export const metadata: Metadata = {
   title: {

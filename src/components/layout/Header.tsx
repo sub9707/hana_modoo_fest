@@ -16,7 +16,7 @@ const navigation = [
   { name: '행사 프로그램', href: '/programs' },
   { name: '공지/소식', href: '/news' },
   { name: '오시는 길', href: '/directions' },
-  { name: '갤러리', href: '/gallery' },
+  // { name: '갤러리', href: '/gallery' },/
   { name: '함께하는 기관', href: '/partners' },
 ]
 

@@ -1,6 +1,7 @@
 // hooks/useAdmin.ts
 import { useState, useEffect, useCallback } from 'react'
-import { User, Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin'
+import { Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin'
+import { User } from '@/types/auth'
 
 // API 응답 타입
 interface ApiResponse<T> {

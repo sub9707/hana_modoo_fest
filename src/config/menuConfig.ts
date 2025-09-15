@@ -33,12 +33,12 @@ export const menuItems: MenuItem[] = [
     icon: Bell,
     path: '/admin/notices'
   },
-  {
-    id: 'gallery',
-    title: '갤러리 관리',
-    icon: Image,
-    path: '/admin/gallery'
-  },
+  // {
+  //   id: 'gallery',
+  //   title: '갤러리 관리',
+  //   icon: Image,
+  //   path: '/admin/gallery'
+  // },
   {
     id: 'users',
     title: '회원 관리',
