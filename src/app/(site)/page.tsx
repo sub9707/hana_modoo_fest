@@ -34,7 +34,7 @@ export default async function HomePage() {
         {/* 히어로 섹션 */}
         <HeroSection />
       </div>
-      <div className="h-80">
+      <div className="min-h-80">
         <Introduction />
       </div>
       <div>

@@ -25,9 +25,9 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-paper">
       {/* 히어로 섹션 */}
-      <FestivalHero festivalData={festivalData} />
+      <FestivalHero />
       
       {/* 축제 개요 섹션 */}
       <FestivalOverview 
