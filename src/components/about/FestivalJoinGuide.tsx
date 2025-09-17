@@ -9,7 +9,7 @@ function FestivalJoinGuide() {
     ];
 
     return (
-        <section className="py-16 bg-gradient-to-r from-pink-300 to-[rgba(255,162,150,1)] relative">
+        <section className="py-16 bg-gradient-to-r from-pink-300 to-[rgba(255,162,150,1)] relative overflow-x-hidden">
             <div className="container mx-auto px-4 flex flex-col items-center min-h-screen">
                 {/* 타이틀 */}
                 <h2 className="text-white text-4xl lg:text-8xl font-black italic text-shadow-lg mb-6 text-center">
