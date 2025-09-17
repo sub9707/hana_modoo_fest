@@ -1,0 +1,26 @@
+[
+    {
+      "title": "가족다양성",
+      "subtitle": "Family Diversity",
+      "description": "모든 형태의 가족을 인정하고 존중합니다",
+      "image": "/images/about/가족다양성.webp"
+    },
+    {
+      "title": "시민참여",
+      "subtitle": "Citizen Participation",
+      "description": "시민이 주체가 되어 함께 만들어가는 축제입니다",
+      "image": "/images/about/시민참여.webp"
+    },
+    {
+      "title": "사회연대",
+      "subtitle": "Social Solidarity",
+      "description": "서로 다른 가족이 하나로 연결되는 연대의 장입니다",
+      "image": "/images/about/사회연대.webp"
+    },
+    {
+      "title": "포용성장",
+      "subtitle": "Inclusive Growth",
+      "description": "누구도 소외되지 않는 포용적 사회를 지향합니다",
+      "image": "/images/about/포용성장.webp"
+    }
+]
