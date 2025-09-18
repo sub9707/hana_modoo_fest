@@ -1,0 +1,129 @@
+/* FestivalJoinGuide.module.css */
+
+/* 기본 텍스트 스타일 - 통일된 그림자 */
+.baseTextStyle {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+@keyframes glowLine {
+    0% { 
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+        filter: brightness(1);
+        background-color: rgba(255,255,255,1);
+    }
+    100% { 
+        box-shadow: 
+            0 0 80px rgba(255,255,255,1), 
+            0 0 160px rgba(255,255,255,1), 
+            0 0 240px rgba(255,255,255,0.9),
+            0 0 320px rgba(255,255,255,0.8),
+            0 0 400px rgba(255,255,255,0.6);
+        filter: brightness(3) saturate(2) drop-shadow(0 0 40px rgba(255,255,255,1)) drop-shadow(0 0 80px rgba(255,255,255,0.8));
+        background-color: rgba(255,255,255,1);
+        transform: scaleY(2);
+    }
+}
+
+@keyframes glowDot {
+    0% { 
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+        transform: scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 20px rgba(255,255,255,1), 0 0 40px rgba(255,255,255,0.7);
+        transform: scale(1.2);
+    }
+}
+
+@keyframes glowTextLeft {
+    0% { 
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1);
+    }
+    100% { 
+        text-shadow: 0 0 20px rgba(255,255,255,0.8), 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+}
+
+@keyframes glowTextRight {
+    0% { 
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1);
+    }
+    100% { 
+        text-shadow: 0 0 20px rgba(255,255,255,0.8), 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+}
+
+.animateGlowLine {
+    animation: glowLine 0.4s ease-out forwards;
+}
+
+.animateGlowDot {
+    animation: glowDot 0.4s ease-out 0.3s forwards;
+}
+
+.animateGlowTextLeft {
+    animation: glowTextLeft 0.6s ease-out 0.6s forwards;
+}
+
+.animateGlowTextRight {
+    animation: glowTextRight 0.6s ease-out 0.6s forwards;
+}
+
+/* 마우스 아웃시 동시 페이드아웃 - 부드러운 keyframe 애니메이션 */
+.fadeOutText {
+    animation: fadeOutTextAnimation 0.5s ease-out forwards;
+}
+
+.fadeOutDot {
+    animation: fadeOutDotAnimation 0.5s ease-out forwards;
+}
+
+.fadeOutLine {
+    animation: fadeOutLineAnimation 0.5s ease-out forwards;
+}
+
+@keyframes fadeOutTextAnimation {
+    0% {
+        text-shadow: 0 0 20px rgba(255,255,255,0.8), 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+    100% {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        filter: brightness(1);
+    }
+}
+
+@keyframes fadeOutDotAnimation {
+    0% {
+        box-shadow: 0 0 20px rgba(255,255,255,1), 0 0 40px rgba(255,255,255,0.7);
+        transform: scale(1.2);
+    }
+    100% {
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOutLineAnimation {
+    0% {
+        box-shadow: 
+            0 0 80px rgba(255,255,255,1), 
+            0 0 160px rgba(255,255,255,1), 
+            0 0 240px rgba(255,255,255,0.9),
+            0 0 320px rgba(255,255,255,0.8),
+            0 0 400px rgba(255,255,255,0.6);
+        filter: brightness(3) saturate(2) drop-shadow(0 0 40px rgba(255,255,255,1)) drop-shadow(0 0 80px rgba(255,255,255,0.8));
+        background-color: rgba(255,255,255,1);
+        transform: scaleY(2);
+    }
+    100% {
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+        filter: brightness(1);
+        background-color: rgba(255,255,255,1);
+        transform: scaleY(1);
+    }
+}
