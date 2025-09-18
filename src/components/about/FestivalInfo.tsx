@@ -1,3 +1,4 @@
+import Image from "next/image";
 import SectionHeader from "./SectionHeader";
 
 interface InfoCardProps {
@@ -57,10 +58,13 @@ export default function FestivalInfo() {
         모두하나대축제 2025의 상세 정보를 확인하세요.
       </p>
 
-      <div className="w-full max-w-3xl space-y-4 mr-20">
+      <div className="relative w-full max-w-3xl space-y-4 mr-20">
         {infoData.map((item, idx) => (
           <InfoCard key={idx} {...item} />
         ))}
+        <div className="absolute -right-80 bottom-0 w-100 h-100">
+          <Image src={'/images/about/moo_reading.webp'} fill alt="moo_reading" />
+        </div>
       </div>
     </section>
   );

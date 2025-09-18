@@ -1,5 +1,7 @@
 "use client";
 
+import NodeGraph from "./NodeGraph";
+
 function FestivalJoinGuide() {
     const specialBenefits = [
         "사전신청 시 축제 기념품 및 프로그램 우선 예약",
@@ -21,8 +23,8 @@ function FestivalJoinGuide() {
                 </p>
 
                 {/* 그래프 영역 */}
-                <div className="w-full h-100 border-2 border-white text-white text-4xl flex items-center justify-center mb-16 py-6">
-                    그래프 영역
+                <div className="w-full h-100 flex items-center justify-center mb-16">
+                    <NodeGraph/>
                 </div>
 
                 {/* 참여 방법 영역 */}

@@ -23,7 +23,7 @@ export default function FestivalHero() {
             </h2>
           </div>
           {/* 이미지 에셋 좌 */}
-          <div className="absolute left-0 bottom-0 w-80 h-40">
+          <div className="absolute -left-90 bottom-0 w-90 h-70">
             <Image src={'/images/about/about_left.webp'} fill alt="" />
           </div>
           {/* 이미지 에셋 우 */}
