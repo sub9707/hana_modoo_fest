@@ -1,22 +1,9 @@
+import Image from "next/image";
 import HeroTitleBadge from "./HeroTitleBadge";
 
 export default function FestivalHero() {
   return (
     <section className="relative min-h-screen overflow-hidden">
-
-      {/* 캐릭터 위치 - 이미지로 대체될 예정 */}
-      <div className="absolute top-32 left-8 w-20 h-20 bg-green-200 rounded-lg opacity-50 flex items-center justify-center text-xs">
-        캐릭터1
-      </div>
-      <div className="absolute top-20 left-32 w-16 h-16 bg-gray-200 rounded-lg opacity-50 flex items-center justify-center text-xs">
-        캐릭터2
-      </div>
-      <div className="absolute top-28 left-52 w-18 h-18 bg-blue-200 rounded-lg opacity-50 flex items-center justify-center text-xs">
-        캐릭터3
-      </div>
-      <div className="absolute top-20 right-8 w-24 h-32 bg-pink-200 rounded-lg opacity-50 flex items-center justify-center text-xs">
-        메인캐릭터
-      </div>
 
       {/* 메인 콘텐츠 */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 m-0 sm:-mt-10">
@@ -29,11 +16,19 @@ export default function FestivalHero() {
         </div>
 
         {/* 모두하나 대축제 */}
-        <div className="mb-6 -mt-2 sm:-mt-4">
+        <div className="mb-6 -mt-2 sm:-mt-4 relative">
           <div className="bg-gradient-to-r from-cyan-300 via-purple-300 to-indigo-600 py-1 sm:py-2 px-4 sm:px-8">
             <h2 className="text-white text-6xl sm:text-9xl font-black">
               모두하나 대축제
             </h2>
+          </div>
+          {/* 이미지 에셋 좌 */}
+          <div className="absolute left-0 bottom-0 w-80 h-40">
+            <Image src={'/images/about/about_left.webp'} fill alt="" />
+          </div>
+          {/* 이미지 에셋 우 */}
+          <div className="absolute -right-[38%] -bottom-10 w-110 h-110">
+            <Image src={'/images/about/about_right.webp'} fill alt="" />
           </div>
         </div>
 
@@ -51,9 +46,9 @@ export default function FestivalHero() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-6xl">
 
           {/* 일시 */}
-          <HeroTitleBadge title="일시" descMain="2025. 10. 18(토)" descSub="11:00 - 17:00"/>
-          <HeroTitleBadge title="장소" descMain="여의도공원 문화의마당" descSub="무료 입장"/>
-          <HeroTitleBadge title="참여" descMain="누구나 환영" descSub="사전신청 권장"/>
+          <HeroTitleBadge title="일시" descMain="2025. 10. 18(토)" descSub="11:00 - 17:00" />
+          <HeroTitleBadge title="장소" descMain="여의도공원 문화의마당" descSub="무료 입장" />
+          <HeroTitleBadge title="참여" descMain="누구나 환영" descSub="사전신청 권장" />
         </div>
       </div>
     </section>

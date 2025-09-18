@@ -68,6 +68,20 @@
  } 
 
 
+ /* Swiper Custom */
+ .carousel-swiper .swiper-pagination { 
+ left: 5rem !important; 
+ right: auto !important; 
+ bottom: 2rem !important; 
+ text-align: left !important; 
+ display: flex; 
+ gap: 0.75rem; /* 버튼 간격 */
+ } 
+
+ .carousel-swiper .swiper-pagination-bullet { 
+ width: 0.8rem !important; 
+ height: 0.8rem !important; 
+ } 
  /* 파트너 페이지 */
  
  /* 부드러운 그라디언트 마스크 */

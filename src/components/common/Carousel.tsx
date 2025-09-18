@@ -7,8 +7,9 @@ import "swiper/css/pagination"
 
 function Carousel() {
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl relative carousel-swiper">
       <Swiper
+      className="rounded-[5rem]"
         modules={[Pagination, Autoplay]}
         spaceBetween={0}
         slidesPerView={1}                 // 한 슬라이드만 보이게
@@ -21,17 +22,17 @@ function Carousel() {
         }}
       >
         <SwiperSlide>
-          <div className="flex items-center justify-center h-140 bg-purple-200 rounded-[5rem]">
+          <div className="flex items-center justify-center h-140 bg-purple-200">
             Slide 1
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="flex items-center justify-center h-140 bg-blue-200 rounded-[5rem]">
+          <div className="flex items-center justify-center h-140 bg-blue-200">
             Slide 2
           </div>
         </SwiperSlide>
         <SwiperSlide>
-          <div className="flex items-center justify-center h-140 bg-green-200 rounded-[5rem]">
+          <div className="flex items-center justify-center h-140 bg-green-200">
             Slide 3
           </div>
         </SwiperSlide>
