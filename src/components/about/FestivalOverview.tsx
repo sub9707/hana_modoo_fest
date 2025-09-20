@@ -1,3 +1,4 @@
+import Image from "next/image"
 import SectionHeader from "./SectionHeader"
 
 export default function FestivalOverview() {
@@ -7,7 +8,13 @@ export default function FestivalOverview() {
       <div className="container mx-auto px-4">
         {/* 섹션 헤더 */}
         <div className="text-center mb-16">
-          <SectionHeader title="축제 개요" mb={12}/>
+          <div className="w-full h-full relative">
+            <SectionHeader title="축제 개요" mb={12} />
+            <div className="w-50 h-50 absolute right-115 -top-25">
+              <Image src={'/images/about/overview_right.webp'} alt="축제 개요 우측" fill />
+            </div>
+          </div>
+
           <div className="max-w-6xl mx-auto space-y-6">
             <div className="flex flex-col md:flex-row justify-center items-stretch gap-6">
 

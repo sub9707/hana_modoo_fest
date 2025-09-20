@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 function JoinCampaignsSection() {
@@ -31,7 +32,7 @@ function JoinCampaignsSection() {
           {/* 헤더 영역 */}
           <div className="flex items-center justify-between mb-12 max-w-6xl ml-20 translate-x-1/3">
             {/* 텍스트 영역 */}
-            <div className="text-left flex-1">
+            <div className="text-left flex-1 relative">
               <h2 className="text-3xl lg:text-7xl font-black mb-6">
                 온라인 캠페인 참여하기
               </h2>
@@ -41,6 +42,9 @@ function JoinCampaignsSection() {
                 <br />
                 온라인 캠페인에 참여해보세요
               </p>
+              <div className='absolute -left-85 -top-5 w-70 h-55'>
+                  <Image src={'/images/main/join_left.webp'} alt='참여 좌측 캐릭터' fill/>
+              </div>
             </div>
 
           </div>

@@ -13,4 +13,4 @@ export interface PartnersData {
   participants: Partner[]
 }
 
-export type PartnerCategory = '주최' | '주관' | '후원' | '협력' | '참여기관'
+export type PartnerCategory = '주최' | '주관' | '후원' | '협력' | '참여기관'| '운영법인'

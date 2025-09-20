@@ -2,8 +2,6 @@ export interface CoreValue {
   title: string
   subtitle: string
   description: string
-  icon: string
-  color: 'blue' | 'green' | 'purple' | 'pink' | 'yellow' | 'indigo' | 'red'
 }
 
 export interface MainProgram {

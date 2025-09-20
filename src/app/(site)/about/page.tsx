@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 import FestivalHero from '@/components/about/FestivalHero'
 import FestivalOverview from '@/components/about/FestivalOverview'
 import FestivalInfo from '@/components/about/FestivalInfo'
-import festivalData from '@/data/FestivalData.json';
 import CoreValues from '@/components/about/CoreValues'
 import FestivalPrograms from '@/components/about/FestivalPrograms'
 import FestivalJoinGuide from '@/components/about/FestivalJoinGuide';

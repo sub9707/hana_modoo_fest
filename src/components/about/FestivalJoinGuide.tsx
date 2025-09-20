@@ -2,22 +2,15 @@
 
 import React, { useState } from 'react';
 import styles from './FestivalJoinGuide.module.css';
-
-// NodeGraph 컴포넌트 (원본 코드에서 import하는 컴포넌트)
-function NodeGraph() {
-    return (
-        <div className="w-full h-64 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-            <p className="text-white text-lg">Node Graph Component</p>
-        </div>
-    );
-}
+import NodeGraph from './NodeGraph';
+import Image from 'next/image';
 
 function FestivalJoinGuide() {
     const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
     const getTextClass = (itemId: number, isLeft: boolean) => {
         const baseClass = `text-6xl font-bold mb-2 cursor-pointer transition-all duration-400 ${styles.baseTextStyle}`;
-        
+
         if (hoveredItem === itemId) {
             return `${baseClass} ${isLeft ? styles.animateGlowTextLeft : styles.animateGlowTextRight}`;
         } else {
@@ -27,7 +20,7 @@ function FestivalJoinGuide() {
 
     const getDotClass = (itemId: number) => {
         const baseClass = "w-4 h-4 bg-white rounded-full transition-all duration-400";
-        
+
         if (hoveredItem === itemId) {
             return `${baseClass} ${styles.animateGlowDot}`;
         } else {
@@ -37,14 +30,14 @@ function FestivalJoinGuide() {
 
     const getLineClass = (itemId: number) => {
         const baseClass = "w-screen h-0.5 bg-white transition-all duration-400";
-        
+
         if (hoveredItem === itemId) {
             return `${baseClass} ${styles.animateGlowLine}`;
         } else {
             return `${baseClass} ${styles.fadeOutLine}`;
         }
     };
-    
+
     const specialBenefits = [
         "사전신청 시 축제 기념품 및 프로그램 우선 예약",
         "온라인 캠페인 참여자 대상 현장 이벤트 추가 혜택",
@@ -66,7 +59,7 @@ function FestivalJoinGuide() {
 
                 {/* 그래프 영역 */}
                 <div className="w-full h-100 flex items-center justify-center mb-16">
-                    <NodeGraph/>
+                    <NodeGraph />
                 </div>
 
                 {/* 참여 방법 영역 */}
@@ -81,7 +74,7 @@ function FestivalJoinGuide() {
                                     <div className={`${getLineClass(1)}`}></div>
                                     <div className={`${getDotClass(1)} -ml-1.5`}></div>
                                 </div>
-                                <h4 
+                                <h4
                                     className={getTextClass(1, true)}
                                     onMouseEnter={() => setHoveredItem(1)}
                                     onMouseLeave={() => setHoveredItem(null)}
@@ -98,12 +91,15 @@ function FestivalJoinGuide() {
                                     <div className={`${getLineClass(2)}`}></div>
                                     <div className={`${getDotClass(2)} -ml-1.5`}></div>
                                 </div>
-                                <h4 
+                                <h4
                                     className={getTextClass(2, true)}
                                     onMouseEnter={() => setHoveredItem(2)}
                                     onMouseLeave={() => setHoveredItem(null)}
                                 >2. 온라인 캠페인 참여</h4>
                                 <p className="text-lg text-center font-bold text-amber-100 text-shadow-md opacity-80">9-10월 사전축제</p>
+                                <div className='absolute -right-85 -top-37 w-80 h-80'>
+                                    <Image src={'/images/about/join_right.webp'} alt='참여 방법 우측' fill />
+                                </div>
                             </div>
                         </div>
 
@@ -115,7 +111,7 @@ function FestivalJoinGuide() {
                                     <div className={`${getDotClass(3)} -mr-1.5`}></div>
                                     <div className={`${getLineClass(3)}`}></div>
                                 </div>
-                                <h4 
+                                <h4
                                     className={getTextClass(3, false)}
                                     onMouseEnter={() => setHoveredItem(3)}
                                     onMouseLeave={() => setHoveredItem(null)}
@@ -132,12 +128,15 @@ function FestivalJoinGuide() {
                                     <div className={`${getDotClass(4)} -mr-1.5`}></div>
                                     <div className={`${getLineClass(4)}`}></div>
                                 </div>
-                                <h4 
+                                <h4
                                     className={getTextClass(4, false)}
                                     onMouseEnter={() => setHoveredItem(4)}
                                     onMouseLeave={() => setHoveredItem(null)}
                                 >4. 연대와 소통</h4>
                                 <p className="text-lg text-center font-bold text-amber-100 text-shadow-md opacity-80">지속적인 네트워킹</p>
+                            </div>
+                            <div className='absolute left-45 -top-37 w-50 h-50'>
+                                <Image src={'/images/about/join_left_2.webp'} alt='참여 방법 좌측' fill />
                             </div>
                         </div>
                     </div>

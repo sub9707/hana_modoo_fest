@@ -3,6 +3,7 @@ import OrganizationHero from '@/components/organization/OrganizationHero'
 import VisionSection from '@/components/organization/VisionSection'
 import BusinessSection from '@/components/organization/BusinessSection'
 import ContactSection from '@/components/organization/ContactSection'
+import OrganizationBanner from '@/components/organization/OrganizationBanner'
 
 export const metadata: Metadata = {
   title: '기관 소개',
@@ -26,7 +27,7 @@ const organizationData = {
   name: '서울특별시한부모가족지원센터',
   englishName: 'Seoul Single Parent Family Support Center',
   established: '2019년',
-  vision: '모든 가족이 행복한 포용사회 실현',
+  vision: '함께 만들고, 함께 나누고, 함께 누리는 한부모가족지원',
   mission: '한부모가족의 자립과 사회통합을 통한 삶의 질 향상',
   coreValues: [
     {
@@ -94,12 +95,14 @@ const organizationData = {
 
 export default async function OrganizationPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-paper">
       {/* 히어로 섹션 */}
       <OrganizationHero organizationData={organizationData} />
       
       {/* 비전과 가치 섹션 */}
-      <VisionSection coreValues={organizationData.coreValues} vision={organizationData.vision} mission={organizationData.mission} />
+      <VisionSection />
+
+      <OrganizationBanner/>
       
       {/* 주요 사업 섹션 */}
       <BusinessSection mainServices={organizationData.mainServices} achievements={organizationData.achievements} />

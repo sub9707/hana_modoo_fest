@@ -13,7 +13,7 @@ function JoinFestival() {
          <AboutCTAButton href="/registration" text="사전참가 신청하기" />
          <AboutCTAButton href="/directions" text="오시는길 확인" reversed/>
       </div>
-      <div className='relative w-150 h-125'>
+      <div className='relative w-160 h-125'>
         <Image src={"/images/about/about_bottom.webp"} fill alt='bottom_character'/>
       </div>
     </section>
