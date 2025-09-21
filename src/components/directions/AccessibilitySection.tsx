@@ -1,7 +1,3 @@
-"use client";
-
-import ThemedButton from "../ui/ThemedButton";
-
 const accessibilityFeatures = [
   {
     category: '접근성',
@@ -57,7 +53,7 @@ const supportServices = [
 
 export default function AccessibilitySection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-orange-50 to-pink-50">
+    <section className="py-20 bg-gradient-to-b from-orange-50 to-purple-50">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* 섹션 헤더 */}
@@ -144,25 +140,7 @@ export default function AccessibilitySection() {
                 추가적인 지원이 필요하시거나 궁금한 사항이 있으시면 언제든지 연락해 주세요
               </p>
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <ThemedButton
-                title="지원 서비스 신청하기"
-                theme="orange"
-                variant="primary"
-                size="lg"
-                onClick={() => { }}
-              />
-              <ThemedButton
-                title="접근성 문의하기"
-                theme="orange"
-                variant="secondary"
-                size="lg"
-                onClick={() => { }}
-              />
-            </div>
-
-            <div className="mt-6 text-center text-sm text-gray-500">
+            <div className="mt-6 text-center text-md font-bold text-gray-500">
               <p>전화: 02-2133-5000 | 이메일: accessibility@seoulsingleparent.or.kr</p>
             </div>
           </div>
