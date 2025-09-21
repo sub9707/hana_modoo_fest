@@ -1,19 +1,78 @@
-export default function DirectionsHero() {
+'use client';
+
+import Image from "next/image";
+
+interface VenueData {
+  name: string;
+  address: string;
+  date: string;
+  time: string;
+}
+
+interface DirectionsHeroProps {
+  venueData: VenueData;
+}
+
+export default function DirectionsHero({ venueData }: DirectionsHeroProps) {
+  const handleScrollToMap = () => {
+    const mapSection = document.getElementById('directions-map');
+    if (mapSection) {
+      mapSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6">
-          오시는 길
-        </h1>
-        <p className="text-xl md:text-2xl mb-8 opacity-90">
-          여의도공원 문화의마당에서 만나요
-        </p>
-        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-6 inline-block">
-          <div className="text-lg font-semibold mb-2">2025년 10월 18일 (토)</div>
-          <div className="text-lg mb-2">오전 11:00 - 오후 4:00</div>
-          <div className="text-lg">서울특별시 영등포구 여의도공원 문화의마당</div>
+    <section className="min-h-screen relative bg-gradient-to-br from-orange-300 to-pink-400 text-white flex flex-col items-center justify-center text-center px-4">
+
+      <div className="transform -translate-y-8 md:-translate-y-16 flex flex-col items-center justify-center">
+        {/* 로고 */}
+        <div className="w-250 h-40 relative mr-40">
+          <Image src="/icons/logo@2x.png" alt="모두하나대축제 로고" fill />
         </div>
+
+        {/* 메인 타이틀 */}
+        <h1 className="text-5xl md:text-7xl font-bold mb-6">오시는 길</h1>
+
+        {/* 서브 타이틀 */}
+        <p className="text-xl md:text-2xl mb-8 font-light">
+          {venueData.name}에서 만나요
+        </p>
+
+        {/* 행사 정보 카드 */}
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8 max-w-2xl w-full mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+            <div>
+              <h3 className="font-semibold text-white/80 mb-2 text-xl uppercase tracking-wider">
+                날짜 & 시간
+              </h3>
+              <p className="text-2xl font-medium mb-1">{venueData.date}</p>
+              <p className="text-white/90">{venueData.time}</p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-white/80 mb-2 text-xl uppercase tracking-wider">
+                장소
+              </h3>
+              <p className="text-2xl font-medium mb-1">{venueData.name}</p>
+              <p className="text-white/90 text-sm leading-relaxed">
+                {venueData.address}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA 버튼 */}
+        <button 
+          onClick={handleScrollToMap}
+          className="group bg-white text-2xl text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+        >
+          길찾기 바로가기
+          <div className="w-4 h-4 border-t-2 border-r-2 border-current rotate-45 group-hover:translate-x-1 transition-transform duration-300"></div>
+        </button>
       </div>
     </section>
-  )
+  );
 }

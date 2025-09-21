@@ -1,145 +1,94 @@
-interface MainService {
-  category: string
-  services: string[]
-  icon: string
-}
+import ProgramCard from "../home/ProgramCard"
 
-interface Achievement {
-  year: string
-  content: string
-}
+const mainServices = [
+  {
+    title: '상담 및 정보제공',
+    features: ['생활상담', '법률상담', '심리상담', '자녀양육상담', '정보제공 서비스'],
+  },
+  {
+    title: '교육 및 문화',
+    features: ['자립역량강화교육', '자녀교육프로그램', '문화체험활동', '가족캠프'],
+  },
+  {
+    title: '경제적 지원',
+    features: ['긴급지원사업', '후원사업', '장학금지원', '생활용품지원'],
+  },
+  {
+    title: '네트워킹',
+    features: ['자조모임운영', '멘토링사업', '지역사회연계', '취업연계서비스'],
+  }
+];
 
-interface BusinessSectionProps {
-  mainServices: MainService[]
-  achievements: Achievement[]
-}
-
-export default function BusinessSection({ mainServices, achievements }: BusinessSectionProps) {
+export default function BusinessSection() {
   return (
-    <section id="business" className="py-20 bg-gradient-to-b from-white to-gray-50">
+    <section className="w-full py-20 bg-gradient-to-b from-white to-gray-50">
       <div className="container mx-auto px-4">
-        {/* 주요 사업 섹션 */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              주요 <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">사업</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              한부모가족의 자립과 사회통합을 위한 다양한 서비스를 제공합니다
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {mainServices.map((service, index) => {
-              const getServiceColor = (index: number) => {
-                const colors = [
-                  'from-blue-500 to-blue-600 text-blue-600',
-                  'from-green-500 to-green-600 text-green-600', 
-                  'from-purple-500 to-purple-600 text-purple-600',
-                  'from-pink-500 to-pink-600 text-pink-600'
-                ]
-                return colors[index % colors.length]
-              }
-              
-              const colorClass = getServiceColor(index)
-              const [gradientClass, textClass] = colorClass.split(' text-')
-              
-              return (
-                <div
-                  key={index}
-                  className="group bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border"
-                >
-                  {/* 아이콘 */}
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientClass} flex items-center justify-center text-white text-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    {service.icon}
-                  </div>
-                  
-                  {/* 카테고리명 */}
-                  <h3 className={`text-xl font-bold mb-4 text-${textClass}`}>
-                    {service.category}
-                  </h3>
-                  
-                  {/* 서비스 목록 */}
-                  <ul className="space-y-2">
-                    {service.services.map((item, serviceIndex) => (
-                      <li key={serviceIndex} className="flex items-start text-gray-600">
-                        <svg className="w-4 h-4 mt-1 mr-2 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
-                        </svg>
-                        <span className="text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* 성과 및 연혁 섹션 */}
-        <div className="mb-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              성과와 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">연혁</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              설립부터 현재까지 한부모가족과 함께한 발자취입니다
-            </p>
-          </div>
-
-          <div className="relative max-w-4xl mx-auto">
-            {/* 타임라인 선 */}
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 transform md:-translate-x-px"></div>
+        {/* 섹션 타이틀 */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             
-            {/* 성과 항목들 */}
-            <div className="space-y-8">
-              {achievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                >
-                  {/* 타임라인 점 */}
-                  <div className="absolute left-4 md:left-1/2 w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full border-4 border-white shadow-lg transform md:-translate-x-1/2 z-10"></div>
-                  
-                  {/* 콘텐츠 카드 */}
-                  <div className={`ml-12 md:ml-0 flex-1 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
-                    <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border group hover:scale-105">
-                      <div className={`text-right ${index % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
-                        <span className="inline-block px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-bold rounded-full mb-3">
-                          {achievement.year}
-                        </span>
-                        <p className="text-gray-700 text-base md:text-lg leading-relaxed">
-                          {achievement.content}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+            <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              주요 사업
+            </span>
+          </h2>
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+            한부모가족의 자립과 사회통합을 위한 다양한 서비스를 제공합니다
+          </p>
         </div>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white text-center">
-            <div className="text-3xl font-bold mb-2">10,000+</div>
-            <div className="text-sm opacity-90">서비스 제공 가구</div>
+        <div className="w-full max-w-6xl mx-auto">
+          {/* 모바일: 가로 스크롤 */}
+          <div
+            className="flex gap-4 overflow-x-auto sm:hidden py-8 px-4 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {mainServices.map((data, idx) => (
+              <div key={idx} className="flex-shrink-0 w-72">
+                <ProgramCard {...data} />
+              </div>
+            ))}
           </div>
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white text-center">
-            <div className="text-3xl font-bold mb-2">500+</div>
-            <div className="text-sm opacity-90">자조모임 운영</div>
+
+          {/* 데스크탑: grid */}
+          <div
+            className="hidden sm:flex gap-6 py-8 px-6 justify-center"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {mainServices.map((data, idx) => (
+              <div key={idx} className="flex-shrink-0 min-w-[280px]">
+                <ProgramCard
+                  title={data.title}
+                  features={data.features ?? []}
+                  gradient={"from-purple-400 via-blue-400 to-cyan-400"}
+                />
+              </div>
+            ))}
           </div>
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white text-center">
-            <div className="text-3xl font-bold mb-2">50+</div>
-            <div className="text-sm opacity-90">협력기관</div>
-          </div>
-          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 text-white text-center">
-            <div className="text-3xl font-bold mb-2">6년</div>
-            <div className="text-sm opacity-90">운영 경험</div>
+
+          {/* 모바일 스와이프 힌트 */}
+          <div className="sm:hidden flex flex-col items-center justify-center mt-0 sm:mt-6 gap-4">
+            {/* 텍스트를 위로 */}
+            <span className="text-gray-500 text-sm whitespace-nowrap">좌우로 스와이프</span>
+
+            <div className="swipe-hint-container">
+              {/* 더 큰 화살표들 - 간격 더 벌림 */}
+              <div className="swipe-arrows">
+                <svg width="100" height="50" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg" className="arrow-left">
+                  <path d="M18 15L8 25L18 35M8 25H30" stroke="#9CA3AF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <svg width="100" height="50" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg" className="arrow-right">
+                  <path d="M82 35L92 25L82 15M92 25H70" stroke="#9CA3AF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+
+              {/* 애니메이션되는 손가락 아이콘 */}
+              <div className="swipe-finger">
+                <img src="/images/icons/ui/touch.svg" alt="터치" width="35" height="35" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,51 +1,63 @@
 import { Metadata } from 'next'
 import DirectionsHero from '@/components/directions/DirectionHero'
-import EventLocationMap from '@/components/directions/EventLocationMap'
-import TransportInfo from '@/components/directions/TransportInfo'
-import AccessibilityInfo from '@/components/directions/AccessibilityInfo'
-import ParkingInfo from '@/components/directions/ParkingInfo'
 import WeatherNotice from '@/components/directions/WeatherNotice'
+import ParkingSection from '@/components/directions/ParkingSection';
+import TransportationSection from '@/components/directions/TransportationSection';
+import DirectionsMap from '@/components/directions/DirectionsMap';
+import AccessibilitySection from '@/components/directions/AccessibilitySection';
 
 export const metadata: Metadata = {
   title: '오시는 길',
-  description: '모두하나대축제 2025 행사장인 여의도공원 문화의마당 오시는 길을 안내합니다. 지하철, 버스, 자가용 이용 방법을 확인하세요.',
+  description: '모두하나대축제 2025가 열리는 여의도공원 문화의마당으로 오시는 길을 안내합니다.',
   openGraph: {
     title: '오시는 길 | 모두하나대축제 2025',
-    description: '여의도공원 문화의마당으로 오시는 교통편과 접근성 정보를 확인하세요.',
+    description: '여의도공원 문화의마당에서 10월 18일 만나요. 대중교통 및 주차 안내 정보를 확인하세요.',
+    images: [
+      {
+        url: '/images/directions/directions-og.jpg',
+        width: 1200,
+        height: 630,
+        alt: '모두하나대축제 2025 오시는 길',
+      },
+    ],
   },
-}
+};
+
+// 행사장 정보 데이터
+const venueData = {
+  name: '여의도공원 문화의마당',
+  address: '서울특별시 영등포구 여의도동 여의도공원',
+  detailAddress: '서울특별시 영등포구 여의도공원',
+  date: '2025년 10월 18일 (토)',
+  time: '오전 11:00 - 오후 4:00',
+  operatingHours: '2025. 10. 18 (토) 11:00 - 16:00',
+  admission: '무료 (사전신청 권장)',
+  coordinates: {
+    lat: 37.5285,
+    lng: 126.9244
+  }
+};
 
 export default function DirectionsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-paper">
       {/* 날씨/안전 공지 배너 */}
       <WeatherNotice />
-      
+
       {/* 히어로 섹션 */}
-      <DirectionsHero />
-      
-      {/* 메인 콘텐츠 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* 행사장 지도 */}
-        <section className="mb-16">
-          <EventLocationMap />
-        </section>
-        
-        {/* 교통 정보 */}
-        <section className="mb-16">
-          <TransportInfo />
-        </section>
-        
-        {/* 주차 정보 */}
-        <section className="mb-16">
-          <ParkingInfo />
-        </section>
-        
-        {/* 접근성 정보 */}
-        <section className="mb-16">
-          <AccessibilityInfo />
-        </section>
-      </div>
-    </div>
+      <DirectionsHero venueData={venueData} />
+
+      {/* 지도 섹션 */}
+      <DirectionsMap venueData={venueData} />
+
+      {/* 교통편 안내 */}
+      <TransportationSection />
+
+      {/* 주차 안내 */}
+      <ParkingSection />
+
+      {/* 접근성 & 편의시설 */}
+      <AccessibilitySection />
+    </div >
   )
 }

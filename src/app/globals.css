@@ -24,6 +24,14 @@
  --festival-pink: #db2777; 
  --festival-orange: #ea580c; 
  } 
+
+.header-orange {
+  background: linear-gradient(to right, #fb923c, #f472b6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
  
 
 
