@@ -58,15 +58,6 @@ export default function NewsList({ searchParams }: NewsListProps) {
     setSelectedNews(null)
   }, [searchParams.category, searchParams.search, searchParams.sort])
 
-  // 상세 정보 로딩 중일 때
-  if (loadingDetail) {
-    return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner />
-        <span className="ml-2 text-gray-600">뉴스를 불러오는 중...</span>
-      </div>
-    )
-  }
 
   // 상세 화면 렌더링
   if (selectedNews) {

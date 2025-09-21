@@ -1,6 +1,7 @@
 'use client'
 
 import { NewsItem } from '@/types/Board'
+import { Eye } from 'lucide-react'
 
 interface NewsDetailProps {
   news: NewsItem
@@ -80,7 +81,7 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
             </span>
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <span>👀 {news.views.toLocaleString()}</span>
+            <span className='flex items-center gap-2 font-bold'>{news.views.toLocaleString()} 조회</span>
             <span>{news.date}</span>
           </div>
         </div>
@@ -88,20 +89,7 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
         <h1 className="text-3xl font-bold text-gray-800 mb-6">
           {news.title}
         </h1>
-        
-        <div className="flex items-center justify-between">
-          <div className="flex space-x-2">
-            <button 
-              onClick={handleShare}
-              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-            >
-              📤 공유
-            </button>
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-              🔖 북마크
-            </button>
-          </div>
-        </div>
+
       </div>
       
       {/* 내용 - 모바일 최적화 */}

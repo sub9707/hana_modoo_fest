@@ -41,7 +41,6 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
           
           {/* 조회수/날짜 */}
           <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-500 flex-shrink-0">
-            <span>👀 {news.views.toLocaleString()}</span>
             <span className="hidden sm:block">{news.date}</span>
             <span className="sm:hidden">{news.date.slice(5)}</span>
           </div>

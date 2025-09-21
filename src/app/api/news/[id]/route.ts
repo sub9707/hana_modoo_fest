@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { NewsService } from '@/lib/news-service'
 
 interface Params {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(
@@ -12,15 +12,16 @@ export async function GET(
   { params }: Params
 ) {
   try {
-    const news = await NewsService.getNewsById(params.id)
-    
+    const { id } = await params 
+    const news = await NewsService.getNewsById(id)
+
     if (!news) {
       return NextResponse.json(
         { error: 'News not found' },
         { status: 404 }
       )
     }
-    
+
     return NextResponse.json(news)
   } catch (error) {
     console.error('Error fetching news detail:', error)

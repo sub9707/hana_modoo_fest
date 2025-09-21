@@ -36,7 +36,6 @@ async function getInitialData() {
       todayNews: stats.todayNews,
       totalViews: stats.totalViews,
       latestNews: recentNews.length > 0 ? recentNews[0].date : null,
-      hasImportantNews: recentNews.some(news => news.important)
     }
   } catch (error) {
     console.error('Failed to fetch initial data:', error)
@@ -48,7 +47,6 @@ async function getInitialData() {
       todayNews: 0,
       totalViews: 0,
       latestNews: null,
-      hasImportantNews: false
     }
   }
 }
@@ -57,14 +55,13 @@ export default async function NewsPage() {
   const initialData = await getInitialData()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
       {/* 히어로 섹션 */}
       <NewsHero 
         totalNews={initialData.totalNews}
         todayNews={initialData.todayNews}
         totalViews={initialData.totalViews}
         latestNews={initialData.latestNews}
-        hasImportantNews={initialData.hasImportantNews}
       />
       
       {/* 메인 콘텐츠 */}

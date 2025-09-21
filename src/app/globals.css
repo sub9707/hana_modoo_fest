@@ -10,7 +10,7 @@
  --festival-blue: #2563eb; --festival-blue-light: #3b82f6; --festival-green: #059669; --festival-purple: #7c3aed; --festival-pink: #db2777; --festival-orange: #ea580c; } 
 
 .header-orange { background: linear-gradient(to right, #fb923c, #f472b6); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; } 
- 
+ .orange-gradient{background: linear-gradient(to right, #fb923c, #f472b6);}
 
 
  /************************* 컴포넌트 *************************/
