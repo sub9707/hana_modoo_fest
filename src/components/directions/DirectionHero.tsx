@@ -30,7 +30,7 @@ export default function DirectionsHero({ venueData }: DirectionsHeroProps) {
       <div className="transform -translate-y-8 md:-translate-y-16 flex flex-col items-center justify-center">
         {/* 로고 */}
         <div className="w-250 h-40 relative mr-40">
-          <Image src="/icons/logo@2x.png" alt="모두하나대축제 로고" fill />
+          <Image src="/icons/logo@2x_invert.png" alt="모두하나대축제 로고" fill />
         </div>
 
         {/* 메인 타이틀 */}
