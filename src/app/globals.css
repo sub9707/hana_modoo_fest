@@ -1,7 +1,5 @@
-@import "tailwindcss";
-@theme inline { /* 모두하나대축제 커스텀 컬러 */
- --color-festival-blue: #2563eb; --color-festival-blue-light: #3b82f6; --color-festival-green: #059669; --color-festival-purple: #7c3aed; --color-festival-pink: #db2777; --color-festival-orange: #ea580c;
- /* 폰트 클래스명 */
+@import "tailwindcss";@theme inline { /* 모두하나대축제 커스텀 컬러 */
+ --color-festival-blue: #2563eb; --color-festival-blue-light: #3b82f6; --color-festival-green: #059669; --color-festival-purple: #7c3aed; --color-festival-pink: #db2777; --color-festival-orange: #ea580c; /* 폰트 클래스명 */
  --font-paper: var(--font-paperlogy); } 
 
 
@@ -10,9 +8,9 @@
  --festival-blue: #2563eb; --festival-blue-light: #3b82f6; --festival-green: #059669; --festival-purple: #7c3aed; --festival-pink: #db2777; --festival-orange: #ea580c; } 
 
 .header-orange { background: linear-gradient(to right, #fb923c, #f472b6); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; } 
- .orange-gradient{background: linear-gradient(to right, #fb923c, #f472b6);}
+.orange-gradient { background: linear-gradient(to right, #fb923c, #f472b6); } 
 
-
+.text-gradient { background: linear-gradient(to right, #fb923c, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } 
  /************************* 컴포넌트 *************************/
 
  /* 카드 호버 그림자 효과 */
@@ -40,7 +38,7 @@
 
 
  /* Swiper Custom */
- .carousel-swiper .swiper-pagination { left: 5rem !important; right: auto !important; bottom: 2rem !important; text-align: left !important; display: flex; gap: 0.75rem; /* 버튼 간격 */}
+ .carousel-swiper .swiper-pagination { left: 5rem !important; right: auto !important; bottom: 2rem !important; text-align: left !important; display: flex; gap: 0.75rem; /* 버튼 간격 */ } 
 
  .carousel-swiper .swiper-pagination-bullet { width: 0.8rem !important; height: 0.8rem !important; } 
  
@@ -123,7 +121,7 @@
 .animation-delay-3000 { animation-delay: 3000ms; } 
  .fade-in-up { animation: fadeInUp 0.6s ease-out; } 
 
-.animate-scroll { animation: scroll 35s linear infinite; width: calc(200% + 64px); /* 두 세트 + 마진 고려 */}
+.animate-scroll { animation: scroll 35s linear infinite; width: calc(200% + 64px); /* 두 세트 + 마진 고려 */ } 
 
  .float-animation { animation: floatUp 4s ease-in-out infinite; } 
 
@@ -134,7 +132,7 @@
 
 /* 모바일에서 더 빠른 스크롤 */
 @media (max-width: 768px){
- .animate-scroll { animation: scroll 25s linear infinite; width: calc(200% + 32px); /* 모바일에서 더 작은 마진 */} 
+ .animate-scroll { animation: scroll 25s linear infinite; width: calc(200% + 32px); /* 모바일에서 더 작은 마진 */ } 
  }
 
 @media (min-width: 1440px){

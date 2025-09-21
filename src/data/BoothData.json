@@ -1,0 +1,218 @@
+[
+  {
+    "id": 1,
+    "organization": "도봉노인종합복지관",
+    "group": "따로 또 같이",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 나만의 손수건 만들기",
+    "booth_activity": "손수건 만들기"
+  },
+  {
+    "id": 2,
+    "organization": "유린원광종합사회복지관",
+    "group": "봄봄가족",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 \"상큼한 체리 키링\" 만들기",
+    "booth_activity": "양말목 체리 키링 만들기"
+  },
+  {
+    "id": 3,
+    "organization": "(사)참여성노동복지터",
+    "group": "웃음꽃동행",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 \"나만의 에코백 만들기\"",
+    "booth_activity": "에코백 만들기"
+  },
+  {
+    "id": 4,
+    "organization": "은평구립우리장애인복지관",
+    "group": "맘's 터치",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 행복한 향기, 디퓨저 만들기 체험",
+    "booth_activity": "디퓨저 만들기 체험 / 장애 인식개선 활동"
+  },
+  {
+    "id": 5,
+    "organization": "동작종합사회복지관",
+    "group": "꽃보다 아름다워",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 우리 가족 양말목 키링 만들기",
+    "booth_activity": "업사이클링 양말목 공예"
+  },
+  {
+    "id": 6,
+    "organization": "선재누리",
+    "group": "아버지와 자녀의 파트너쉽 트레이닝 '아-파-트'",
+    "zone": "모두 다 누리는",
+    "banner_title": "Event Time ! 모여라 ~ 즐겨라 ~ 놀자 - 한부모 부자(父子)가족 복지시설 선재누리 -",
+    "booth_activity": "한부모 관련 설문조사"
+  },
+  {
+    "id": 7,
+    "organization": "가양7종합사회복지관",
+    "group": "나,너,우리",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 우리 가족만의 냄비받침대 만들기",
+    "booth_activity": "냄비 받침 만들기"
+  },
+  {
+    "id": 8,
+    "organization": "글로벌한부모센터",
+    "group": "여성가장 활동가모임",
+    "zone": "모두 다 행복한",
+    "banner_title": "모두 다 행복한 사회",
+    "booth_activity": "다문화가족 인식개선 캠페인"
+  },
+  {
+    "id": 9,
+    "organization": "불교여성개발원",
+    "group": "좋은벗",
+    "zone": "모두 다 행복한",
+    "banner_title": "모두 다 함께하는 차명상",
+    "booth_activity": "차명상"
+  },
+  {
+    "id": 10,
+    "organization": "(사)지혜로운여성 다문화행복가족센터",
+    "group": "다문화행복가족센터",
+    "zone": "모두 다 행복한",
+    "banner_title": "모두 다 행복한 내일을 응원해!",
+    "booth_activity": "행복 메시지 룰렛 게임"
+  },
+  {
+    "id": 11,
+    "organization": "동대문종합사회복지관",
+    "group": "소담",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 깨끗한 환경, 건강한 생활",
+    "booth_activity": "친환경 세탁세제 나눔 및 한부모 인식개선"
+  },
+  {
+    "id": 12,
+    "organization": "월계종합사회복지관",
+    "group": "징검다리",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 행운의 키링 만들기",
+    "booth_activity": "키링 만들기"
+  },
+  {
+    "id": 13,
+    "organization": "생각나무BB센터",
+    "group": "수혜자에서 공헌자로 자립",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 추억의 세계여행",
+    "booth_activity": "세계문화 소개 및 만들기"
+  },
+  {
+    "id": 14,
+    "organization": "(사)한국한부모가정사랑회 서울시지부",
+    "group": "we함께",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 우리 가족 행복 꽃 코사지 만들기",
+    "booth_activity": "코사지 만들기"
+  },
+  {
+    "id": 15,
+    "organization": "서울한부모회",
+    "group": "공간열고 마음열고",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 돌려돌려 룰렛 선물 팡팡",
+    "booth_activity": "한부모 삼행시 짓기 / 룰렛 돌리기"
+  },
+  {
+    "id": 16,
+    "organization": "서울YWCA 누리봄",
+    "group": "가족의 꿈을 그리다",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 미리 메리크리스마스 키링 만들기",
+    "booth_activity": "크리스마스 테마 키링 만들기"
+  },
+  {
+    "id": 17,
+    "organization": "도봉구가족센터",
+    "group": "설레임",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 미니 디퓨저 만들기",
+    "booth_activity": "디퓨저 만들기 체험"
+  },
+  {
+    "id": 18,
+    "organization": "월곡종합사회복지관",
+    "group": "해피투게더",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 '혼자가 아닌 다육이처럼 나란히' 다육이 만들기",
+    "booth_activity": "다육이를 활용한 인식개선캠페인"
+  },
+  {
+    "id": 19,
+    "organization": "서울시립영등포장애인복지관",
+    "group": "맘마미아",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 나만의 키링 만들기",
+    "booth_activity": "키링 만들기 / 뻥튀기 얼굴 꾸미기"
+  },
+  {
+    "id": 20,
+    "organization": "성내종합사회복지관",
+    "group": "도담보담",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 행운 키링 만들기",
+    "booth_activity": "지퍼백 키링 만들기"
+  },
+  {
+    "id": 21,
+    "organization": "녹번종합사회복지관",
+    "group": "힐링타임",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 \"행복한 향기 여행\"",
+    "booth_activity": "향기 체험"
+  },
+  {
+    "id": 22,
+    "organization": "목동종합사회복지관",
+    "group": "울림",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 반짝반짝 비즈볼펜 만들기 돌리GO! 받GO!",
+    "booth_activity": "돌림판 돌리기 / 비즈공예 볼펜 만들기"
+  },
+  {
+    "id": 23,
+    "organization": "서초구가족센터",
+    "group": "나너보듬",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 꽃향기 쏙쏙 디퓨저",
+    "booth_activity": "드라이 플라워를 활용한 디퓨저 만들기"
+  },
+  {
+    "id": 24,
+    "organization": "금천구가족센터",
+    "group": "우리가(家) 웰빙패밀리",
+    "zone": "모두 다 누리는",
+    "banner_title": "모두 다 누리는 심리 상담",
+    "booth_activity": "부모-자녀 양육 상담"
+  },
+  {
+    "id": 25,
+    "organization": "은평구가족센터",
+    "group": "당당하게 날다",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 마크라메 키링 만들기",
+    "booth_activity": "마크라메 키링 만들기 / 폴라로이드 사진 촬영"
+  },
+  {
+    "id": 26,
+    "organization": "태화기독교사회복지관",
+    "group": "여성한부모지원사업 '굿맘'",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 통일 대한민국 국기 만들기",
+    "booth_activity": "통일 대한민국 국기 만들기"
+  },
+  {
+    "id": 27,
+    "organization": "(사)우리더불어이웃",
+    "group": "한마음 자조모임",
+    "zone": "모두 다 함께하는",
+    "banner_title": "모두 다 함께하는 아로마 테라피 체험하기",
+    "booth_activity": "아로마 입욕제 만들기"
+  }
+]
