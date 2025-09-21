@@ -16,15 +16,16 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
     setMounted(true);
   }, []);
 
-  // 배경 이미지들 (실제 이미지 경로로 교체 예정)
+  // 배경 이미지
   const backgroundImages = [
-    '/images/partners/bg-1.jpg',
-    '/images/partners/bg-2.jpg', 
-    '/images/partners/bg-3.jpg',
-    '/images/partners/bg-4.jpg'
+    '/images/partners/backgrounds/bg-1.jpg',
+    '/images/partners/backgrounds/bg-2.jpg', 
+    '/images/partners/backgrounds/bg-3.jpg',
+    '/images/partners/backgrounds/bg-4.jpg',
+    '/images/partners/backgrounds/bg-5.jpg'
   ];
 
-  // 모든 파트너 데이터를 하나의 배열로 합치기
+  // 모든 파트너 데이터
   const allPartners = [
     ...partnersData.organizers,
     ...partnersData.sponsors,
@@ -56,7 +57,7 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
                 <Image src={'/icons/logo@2x_invert.png'} alt='modoo_logo' fill/>
               </div>
               와 &nbsp;
-              <span className="block bg-gradient-to-r from-cyan-100 via-cyan-200 to-cyan-300 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-cyan-100 via-indigo-300 to-purple-300 bg-clip-text text-transparent">
                 함께하는 기관
               </span>
             </div>
@@ -85,7 +86,7 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
                               src={partner.logo}
                               alt={`${partner.name} 로고`}
                               fill
-                              className="object-contain filter brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+                              className="object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
                               sizes="(max-width: 768px) 96px, (max-width: 1024px) 128px, 144px"
                             />
                           </div>
@@ -142,7 +143,7 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                    {stat.count}+
+                    {stat.count}
                   </div>
                   <div className="text-white/90 text-sm md:text-base font-medium">
                     {stat.label}

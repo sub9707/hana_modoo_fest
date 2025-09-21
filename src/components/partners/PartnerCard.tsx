@@ -49,7 +49,7 @@ export default function PartnerCard({ partner, size = 'medium' }: PartnerCardPro
           text: 'text-purple-600',
           bg: 'bg-gradient-to-r from-purple-50 to-cyan-50',
           border: 'border-purple-200',
-          gradient: 'from-purple-400 to-cyan-500'
+          gradient: 'from-purple-400 to-pink-500'
         }
       default:
         return {

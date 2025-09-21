@@ -24,12 +24,12 @@ export default function BackgroundSlideshow({ images, className = '' }: Backgrou
 
   if (images.length === 0) {
     return (
-      <div className={`absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 ${className}`} />
+      <div className={`fixed inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 ${className}`} />
     );
   }
 
   return (
-    <div className={`absolute inset-0 overflow-hidden ${className}`}>
+    <div className={`fixed inset-0 overflow-hidden ${className}`}>
       {/* 배경 이미지들 */}
       {images.map((image, index) => (
         <div
@@ -42,7 +42,7 @@ export default function BackgroundSlideshow({ images, className = '' }: Backgrou
             src={image}
             alt={`배경 이미지 ${index + 1}`}
             fill
-            className="object-cover"
+            className="object-cover scale-110"
             priority={index === 0}
             quality={85}
             onLoad={() => index === 0 && setIsLoaded(true)}

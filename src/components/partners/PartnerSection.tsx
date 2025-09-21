@@ -57,7 +57,7 @@ export default function PartnerSection({
         <div className="max-w-7xl mx-auto">
           {/* 섹션 헤더 */}
           <div className="text-center space-y-6 mb-16">
-            <div className={`inline-flex items-center px-8 py-3 bg-gradient-to-r ${gradient} text-white text-sm font-semibold rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
+            <div className={`inline-flex items-center px-8 py-3 bg-gradient-to-r ${gradient} text-white text-sm font-semibold rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 hover:scale-105`}>
               <div className="mr-3 text-lg">
                 {icon}
               </div>
@@ -116,40 +116,6 @@ export default function PartnerSection({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-            </div>
-          )}
-
-          {/* 섹션 통계 (큰 섹션인 경우) */}
-          {partners.length > 10 && (
-            <div className="mt-16 bg-white/50 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="space-y-2">
-                  <div className={`text-3xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
-                    {partners.filter(p => p.website).length}
-                  </div>
-                  <div className="text-gray-600 text-sm">
-                    웹사이트 보유 기관
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className={`text-3xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
-                    {new Set(partners.map(p => p.category)).size}
-                  </div>
-                  <div className="text-gray-600 text-sm">
-                    다양한 분야
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className={`text-3xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
-                    100%
-                  </div>
-                  <div className="text-gray-600 text-sm">
-                    참여 의지
-                  </div>
-                </div>
-              </div>
             </div>
           )}
         </div>

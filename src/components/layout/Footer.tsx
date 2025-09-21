@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 export default function Footer() {
   return (
-    <footer className="font-paper bg-gradient-to-b from-purple-50 to-purple-100 text-gray-700 pb-20 lg:pb-0" role="contentinfo">
+    <footer className="font-paper bg-gradient-to-b from-purple-50 to-purple-100 text-gray-700 pb-20 lg:pb-0 z-10" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 메인 푸터 콘텐츠 */}
         <div className="py-8 lg:py-12">
