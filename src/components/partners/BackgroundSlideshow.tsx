@@ -44,7 +44,6 @@ export default function BackgroundSlideshow({ images, className = '' }: Backgrou
             fill
             className="object-cover scale-110"
             priority={index === 0}
-            quality={85}
             onLoad={() => index === 0 && setIsLoaded(true)}
           />
         </div>
