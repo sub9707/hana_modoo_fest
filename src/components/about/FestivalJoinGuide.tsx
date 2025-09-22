@@ -59,7 +59,8 @@ function FestivalJoinGuide() {
 
                 {/* 그래프 영역 */}
                 <div className="w-full h-100 flex items-center justify-center mb-16">
-                    <NodeGraph />/
+                    그래프 구현 예정
+                    {/* <NodeGraph />/ */}
                 </div>
 
                 {/* 참여 방법 영역 */}
