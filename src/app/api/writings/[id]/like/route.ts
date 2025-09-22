@@ -5,7 +5,7 @@ import { getCurrentUser } from '@/lib/mysql/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }  // ✅ params는 Promise
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,12 +16,13 @@ export async function POST(
       )
     }
 
-    const writingId = params.id
+    const { id: writingId } = await context.params   // ✅ await 추가
 
     // 글 존재 여부 확인
-    const writing = await query(`
-      SELECT id, user_id FROM writings WHERE id = ?
-    `, [writingId])
+    const writing = await query(
+      `SELECT id, user_id FROM writings WHERE id = ?`,
+      [writingId]
+    )
 
     if (!writing.length) {
       return NextResponse.json(
@@ -40,60 +41,56 @@ export async function POST(
 
     const result = await transaction(async (connection) => {
       // 기존 좋아요 확인
-      const existingLike = await connection.execute(`
-        SELECT id FROM writing_likes 
-        WHERE user_id = ? AND writing_id = ?
-      `, [user.id, writingId])
+      const [existingLike] = await connection.execute(
+        `SELECT id FROM writing_likes WHERE user_id = ? AND writing_id = ?`,
+        [user.id, writingId]
+      )
 
       let isLiked: boolean
       let likesCount: number
 
-      if (existingLike[0] && (existingLike[0] as any[]).length > 0) {
+      if ((existingLike as any[]).length > 0) {
         // 좋아요 취소
-        await connection.execute(`
-          DELETE FROM writing_likes 
-          WHERE user_id = ? AND writing_id = ?
-        `, [user.id, writingId])
+        await connection.execute(
+          `DELETE FROM writing_likes WHERE user_id = ? AND writing_id = ?`,
+          [user.id, writingId]
+        )
 
-        await connection.execute(`
-          UPDATE writings 
-          SET likes_count = likes_count - 1 
-          WHERE id = ?
-        `, [writingId])
+        await connection.execute(
+          `UPDATE writings SET likes_count = likes_count - 1 WHERE id = ?`,
+          [writingId]
+        )
 
         isLiked = false
       } else {
         // 좋아요 추가
-        await connection.execute(`
-          INSERT INTO writing_likes (user_id, writing_id)
-          VALUES (?, ?)
-        `, [user.id, writingId])
+        await connection.execute(
+          `INSERT INTO writing_likes (user_id, writing_id) VALUES (?, ?)`,
+          [user.id, writingId]
+        )
 
-        await connection.execute(`
-          UPDATE writings 
-          SET likes_count = likes_count + 1 
-          WHERE id = ?
-        `, [writingId])
+        await connection.execute(
+          `UPDATE writings SET likes_count = likes_count + 1 WHERE id = ?`,
+          [writingId]
+        )
 
         isLiked = true
       }
 
       // 업데이트된 좋아요 수 조회
-      const updatedWriting = await connection.execute(`
-        SELECT likes_count FROM writings WHERE id = ?
-      `, [writingId])
+      const [updatedWriting] = await connection.execute(
+        `SELECT likes_count FROM writings WHERE id = ?`,
+        [writingId]
+      )
 
-      likesCount = (updatedWriting[0] as any[])[0].likes_count
+      likesCount = (updatedWriting as any[])[0].likes_count
 
       return { isLiked, likesCount }
     })
 
     return NextResponse.json({
       success: true,
-      data: {
-        isLiked: result.isLiked,
-        likesCount: result.likesCount
-      }
+      data: result,
     })
   } catch (error) {
     console.error('Error toggling like:', error)

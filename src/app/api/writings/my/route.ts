@@ -1,4 +1,3 @@
-// app/api/writings/my/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
@@ -27,7 +26,17 @@ export async function GET(request: NextRequest) {
         w.title,
         w.content,
         w.likes_count,
-        w.is_featured,
+        CASE 
+          WHEN w.id IN (
+            SELECT id FROM (
+              SELECT id, ROW_NUMBER() OVER (ORDER BY likes_count DESC, created_at DESC) as rn
+              FROM writings 
+              WHERE likes_count > 0
+            ) ranked 
+            WHERE rn <= 10
+          ) THEN true 
+          ELSE false 
+        END as is_featured,
         w.created_at,
         u.name as author_name,
         true as is_mine

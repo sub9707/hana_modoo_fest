@@ -1,4 +1,3 @@
-// app/api/writings/featured/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
         w.title,
         w.content,
         w.likes_count,
-        w.is_featured,
+        true as is_featured,
         w.created_at,
         u.name as author_name
         ${likesSelect}

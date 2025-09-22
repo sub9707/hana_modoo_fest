@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PreRegistration from './PreRegistration'
 import QuizEvent from './Quiz/QuizEvent'
 import SupportComments from './SupportComment/SupportComments'
-import FamilyWriting from './FamilyWriting'
 import RandomEvent from './RandomEvent'
+import FamilyWriting from './FamilyWriting/FamilyWriting'
 
 interface Tab {
   id: string
@@ -120,24 +120,75 @@ export default function OnlineFestivalTabs() {
           ))}
         </div>
 
-        {/* 모바일 탭 (스크롤 가능) */}
-        <div className="md:hidden bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
-          <div className="flex overflow-x-auto scrollbar-hide space-x-2">
+        {/* 태블릿 탭 (한 줄) */}
+        <div className="hidden sm:flex md:hidden bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+          <div className="flex w-full justify-center gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 px-4 py-3 rounded-xl transition-all duration-300 min-w-[120px] ${
+                className={`flex-1 max-w-[140px] px-2 py-3 rounded-xl transition-all duration-300 ${
                   activeTab === tab.id
                     ? 'bg-white shadow-md'
                     : 'hover:bg-white/50'
                 }`}
               >
                 <div className="text-center">
-                  <div className={`text-lg mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                  <div className={`text-base mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
                     {tab.icon}
                   </div>
-                  <div className={`font-medium text-sm ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
+                  <div className={`font-medium text-xs ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
+                    {tab.label}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 모바일 탭 (2줄 배치) */}
+        <div className="sm:hidden bg-white/80 backdrop-blur-sm rounded-2xl p-3 shadow-lg">
+          {/* 첫 번째 줄: 3개 탭 */}
+          <div className="flex gap-2 mb-2">
+            {tabs.slice(0, 3).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 px-2 py-2.5 rounded-xl transition-all duration-300 border-2 ${
+                  activeTab === tab.id
+                    ? `border-current ${tab.color}`
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-white/50'
+                }`}
+              >
+                <div className="text-center">
+                  <div className={`text-sm mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    {tab.icon}
+                  </div>
+                  <div className="font-medium text-xs leading-tight">
+                    {tab.label}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+          
+          {/* 두 번째 줄: 2개 탭 (가운데 정렬) */}
+          <div className="flex justify-center gap-2">
+            {tabs.slice(3, 5).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-[calc(50%-4px)] px-2 py-2.5 rounded-xl transition-all duration-300 border-2 ${
+                  activeTab === tab.id
+                    ? `border-current ${tab.color}`
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-white/50'
+                }`}
+              >
+                <div className="text-center">
+                  <div className={`text-sm mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    {tab.icon}
+                  </div>
+                  <div className="font-medium text-xs leading-tight">
                     {tab.label}
                   </div>
                 </div>
