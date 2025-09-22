@@ -2,9 +2,7 @@ import { Metadata } from 'next'
 import OrganizationHero from '@/components/organization/OrganizationHero'
 import VisionSection from '@/components/organization/VisionSection'
 import BusinessSection from '@/components/organization/BusinessSection'
-import ContactSection from '@/components/organization/ContactSection'
 import OrganizationBanner from '@/components/organization/OrganizationBanner'
-import HistoryAndAchievementsSection from '@/components/organization/HistroyAndAchievementSection'
 import { organizationData } from '@/data/Organization'
 
 export const metadata: Metadata = {
@@ -40,10 +38,6 @@ export default async function OrganizationPage() {
       {/* 주요 사업 섹션 */}
       <BusinessSection />
 
-      {/* 성과와 연혁 */}
-      <HistoryAndAchievementsSection achievements={organizationData.achievements} />
-      {/* 연락처 섹션 */}
-      <ContactSection contact={organizationData.contact} />
     </div>
   )
 }

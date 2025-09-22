@@ -101,7 +101,7 @@ function HeroLeft({ animationStage }: HeroLeftProps) {
                 />
 
                 <HeroCTAButton
-                    text="캠페인 신청하기"
+                    text="캠페인 참여하기"
                     href="/info"
                 />
             </div>

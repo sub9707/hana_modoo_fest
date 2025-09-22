@@ -21,7 +21,7 @@ const mainServices = [
 
 export default function BusinessSection() {
   return (
-    <section className="w-full py-20 bg-gradient-to-b from-white to-gray-50">
+    <section className="w-full py-20 bg-gradient-to-b from-white to-purple-50">
       <div className="container mx-auto px-4">
         {/* 섹션 타이틀 */}
         <div className="text-center mb-16">

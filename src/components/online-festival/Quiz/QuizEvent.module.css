@@ -1,0 +1,142 @@
+/* 최적화된 팡파레 파티클 애니메이션 */
+
+@keyframes fanfareBurst {
+  0% { 
+    transform: translate3d(0, 0, 0) scale(0.2); 
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% { 
+    transform: translate3d(var(--dx), var(--dy), 0) scale(0.6); 
+    opacity: 0;
+  }
+}
+
+@keyframes successPop {
+  0% { 
+    transform: translate3d(0, 8px, 0) scale(0.8); 
+    opacity: 0; 
+  }
+  30% { 
+    transform: translate3d(0, -2px, 0) scale(1.05); 
+    opacity: 1; 
+  }
+  70% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  100% { 
+    transform: translate3d(0, -4px, 0) scale(0.9); 
+    opacity: 0; 
+  }
+}
+
+.fanfareContainer {
+  position: fixed;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 50;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  left: -2px;
+  top: -2px;
+  animation: fanfareBurst 1s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* 각 파티클의 방향과 딜레이 최적화 */
+.particle:nth-child(1) {
+  --dx: -35px; --dy: -45px;
+  animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+  --dx: 28px; --dy: -50px;
+  animation-delay: 0.05s;
+}
+
+.particle:nth-child(3) {
+  --dx: -20px; --dy: -35px;
+  animation-delay: 0.1s;
+}
+
+.particle:nth-child(4) {
+  --dx: 40px; --dy: -40px;
+  animation-delay: 0.02s;
+}
+
+.particle:nth-child(5) {
+  --dx: -45px; --dy: -25px;
+  animation-delay: 0.08s;
+}
+
+.particle:nth-child(6) {
+  --dx: 25px; --dy: -55px;
+  animation-delay: 0.12s;
+}
+
+.particle:nth-child(7) {
+  --dx: -15px; --dy: -48px;
+  animation-delay: 0.06s;
+}
+
+.particle:nth-child(8) {
+  --dx: 35px; --dy: -30px;
+  animation-delay: 0.09s;
+}
+
+.successText {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #f59e0b;
+  animation: successPop 1.1s ease-out forwards;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  user-select: none;
+}
+
+/* 성능 최적화 */
+.fanfareContainer * {
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .successText {
+    font-size: 2rem;
+  }
+  
+  .particle {
+    width: 3px;
+    height: 3px;
+    left: -1.5px;
+    top: -1.5px;
+  }
+  
+  /* 모바일에서는 파티클 수 줄이기 */
+  .particle:nth-child(n+7) {
+    display: none;
+  }
+}
+
+/* 애니메이션 감소 모드 */
+@media (prefers-reduced-motion: reduce) {
+  .particle {
+    animation: none;
+    opacity: 0;
+  }
+  
+  .successText {
+    animation: none;
+    opacity: 1;
+  }
+}

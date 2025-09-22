@@ -107,8 +107,8 @@ export default function NewsList({ searchParams }: NewsListProps) {
             📢 중요 공지
           </div>
           <div className="space-y-4">
-            {importantNews.map((news) => (
-              <div key={news.id} className="bg-white rounded-lg p-4">
+            {importantNews.map((news, idx) => (
+              <div key={news.id + " " + idx} className="bg-white rounded-lg p-4">
                 <NewsCard 
                   news={news} 
                   onClick={() => handleCardClick(news)}
@@ -121,9 +121,9 @@ export default function NewsList({ searchParams }: NewsListProps) {
 
       {/* 일반 뉴스 리스트 */}
       <div className="space-y-4">
-        {regularNews.map((news) => (
+        {regularNews.map((news, idx) => (
           <NewsCard 
-            key={news.id} 
+            key={news.id + " " + idx} 
             news={news} 
             onClick={() => handleCardClick(news)}
           />

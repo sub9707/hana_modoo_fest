@@ -1,0 +1,87 @@
+/* 결과 화면 스타일 */
+
+@keyframes scoreCountUp {
+  0% { 
+    transform: scale(0.5); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.1); 
+  }
+  100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+}
+
+@keyframes emojiFloat {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+.container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.card {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.emoji {
+  animation: emojiFloat 2s ease-in-out infinite;
+  will-change: transform;
+}
+
+.score {
+  animation: scoreCountUp 0.8s ease-out;
+  will-change: transform, opacity;
+}
+
+.gradientText {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+@keyframes fadeIn {
+  0% { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.button {
+  transition: all 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
+
+/* 성능 최적화 */
+.optimized {
+  transform: translateZ(0);
+}

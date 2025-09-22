@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PreRegistration from './PreRegistration'
-import QuizEvent from './QuizEvent'
-import SupportComments from './SupportComments'
+import QuizEvent from './Quiz/QuizEvent'
+import SupportComments from './SupportComment/SupportComments'
 import FamilyWriting from './FamilyWriting'
 import RandomEvent from './RandomEvent'
 
@@ -144,13 +144,6 @@ export default function OnlineFestivalTabs() {
               </button>
             ))}
           </div>
-        </div>
-
-        {/* 모바일에서 현재 탭 설명 */}
-        <div className="md:hidden mt-4 text-center">
-          <p className="text-gray-600">
-            {tabs.find(tab => tab.id === activeTab)?.description}
-          </p>
         </div>
       </div>
 

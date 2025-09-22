@@ -5,29 +5,14 @@ const benefits = [
   {
     icon: <Gift className="w-6 h-6" />,
     title: '사전접수 선물',
-    description: '축제 굿즈와 기념품을 받을 수 있어요'
-  },
-  {
-    icon: <Users className="w-6 h-6" />,
-    title: '우선 참여권',
-    description: '인기 프로그램에 우선적으로 참여할 수 있어요'
-  },
-  {
-    icon: <Calendar className="w-6 h-6" />,
-    title: '일정 알림',
-    description: '축제 소식과 중요 일정을 먼저 받아보세요'
-  },
-  {
-    icon: <MapPin className="w-6 h-6" />,
-    title: '현장 안내',
-    description: '축제 당일 현장 안내 서비스를 제공해요'
+    description: '사전 접수 후 현장 참여 시 선물제공'
   }
 ]
 
 const stats = [
-  { number: '2,847', label: '사전접수 완료', color: 'text-festival-blue' },
-  { number: '5,000', label: '목표 인원', color: 'text-festival-green' },
-  { number: '57%', label: '달성률', color: 'text-festival-purple' }
+  { number: '500', label: '사전접수 완료', color: 'text-festival-blue' },
+  { number: '2,000', label: '목표 인원', color: 'text-festival-green' },
+  { number: '25%', label: '달성률', color: 'text-festival-purple' }
 ]
 
 export default function PreRegistration() {
@@ -66,18 +51,16 @@ export default function PreRegistration() {
         <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-8 text-center">
           사전접수 혜택
         </h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-start space-x-4 p-6 bg-white/50 rounded-2xl hover:bg-white/70 transition-colors duration-300">
+        <div className="flex justify-center">
+            <div className="flex items-start space-x-4 p-6 bg-white/50 rounded-2xl hover:bg-white/70 transition-colors duration-300">
               <div className="flex-shrink-0 w-12 h-12 bg-festival-blue/10 rounded-full flex items-center justify-center text-festival-blue">
-                {benefit.icon}
+                <Gift className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">{benefit.title}</h4>
-                <p className="text-gray-600 text-sm">{benefit.description}</p>
+                <h4 className="font-semibold text-gray-900 mb-2">사전접수 선물</h4>
+                <p className="text-gray-600 text-sm">사전 접수 후 현장 참여 시 선물제공</p>
               </div>
             </div>
-          ))}
         </div>
       </div>
 
