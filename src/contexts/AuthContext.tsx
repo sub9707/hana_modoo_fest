@@ -23,13 +23,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
+  // 쿠키에서 세션 토큰 확인하는 함수
+  const hasSessionToken = useCallback(() => {
+    if (typeof document === 'undefined') return false
+    return document.cookie.includes('session-token=')
+  }, [])
+
   // NextJS 15: useCallback으로 함수 메모이제이션
   const refreshUser = useCallback(async () => {
+    // 🔥 세션 토큰이 없으면 API 호출하지 않음
+    if (!hasSessionToken()) {
+      setUser(null)
+      return
+    }
+
     try {
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
-        cache: 'no-store', // NextJS 15: 캐시 방지
+        cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache',
         },
@@ -46,7 +58,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Auth refresh error:', error)
       setUser(null)
     }
-  }, [])
+  }, [hasSessionToken])
 
   // NextJS 15: 로그인 처리 개선
   const login = useCallback((userData: User) => {
@@ -85,16 +97,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [refreshUser])
 
-  // NextJS 15: 브라우저 포커스 시 사용자 정보 리프레시
+  // 🔥 수정된 부분: 세션 토큰이 있을 때만 리프레시
   useEffect(() => {
     const handleFocus = () => {
-      if (!isLoading && document.visibilityState === 'visible') {
+      if (!isLoading && document.visibilityState === 'visible' && hasSessionToken()) {
         refreshUser()
       }
     }
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && hasSessionToken()) {
         handleFocus()
       }
     }
@@ -106,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isLoading, refreshUser])
+  }, [isLoading, refreshUser, hasSessionToken])
 
   // NextJS 15: Context value 메모이제이션
   const contextValue = {
