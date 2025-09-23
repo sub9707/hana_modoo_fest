@@ -30,7 +30,6 @@ export default function RegistrationManagement() {
   // 필터링된 등록자 목록
   const filteredRegistrations = registrations.filter(registration => {
     const matchesSearch = registration.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         registration.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          registration.phone.includes(searchTerm)
     
     const matchesProgram = selectedProgram === '전체' || 
@@ -175,9 +174,6 @@ export default function RegistrationManagement() {
                 <tr key={registration.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {registration.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {registration.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {registration.phone}

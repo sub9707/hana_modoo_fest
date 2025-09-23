@@ -1,4 +1,4 @@
-@import "tailwindcss";@theme inline { /* 모두하나대축제 커스텀 컬러 */
+@import "tailwindcss"; @theme inline { /* 모두하나대축제 커스텀 컬러 */
  --color-festival-blue: #2563eb; --color-festival-blue-light: #3b82f6; --color-festival-green: #059669; --color-festival-purple: #7c3aed; --color-festival-pink: #db2777; --color-festival-orange: #ea580c; /* 폰트 클래스명 */
  --font-paper: var(--font-paperlogy); } 
 
@@ -188,4 +188,13 @@
  0% { background-position: 0% 50%; } 
  50% { background-position: 100% 50%; } 
  100% { background-position: 0% 50%; } 
+ }
+
+ @keyframes spin { to { transform: rotate(360deg); } 
+ }
+ 
+ .animate-bounce { animation: bounce 2s infinite; } 
+ 
+ @keyframes bounce { 0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); } 
+ 50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); } 
  }

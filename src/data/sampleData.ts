@@ -5,7 +5,6 @@ export const sampleRegistrations: Registration[] = [
   {
     id: '1',
     name: '김가족',
-    email: 'family@example.com',
     phone: '010-1111-2222',
     companions: 3,
     programs: ['공연관람', '체험부스'],
@@ -14,7 +13,6 @@ export const sampleRegistrations: Registration[] = [
   {
     id: '2',
     name: '이가족',
-    email: 'lee@example.com',
     phone: '010-3333-4444',
     companions: 2,
     programs: ['자조모임'],

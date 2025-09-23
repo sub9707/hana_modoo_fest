@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/mysql/server'
 import RegistrationHero from '@/components/registration/RegistrationHero'
 import RegistrationForm from '@/components/forms/RegistrationForm'
+import ExistingRegistration from '@/components/registration/ExisitingRegistration'
+import type { Registration } from '@/types/registration'
 
 export const metadata: Metadata = {
   title: '사전참가 신청',
@@ -13,59 +15,84 @@ export const metadata: Metadata = {
   },
 }
 
-// 프로그램 데이터 가져오기 (실제로는 DB에서)
-async function getProgramsData() {
-  return {
-    programs: [
-      { id: 'opening', name: '개막식', category: '공식행사', time: '11:00-12:00' },
-      { id: 'concert', name: '가족 음악회', category: '공연', time: '13:00-14:00' },
-      { id: 'cooking', name: '요리 체험', category: '체험', time: '14:00-15:00' },
-      { id: 'craft', name: '만들기 체험', category: '체험', time: '14:30-15:30' },
-      { id: 'photo', name: '가족사진 촬영', category: '체험', time: '11:00-16:00' },
-      { id: 'single-parent', name: '한부모가족 모임', category: '자조모임', time: '12:00-13:00' },
-      { id: 'youth-parent', name: '청소년부모 모임', category: '자조모임', time: '13:30-14:30' },
-      { id: 'support', name: '가족지원 상담', category: '연대부스', time: '11:00-16:00' },
-      { id: 'welfare', name: '복지 정보 안내', category: '연대부스', time: '11:00-16:00' },
-    ]
-  }
-}
-
 export default async function RegistrationPage() {
   // 서버에서 현재 사용자 정보 가져오기
   const user = await getCurrentUser()
   
-  // 로그인하지 않은 사용자는 리다이렉트 (middleware에서도 처리하지만 이중 체크)
+  // 로그인하지 않은 사용자는 리다이렉트
   if (!user) {
     redirect('/login?callbackUrl=/registration')
   }
 
-  // 프로그램 데이터 가져오기
-  const { programs } = await getProgramsData()
+  // 기존 참가신청 조회 (서버사이드에서 직접 DB 조회)
+  const { queryOne } = await import('@/lib/mysql/connection')
+  const existingRegistration = await queryOne(
+    `SELECT r.*, u.name as user_name, u.phone as user_phone 
+     FROM registrations r 
+     JOIN users u ON r.user_id = u.id 
+     WHERE r.user_id = ? AND r.status != 'cancelled'`,
+    [user.id]
+  )
+
+  const registration = existingRegistration ? {
+    id: existingRegistration.id,
+    registration_number: existingRegistration.registration_number,
+    participant_type: existingRegistration.participant_type,
+    companions: existingRegistration.companions,
+    companion_details: existingRegistration.companion_details,
+    address: existingRegistration.address,
+    address_detail: existingRegistration.address_detail,
+    zip_code: existingRegistration.zip_code,
+    special_requests: existingRegistration.special_requests,
+    marketing_consent: existingRegistration.marketing_consent === 1,
+    privacy_consent: existingRegistration.privacy_consent === 1,
+    status: existingRegistration.status,
+    created_at: existingRegistration.created_at,
+    updated_at: existingRegistration.updated_at,
+    user_name: existingRegistration.user_name,
+    user_phone: existingRegistration.user_phone
+  } as Registration & { user_name: string; user_phone: string } : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 font-paper">
       {/* 히어로 섹션 */}
       <RegistrationHero />
       
       {/* 메인 콘텐츠 */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {/* 폼 헤더 */}
-          <div className="bg-gradient-to-r from-festival-blue to-festival-purple text-white p-6">
-            <h2 className="text-2xl font-bold mb-2">사전참가 신청서</h2>
-            <p className="opacity-90">
-              축제 당일 원활한 참여를 위해 사전신청을 해주세요. 
-              모든 정보는 안전하게 보호됩니다.
-            </p>
-          </div>
-          
-          {/* 폼 컴포넌트 */}
-          <div className="p-6">
-            <RegistrationForm 
-              user={user} 
-              programs={programs}
-            />
-          </div>
+          {registration ? (
+            // 이미 신청한 경우 - 기존 신청 정보 표시
+            <>
+              <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
+                <h2 className="text-2xl font-bold mb-2">참가신청 완료</h2>
+                <p className="opacity-90">
+                  이미 사전참가 신청을 완료하셨습니다.
+                </p>
+              </div>
+              
+              <div className="p-6">
+                <ExistingRegistration 
+                  user={user}
+                  registration={registration}
+                />
+              </div>
+            </>
+          ) : (
+            // 아직 신청하지 않은 경우 - 신청 폼 표시
+            <>
+              <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
+                <h2 className="text-2xl font-bold mb-2">사전참가 신청서</h2>
+                <p className="opacity-90">
+                  축제 당일 원활한 참여를 위해 사전신청을 해주세요.
+                </p>
+              </div>
+              
+              <div className="p-6">
+                <RegistrationForm user={user} />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
