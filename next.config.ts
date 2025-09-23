@@ -7,13 +7,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['localhost'],
+    domains: ['localhost', 't1.kakaocdn.net'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**.seoul.kr'
       }
-    ]
+    ],
+    
   },
   async headers() {
     return [

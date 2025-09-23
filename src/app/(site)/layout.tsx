@@ -4,6 +4,7 @@ import Script from 'next/script'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
+import ScrollToTop from '@/components/common/ScrollToTop'
 
 export const metadata: Metadata = {
     title: {
@@ -66,6 +67,7 @@ export default function SiteLayout({
 
                 <main id="main-content" className="flex-1" role="main" tabIndex={-1}>
                     {children}
+                    <ScrollToTop />
                 </main>
 
                 <Footer />

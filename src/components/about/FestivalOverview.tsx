@@ -29,7 +29,7 @@ export default function FestivalOverview() {
                 </div>
 
                 {/* 오렌지 빛 레이어 */}
-                <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-orange-400/40 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
+                <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-orange-400 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
               </div>
 
               {/* 카드 우 */}
@@ -43,7 +43,7 @@ export default function FestivalOverview() {
                 </div>
 
                 {/* 핑크 빛 레이어 */}
-                <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-pink-400/40 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
+                <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-pink-400 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
               </div>
 
             </div>

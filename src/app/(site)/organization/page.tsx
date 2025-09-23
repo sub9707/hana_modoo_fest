@@ -35,9 +35,6 @@ export default async function OrganizationPage() {
       {/*배너 기관 배너 */}
       <OrganizationBanner />
 
-      {/* 주요 사업 섹션 */}
-      <BusinessSection />
-
     </div>
   )
 }

@@ -48,8 +48,8 @@ export const QuizCard = memo(function QuizCard({
                   ? 'border-rose-500 bg-rose-50 text-rose-800'
                   : 'border-gray-200 bg-gray-50'
                 : selectedAnswer === index
-                ? 'border-purple-500 bg-purple-50 text-purple-800'
-                : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
+                ? 'border-green-500 bg-green-50 text-green-800'
+                : 'border-gray-200 hover:border-green-300 hover:bg-green-50/50'
             }`}
           >
             <div className="flex items-center justify-between">
