@@ -17,7 +17,7 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
 
   useEffect(() => {
     let interval: NodeJS.Timeout
-    
+
     if (remainingTime > 0) {
       interval = setInterval(() => {
         setRemainingTime((prev) => {
@@ -77,7 +77,7 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
         setError('')
       } else {
         setError(data.error || '댓글 작성에 실패했습니다.')
-        
+
         // 429 에러 (Too Many Requests)인 경우 남은 시간 파싱
         if (response.status === 429 && data.error) {
           const timeMatch = data.error.match(/(\d+)초/)
@@ -100,26 +100,25 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
   }
 
   const isDisabled = isSubmitting || remainingTime > 0 || !user
-  const buttonText = !user 
-    ? '로그인 후 이용하세요' 
-    : remainingTime > 0 
-    ? `${remainingTime}초 후 작성 가능`
-    : isSubmitting 
-    ? '작성 중...'
-    : '응원글 등록'
+  const buttonText = !user
+    ? '로그인 후 이용하세요'
+    : remainingTime > 0
+      ? `${remainingTime}초 후 작성 가능`
+      : isSubmitting
+        ? '작성 중...'
+        : '응원글 등록'
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 mb-8">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-8">
       <div className="flex items-center space-x-2 mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">응원 메시지 남기기</h3>
-
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">응원 메시지 남기기</h3>
       </div>
 
       {!user && (
         <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Lock className="w-4 h-4 text-amber-600" />
-            <span className="text-sm text-amber-700">
+          <div className="flex items-start space-x-2">
+            <Lock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+            <span className="text-sm text-amber-700 leading-relaxed">
               응원 메시지를 남기려면 로그인이 필요합니다.
             </span>
           </div>
@@ -128,18 +127,18 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
 
       <div className="space-y-4">
         <textarea
-          placeholder={user ? "따뜻한 응원 메시지를 남겨주세요... (Ctrl+Enter로 전송)" : "로그인 후 응원 메시지를 남겨보세요"}
+          placeholder={user ? "따뜻한 응원 메시지를 남겨주세요..." : "로그인 후 응원 메시지를 남겨보세요"}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyPress}
           disabled={!user}
-          className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:bg-white transition-all resize-none disabled:bg-gray-50 disabled:text-gray-500"
+          className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:bg-white transition-all resize-none disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
           rows={4}
           maxLength={200}
         />
-        
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
+
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+          <div className="flex items-center justify-between sm:justify-start sm:space-x-4">
             <span className="text-sm text-gray-500">
               {message.length}/200
             </span>
@@ -152,15 +151,14 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
               </div>
             )}
           </div>
-          
+
           <button
             onClick={handleSubmit}
             disabled={isDisabled || !message.trim()}
-            className={`flex items-center space-x-2 px-6 py-3 font-semibold rounded-xl transition-all ${
-              isDisabled || !message.trim()
+            className={`flex items-center justify-center space-x-2 w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all ${isDisabled || !message.trim()
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl transform hover:scale-105'
-            }`}
+                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl active:scale-95 sm:hover:scale-105'
+              }`}
           >
             {!user ? (
               <Lock className="w-4 h-4" />
@@ -175,7 +173,7 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
 
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-600 leading-relaxed">{error}</p>
           </div>
         )}
       </div>

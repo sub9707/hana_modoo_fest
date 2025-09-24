@@ -8,7 +8,7 @@ export default function NewsHero() {
           <h1 className="text-4xl mb-6 md:text-4xl lg:text-6xl xl:text-5xl font-bold leading-tight">
             공지 · 소식
           </h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-sm sm:text-xl text-blue-100 break-keep">
             모두하나대축제 2025의 최신 소식과 중요한 공지사항을 확인하세요
           </p>
         </HeroAnimation>

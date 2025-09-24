@@ -57,12 +57,7 @@ export default async function NewsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
       {/* 히어로 섹션 */}
-      <NewsHero 
-        totalNews={initialData.totalNews}
-        todayNews={initialData.todayNews}
-        totalViews={initialData.totalViews}
-        latestNews={initialData.latestNews}
-      />
+      <NewsHero/>
       
       {/* 메인 콘텐츠 */}
       <NewsContainer initialCategories={initialData.categories} />

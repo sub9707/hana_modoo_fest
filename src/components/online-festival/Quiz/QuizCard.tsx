@@ -26,7 +26,7 @@ export const QuizCard = memo(function QuizCard({
 }: QuizCardProps) {
   return (
     <div 
-      className={`bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg transition-all duration-300 ${
+      className={`bg-white/80 backdrop-blur-sm rounded-2xl p-0 py-4 sm:p-8 shadow-none sm:shadow-lg transition-all duration-300 ${
         shakeCard ? `${styles.shakeAnimation}` : ''
       }`}
     >

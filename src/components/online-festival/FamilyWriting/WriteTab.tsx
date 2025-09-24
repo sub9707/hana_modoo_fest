@@ -38,7 +38,7 @@ export default function WriteTab({
           <h3 className="text-xl font-semibold text-gray-600 mb-2">로그인이 필요합니다</h3>
           <p className="text-gray-500 mb-6">글을 작성하려면 먼저 로그인해주세요</p>
           <button
-            onClick={() => window.location.href = '/login'}
+            onClick={() => window.location.href = '/login?redirect=/online-festival'}
             className="px-6 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-600/90 transition-colors"
           >
             로그인 하기

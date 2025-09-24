@@ -8,7 +8,7 @@ export default function ProgramHero() {
           <h1 className="text-4xl mb-6 md:text-4xl lg:text-6xl xl:text-5xl font-bold leading-tight">
             행사 프로그램 안내
           </h1>
-          <p className="text-lg md:text-xl lg:text-xl opacity-90 max-w-3xl mx-auto">
+          <p className="text-md sm:text-lg md:text-xl lg:text-xl opacity-90 max-w-3xl mx-auto break-keep">
             모두하나대축제 2025의 다양한 프로그램을 확인하세요
           </p>
         </HeroAnimation>

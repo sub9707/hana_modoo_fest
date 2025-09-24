@@ -40,7 +40,7 @@ export default function SupportComments() {
 
   return (
     <div className="relative bg-gradient-to-br from-purple-50/50 via-pink-50/50 to-purple-100/50">
-      <div className="p-6 md:p-8 max-w-4xl mx-auto">
+      <div className="p-1 sm:p-6 md:p-8 max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4 shadow-lg">

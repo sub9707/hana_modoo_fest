@@ -29,7 +29,7 @@ export default function NewsContainer({ initialCategories }: NewsContainerProps)
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid lg:grid-cols-4 gap-8">
         {/* 사이드바 - 필터 */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1 space-y-6 hidden sm:flex">
           <NewsFilters 
             categories={initialCategories}
             searchParams={searchParams}

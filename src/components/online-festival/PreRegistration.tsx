@@ -24,9 +24,9 @@ export default function PreRegistration() {
           <span className="text-2xl">✍️</span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          모두하나대축제 사전참가 신청
+          모두하나대축제 <br className='flex sm:hidden'/> 사전참가 신청
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto break-keep">
           10월 18일 여의도공원에서 열리는 모두하나대축제에 미리 신청하고<br />
           더 특별한 혜택을 받아보세요!
         </p>
@@ -35,8 +35,8 @@ export default function PreRegistration() {
       {/* 통계 섹션 */}
       <div className="grid grid-cols-3 gap-6 mb-12">
         {stats.map((stat, index) => (
-          <div key={index} className="text-center p-6 bg-white/50 rounded-2xl">
-            <div className={`text-2xl md:text-3xl font-bold ${stat.color} mb-2`}>
+          <div key={index} className="text-center p-0 sm:p-6 bg-white/50 rounded-2xl">
+            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-2`}>
               {stat.number}
             </div>
             <div className="text-sm md:text-base text-gray-600">

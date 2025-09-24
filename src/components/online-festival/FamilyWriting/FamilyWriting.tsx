@@ -84,7 +84,7 @@ export default function FamilyWriting() {
   }
 
   return (
-    <div className="p-8 md:p-12">
+    <div className="p-1 py-4 sm:p-8 md:p-12">
       {/* 헤더 */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-pink-600/10 rounded-full mb-6">
@@ -93,7 +93,7 @@ export default function FamilyWriting() {
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           가족 이야기 글짓기
         </h2>
-        <p className="text-lg text-gray-600">
+        <p className="text-md sm:text-lg text-gray-600">
           가족에 대한 소중한 이야기를 글로 표현해보세요
         </p>
       </div>
