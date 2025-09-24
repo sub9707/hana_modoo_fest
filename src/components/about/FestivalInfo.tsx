@@ -9,15 +9,16 @@ interface InfoCardProps {
 
 function InfoCard({ label, title, subtitle }: InfoCardProps) {
   return (
-    <div className="flex items-center gap-4 relative">
-      <div className="w-16 h-24 flex items-center justify-center">
-        <span className="text-orange-500 font-semibold text-xl">{label}</span>
+    <div className="flex flex-row items-center gap-4 sm:gap-6 w-full px-1 sm:px-0">
+      <div className="w-12 sm:w-16 h-20 sm:h-24 flex items-center justify-center mb-2 sm:mb-0 flex-shrink-0">
+        <span className="text-orange-500 text-center font-semibold text-lg sm:text-xl">{label}</span>
       </div>
-      <div className="relative border border-orange-200 rounded-3xl h-24 flex-1 flex items-center justify-center bg-white">
-        <div className="absolute -inset-2 bg-gradient-to-r from-orange-300 to-pink-300 rounded-3xl blur-lg opacity-30 -z-10"></div>
+      <div className="relative border border-orange-200 rounded-3xl h-20 sm:h-24 flex-1 flex items-center justify-center bg-white px-4 min-w-0">
+        {/* 모바일에서 px-1 추가하여 블러 효과 여백 확보 */}
+        <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-r from-orange-300 to-pink-300 rounded-3xl blur-lg opacity-30 -z-10"></div>
         <div className="text-center">
-          <div className="text-xl font-medium text-black mb-1">{title}</div>
-          {subtitle && <div className="text-red-500 text-md">{subtitle}</div>}
+          <div className="text-md sm:text-xl font-medium text-black mb-1 break-words">{title}</div>
+          {subtitle && <div className="text-sm sm:text-md text-red-500 break-words">{subtitle}</div>}
         </div>
       </div>
     </div>
@@ -52,18 +53,22 @@ export default function FestivalInfo() {
   ];
 
   return (
-    <section className="py-16 container mx-auto px-4 flex flex-col items-center">
-      <SectionHeader title="축제 정보" mb={3} />
-      <p className="text-xl text-gray-600 mb-12">
+    <section className="py-10 sm:py-16 container mx-auto px-4 flex flex-col items-center overflow-hidden">
+      <SectionHeader title="축제 정보" mb={2} />
+      <p className="text-base sm:text-xl text-gray-600 mb-8 sm:mb-12 text-center">
         모두하나대축제 2025의 상세 정보를 확인하세요.
       </p>
 
-      <div className="relative w-full max-w-3xl space-y-4 mr-20">
-        {infoData.map((item, idx) => (
-          <InfoCard key={idx} {...item} />
-        ))}
-        <div className="absolute -right-80 bottom-0 w-100 h-100">
-          <Image src={'/images/about/moo_reading.webp'} fill alt="moo_reading" />
+      <div className="relative w-full max-w-3xl px-2 sm:px-0">
+        <div className="space-y-4 pr-0 sm:pr-20">
+          {/* 모바일에서 px-2 추가하여 블러 효과가 잘리지 않도록 여백 확보 */}
+          {infoData.map((item, idx) => (
+            <InfoCard key={idx} {...item} />
+          ))}
+        </div>
+        <div className="absolute -right-8 sm:-right-60 bottom-0 sm:bottom-0 w-32 h-32 sm:w-100 sm:h-100 pointer-events-none">
+          {/* 모바일에서 -right-8로 더 우측으로 이동, overflow-hidden으로 스크롤 방지 */}
+          <Image src={'/images/about/moo_reading.webp'} fill alt="moo_reading" className="object-contain" />
         </div>
       </div>
     </section>

@@ -39,7 +39,7 @@ export default function OrganizationHero({ organizationData }: OrganizationHeroP
 
           {/* 로고 */}
           <div className='w-full flex justify-center items-center mb-4 sm:mb-6'>
-            <div className='w-40 h-10 sm:w-60 sm:h-14 lg:w-180 lg:h-20 relative drop-shadow-xl'>
+            <div className='w-70 h-10 sm:w-60 sm:h-14 lg:w-180 lg:h-20 relative drop-shadow-xl'>
               <Image src={'/images/organization/logo.webp'} alt='서울특별시한부모가족지원센터 로고' fill />
             </div>
           </div>

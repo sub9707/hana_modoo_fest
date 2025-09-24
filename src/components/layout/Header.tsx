@@ -18,7 +18,6 @@ const navigation = [
   { name: '행사 프로그램', href: '/programs' },
   { name: '공지/소식', href: '/news' },
   { name: '오시는 길', href: '/directions' },
-  // { name: '갤러리', href: '/gallery' },/
   { name: '함께하는 기관', href: '/partners' },
 ]
 
@@ -42,7 +41,7 @@ export default function Header() {
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
-  
+
 
   return (
     <>
@@ -63,7 +62,7 @@ export default function Header() {
                 aria-label="모두하나대축제 홈페이지로 이동"
               >
                 <div className="relative mt-2 w-35 sm:w-50 h-7 sm:h-10 lg:w-80 lg:h-15 flex">
-                  <Image src={'/icons/logo.png'} fill alt='logo'/>
+                  <Image src={'/icons/logo.png'} fill alt='logo' />
                 </div>
               </Link>
             </div>
@@ -94,39 +93,41 @@ export default function Header() {
               })}
             </nav>
 
-            {/* CTA 버튼 그룹 */}
-            <div className='flex items-center gap-4 ml-6 sm:ml-0'>
-              <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
+            <div className='flex items-center gap-6'>
+              {/* CTA 버튼 그룹 */}
+              <div className='flex items-center gap-4 ml-6 sm:ml-0'>
+                <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
 
-              {/* 로그인 상태에 따른 분기 처리 */}
-              <div className='hidden lg:flex items-center'>
-                {isLoadingAuth ? (
-                  // 로딩 중
-                  <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
-                ) : user ? (
-                  // 로그인된 상태 - 로그아웃만 표시
-                  <LogoutButton type="link" />
-                ) : (
-                  // 로그인되지 않은 상태 - 로그인/회원가입 링크 표시
-                  <HeaderCTAButton href='login' title='로그인/회원가입' type='secondary' />
-                )}
+                {/* 로그인 상태에 따른 분기 처리 */}
+                <div className='hidden lg:flex items-center'>
+                  {isLoadingAuth ? (
+                    // 로딩 중
+                    <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
+                  ) : user ? (
+                    // 로그인된 상태 - 로그아웃만 표시
+                    <LogoutButton type="link" />
+                  ) : (
+                    // 로그인되지 않은 상태 - 로그인/회원가입 링크 표시
+                    <HeaderCTAButton href='login' title='로그인/회원가입' type='secondary' />
+                  )}
+                </div>
+
+                <LanguageSelect />
               </div>
 
-              <LanguageSelect />
+              {/* 모바일 메뉴 버튼 */}
+              <button
+                className="lg:hidden p-2 rounded-md text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
+                onClick={handleMobileMenuToggle}
+                aria-label="메뉴 열기"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
             </div>
-
-            {/* 모바일 메뉴 버튼 */}
-            <button
-              className="lg:hidden p-2 rounded-md text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
-              onClick={handleMobileMenuToggle}
-              aria-label="메뉴 열기"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
           </div>
         </div>
 
@@ -165,7 +166,7 @@ export default function Header() {
                   </div>
                 ) : user ? (
                   <div className="px-3 py-2">
-                    <LogoutButton type="link" showIcon={false} className="text-base" />
+                   <LogoutButton type="link" />
                   </div>
                 ) : (
                   <Link

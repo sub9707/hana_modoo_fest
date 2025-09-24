@@ -36,37 +36,37 @@ export default function FestivalHero() {
               : 'opacity-0 translate-y-6'
           }`}
         >
-          <h1 className="text-[9rem] md:text-[18rem] sm:text-[20rem] font-black bg-gradient-to-r from-cyan-300 via-purple-300 to-indigo-600 bg-clip-text text-transparent leading-none">
+          <h1 className="text-[6rem] md:text-[18rem] sm:text-[20rem] font-black bg-gradient-to-r from-cyan-300 via-purple-300 to-indigo-600 bg-clip-text text-transparent leading-none">
             2025
           </h1>
         </div>
 
         {/* 모두하나 대축제 + 이미지들 */}
         <div 
-          className={`mb-6 -mt-2 sm:-mt-4 relative transition-all duration-700 ease-out ${
+          className={`mb-2 sm:mb-6 -mt-2 sm:-mt-4 relative transition-all duration-700 ease-out ${
             animationStage >= 2 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-6'
           }`}
         >
           <div className="bg-gradient-to-r from-cyan-300 via-purple-300 to-indigo-600 py-1 sm:py-2 px-4 sm:px-8">
-            <h2 className="text-white text-6xl sm:text-9xl font-black">
+            <h2 className="text-white text-4xl sm:text-9xl font-black">
               모두하나 대축제
             </h2>
           </div>
           {/* 이미지 에셋 좌 */}
-          <div className="absolute -left-90 bottom-0 w-90 h-70">
+          <div className="absolute -left-15 sm:-left-90 -bottom-5 sm:bottom-0 w-30 h-20 sm:w-90 sm:h-70">
             <Image src={'/images/about/about_left.webp'} fill alt="" />
           </div>
           {/* 이미지 에셋 우 */}
-          <div className="absolute -right-[38%] -bottom-10 w-110 h-110">
+          <div className="absolute -right-20 sm:-right-[38%] -bottom-5 sm:-bottom-10 w-30 h-30 sm:w-110 sm:h-110">
             <Image src={'/images/about/about_right.webp'} fill alt="" />
           </div>
         </div>
 
-        {/* Seoul Family Diversity Festival */}
+        {/* 영문 소제목 */}
         <p 
-          className={`text-gray-700 text-xl md:text-2xl font-medium mb-4 transition-all duration-700 ease-out ${
+          className={`text-gray-700 text-md sm:text-xl md:text-2xl font-medium mb-1 sm:mb-4 transition-all duration-700 ease-out ${
             animationStage >= 2 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-6'
@@ -87,7 +87,7 @@ export default function FestivalHero() {
         </p>
 
         {/* 정보 카드들 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-12 w-full max-w-6xl">
           {/* 일시 */}
           <div 
             className={`transition-all duration-700 ease-out ${

@@ -3,7 +3,7 @@ import CoreValuesSection from "./CoreValueSection"
 
 export default function VisionSection() {
   return (
-    <section className="py-20 mb-20">
+    <section className="py-20 mb-20 overflow-x-hidden">
       <div className="mx-auto px-4 container ">
         {/* 섹션 헤더 */}
         <div className="text-center mb-32 flex flex-col items-center">

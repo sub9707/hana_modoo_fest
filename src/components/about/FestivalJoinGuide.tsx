@@ -19,7 +19,7 @@ function FestivalJoinGuide() {
 
     // 클래스 생성 함수들을 메모이제이션
     const getTextClass = useCallback((itemId: number, isLeft: boolean) => {
-        const baseClass = `text-6xl font-bold mb-2 cursor-pointer transition-all duration-400 ${styles.baseTextStyle}`;
+        const baseClass = `text-3xl sm:text-6xl font-bold mb-2 cursor-pointer transition-all duration-400 ${styles.baseTextStyle}`;
 
         if (hoveredItem === itemId) {
             return `${baseClass} ${isLeft ? styles.animateGlowTextLeft : styles.animateGlowTextRight}`;
@@ -73,7 +73,7 @@ function FestivalJoinGuide() {
             hasImage: true,
             imageSrc: "/images/about/join_right.webp",
             imageAlt: "참여 방법 우측",
-            imageClass: "absolute -right-85 -top-37 w-80 h-80"
+            imageClass: "absolute sm:-right-85 sm:-top-37 sm:w-80 sm:h-80 -right-14 -top-55 w-25 h-25"
         },
         {
             id: 3,
@@ -90,7 +90,7 @@ function FestivalJoinGuide() {
             hasImage: true,
             imageSrc: "/images/about/join_left_2.webp",
             imageAlt: "참여 방법 좌측",
-            imageClass: "absolute -left-100 -top-37 w-50 h-50"
+            imageClass: "absolute -left-20 -top-105 w-15 h-15 sm:-left-100 sm:-top-50 sm:w-50 sm:h-50"
         }
     ], []);
 
@@ -98,12 +98,12 @@ function FestivalJoinGuide() {
         <section className="py-16 bg-gradient-to-r from-pink-300 to-[rgba(255,162,150,1)] relative overflow-x-hidden">
             <div className="container mx-auto px-4 flex flex-col items-center min-h-screen">
                 {/* 타이틀 */}
-                <h2 className="text-white text-4xl lg:text-8xl font-black italic text-shadow-lg mb-6 text-center">
-                    누구나 참여할 수 있는 축제
-                </h2>
+                <div className="text-white text-4xl lg:text-8xl font-black italic text-shadow-lg mb-6 text-center">
+                    누구나 참여할 수 있는 <span className='text-6xl lg:text-8xl'>축제</span>
+                </div>
                 <p className="text-white text-md lg:text-2xl text-center text-shadow-lg mb-14">
-                    모두하나대축제는 서울시민 누구나, 어떤 형태의 가족이든 환영합니다. <br />
-                    여러분의 참여가 더 따뜻하고 포용적인 서울을 만듭니다.
+                    모두하나대축제는 서울시민 누구나, <br className='flex sm:hidden'/> 어떤 형태의 가족이든 환영합니다. <br />
+                    여러분의 참여가 더 따뜻하고 <br className='flex sm:hidden'/> 포용적인 서울을 만듭니다.
                 </p>
 
                 {/* 그래프 영역 */}
@@ -114,13 +114,13 @@ function FestivalJoinGuide() {
 
                 {/* 참여 방법 영역 - 최적화된 렌더링 */}
                 <div className="text-white text-center py-6 w-full relative my-25">
-                    <h3 className="text-7xl font-bold mb-15 text-shadow-md">참여 방법</h3>
+                    <h3 className="text-5xl sm:text-7xl font-bold mb-15 text-shadow-md">참여 방법</h3>
                     <div className="space-y-8">
                         {participationSteps.map((step) => (
                             <div key={step.id} className={`${styles.participationStep} relative flex items-center justify-center`}>
                                 <div className={`inline-block ${step.isLeft ? 'text-left' : step.id === 3 ? 'text-center' : 'text-right'} relative`}>
                                     {/* 선분과 점 */}
-                                    <div className={`absolute ${step.isLeft ? 'right-[105%]' : 'left-[105%]'} top-[35%] transform -translate-y-1/2 flex items-center`}>
+                                    <div className={`absolute ${step.isLeft ? 'right-[105%]' : 'left-[105%]'} top-[35%] transform -translate-y-1/2 hidden items-center sm:flex`}>
                                         {step.isLeft ? (
                                             <>
                                                 <div className={getLineClass(step.id)}></div>
@@ -169,8 +169,8 @@ function FestivalJoinGuide() {
                     </h3>
                     <ul className="flex flex-col">
                         {specialBenefits.map((item, idx) => (
-                            <li key={idx} className="flex items-center justify-center gap-2 text-lg lg:text-2xl">
-                                <span className="text-white font-bold text-4xl mb-1.5">◆</span>
+                            <li key={idx} className="flex items-center justify-center gap-2 text-sm sm:text-lg lg:text-2xl">
+                                <span className="text-white font-bold text-lg sm:text-4xl mb-1.5">◆</span>
                                 <span className="font-medium">{item}</span>
                             </li>
                         ))}

@@ -27,7 +27,7 @@ export default function VisionSection() {
       <div className="mx-auto px-4 container">
         {/* 핵심 가치 영역 */}
           <div className="text-center mb-12">
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h3 className="text-2xl md:text-5xl font-bold text-gray-900 mb-4">
                한부모가족지원센터의 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">핵심 가치</span>
             </h3>
             <div className="w-20 h-1 bg-gradient-to-r from-cyan-300 via-purple-300 to-indigo-600 mx-auto rounded-full"></div>

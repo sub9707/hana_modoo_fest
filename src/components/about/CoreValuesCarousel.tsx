@@ -46,7 +46,7 @@ function CoreValuesCarousel() {
               />
               {/* 오버레이 + 설명 */}
               <div className="absolute inset-0 bg-black/60 flex items-center justify-center px-4">
-                <p className="text-white text-lg md:text-3xl font-normal text-center w-full">
+                <p className="text-white text-md sm:text-lg md:text-3xl font-normal text-center w-full">
                   {item.description}
                 </p>
               </div>

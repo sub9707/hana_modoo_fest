@@ -20,7 +20,7 @@ export default function FestivalOverview() {
 
               {/* 카드 좌 */}
               <div className="relative group flex-1">
-                <div className="bg-white shadow-lg py-12 px-8 md:px-20 rounded-bl-[3rem] rounded-tr-[3rem] hover:shadow-xl transition-all duration-300 relative z-10 h-full">
+                <div className="bg-white shadow-lg py-6 md:py-12 px-4 md:px-20 rounded-bl-[3rem] rounded-tr-[3rem] hover:shadow-xl transition-all duration-300 relative z-10 h-full">
                   <h3 className="text-xl md:text-4xl font-bold text-orange-400 mb-2">목적</h3>
                   <h4 className="text-lg md:text-xl mb-8 text-gray-600 font-normal">Purpose</h4>
                   <p className="text-base md:text-lg text-orange-400 font-medium">
@@ -28,13 +28,12 @@ export default function FestivalOverview() {
                   </p>
                 </div>
 
-                {/* 오렌지 빛 레이어 */}
                 <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-orange-400 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
               </div>
 
               {/* 카드 우 */}
               <div className="relative group flex-1">
-                <div className="bg-white shadow-lg py-12 px-8 md:px-20 rounded-bl-[3rem] rounded-tr-[3rem] hover:shadow-xl transition-all duration-300 relative z-10 h-full">
+                <div className="bg-white shadow-lg py-6 md:py-12 px-4 md:px-20 rounded-bl-[3rem] rounded-tr-[3rem] hover:shadow-xl transition-all duration-300 relative z-10 h-full">
                   <h3 className="text-xl md:text-4xl font-bold text-pink-400 mb-2">의의</h3>
                   <h4 className="text-lg md:text-xl mb-8 text-gray-600 font-normal">Significance</h4>
                   <p className="text-base md:text-lg text-pink-400 font-medium">
@@ -42,9 +41,9 @@ export default function FestivalOverview() {
                   </p>
                 </div>
 
-                {/* 핑크 빛 레이어 */}
                 <div className="absolute inset-0 rounded-bl-[3rem] rounded-tr-[3rem] bg-pink-400 blur-xl opacity-50 scale-95 transition-all duration-500 group-hover:opacity-80 group-hover:scale-105 group-hover:blur-2xl"></div>
               </div>
+
 
             </div>
           </div>

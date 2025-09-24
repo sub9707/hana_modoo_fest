@@ -4,11 +4,11 @@ function OrganizationBanner() {
     return (
         <section className="w-full h-full min-h-80 bg-[#885ef9]">
             <div className="w-full h-full flex flex-col items-center justify-center gap-6 sm:gap-8 text-center px-4 py-10 relative">
-                <h2 className="text-5xl sm:text-5xl lg:text-6xl text-white font-extrabold leading-tight">
+                <h2 className="text-3xl sm:text-5xl lg:text-6xl text-white font-extrabold leading-tight">
                     함께 만들어가는 따뜻한 사회
                 </h2>
-                <p className="text-white text-lg sm:text-xl leading-relaxed">
-                    서울특별시한부모가족지원센터는 모든 가족이 행복할 수 있는 포용사회를 만들어갑니다. <br /> 여러분의 관심과 참여가 더 나은 미래를 만드는 힘입니다.
+                <p className="text-white text-sm sm:text-xl leading-relaxed">
+                    서울특별시한부모가족지원센터는 <br className="flex sm:hidden"/> 모든 가족이 행복할 수 있는 포용사회를 만들어갑니다. <br /> 여러분의 관심과 참여가 더 나은 미래를 만드는 힘입니다.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link

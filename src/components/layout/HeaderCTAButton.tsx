@@ -8,7 +8,7 @@ interface HeaderCTAButtonProps {
 
 function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps) {
   if (type === "primary") {
-    const primaryStyle = "inline-block px-2 sm:px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 text-center bg-gradient-to-r from-purple-200 via-blue-200 to-green-100 text-white border border-white hover:brightness-105";
+    const primaryStyle = " inline-block text-sm sm:text-lg px-2 sm:px-6 py-2 rounded-lg font-semibold shadow-md transition-all duration-200 text-center bg-gradient-to-r from-purple-200 via-blue-200 to-green-100 text-white border border-white hover:brightness-105";
     const primaryTextShadow = { textShadow: "2px 2px 4px rgba(0,0,0,0.7)" };
     
     return (

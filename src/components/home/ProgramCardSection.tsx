@@ -4,7 +4,7 @@ import cardData from "@/data/ProgramCardData.json"
 
 function ProgramCardSection() {
     return (
-        <section className='w-full h-auto pt-20 pb-32 sm:py-20 min-[2560px]:py-12 px-4 sm:h-screen min-[2560px]:h-[75vh] flex flex-col items-center justify-center'>
+        <section className='w-full h-auto pt-0 sm:pt-20 pb-32 sm:py-20 px-4 sm:h-screen/3 flex flex-col items-center justify-center'>
             {/* 가로 스크롤 컨테이너 */}
             <div className="w-full max-w-6xl">
                 <div

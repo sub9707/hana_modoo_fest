@@ -3,22 +3,17 @@ import HeroCTAButton from "./HeroCTAButton"
 export default function CampaignOverview() {
   const stats = [
     {
-      number: "5,000",
+      number: "2,000",
       label: "예상 참가자",
       unit: "시민"
     },
     {
-      number: "50",
+      number: "27",
       label: "참여 프로그램",
       unit: "개"
     },
     {
-      number: "20",
-      label: "자조모임 부스",
-      unit: "개"
-    },
-    {
-      number: "30",
+      number: "34",
       label: "협력 기관",
       unit: "곳"
     }
@@ -44,10 +39,10 @@ export default function CampaignOverview() {
         </div>
 
         {/* 통계 섹션 */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="flex justify-around items-center">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-4xl lg:text-5xl font-black text-gray-900 mb-2">
+              <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-2">
                 {stat.number}
                 <span className="text-sky-500">+</span>
               </div>
