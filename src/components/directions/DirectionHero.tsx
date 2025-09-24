@@ -47,7 +47,7 @@ export default function DirectionsHero({ venueData }: DirectionsHeroProps) {
         
         {/* 로고 */}
         <div 
-          className={`w-250 h-40 relative mr-40 transition-all duration-700 ease-out ${
+          className={`w-80 h-15 sm:w-250 sm:h-40 relative mr-10 sm:mr-40 transition-all duration-700 ease-out ${
             animationStage >= 1 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-6'
@@ -58,7 +58,7 @@ export default function DirectionsHero({ venueData }: DirectionsHeroProps) {
 
         {/* 메인 타이틀 */}
         <h1 
-          className={`text-5xl md:text-7xl font-bold mb-6 transition-all duration-700 ease-out ${
+          className={`text-3xl sm:text-5xl md:text-7xl font-bold mb-6 transition-all duration-700 ease-out ${
             animationStage >= 2 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-6'

@@ -32,7 +32,7 @@ export default function ParkingSection() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               <span className="header-orange">주차 안내</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
               행사 당일 주차 공간이 제한적이니 대중교통 이용을 권장합니다
             </p>
           </div>

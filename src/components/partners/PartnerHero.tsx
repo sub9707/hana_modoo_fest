@@ -18,11 +18,11 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
 
   // 배경 이미지
   const backgroundImages = [
-    '/images/partners/backgrounds/bg-1.jpg',
-    '/images/partners/backgrounds/bg-2.jpg', 
-    '/images/partners/backgrounds/bg-3.jpg',
-    '/images/partners/backgrounds/bg-4.jpg',
-    '/images/partners/backgrounds/bg-5.jpg'
+    '/images/partners/backgrounds/bg-1.webp',
+    '/images/partners/backgrounds/bg-2.webp',
+    '/images/partners/backgrounds/bg-3.webp',
+    '/images/partners/backgrounds/bg-4.webp',
+    '/images/partners/backgrounds/bg-5.webp'
   ];
 
   // 모든 파트너 데이터
@@ -51,28 +51,44 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
         <div className={`text-center space-y-8 xl:space-y-12 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
           {/* 메인 제목 */}
+          {/* 메인 제목 */}
           <div className="space-y-6">
-            <div className="w-full -translate-x-8 text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight text-white flex justify-start text-center">
-              <div className='w-200 h-35 relative'>
-                <Image src={'/icons/logo@2x_invert.png'} alt='modoo_logo' fill/>
+            <div className="
+              w-full translate-0 sm:-translate-x-8 
+              text-4xl md:text-6xl lg:text-7xl xl:text-8xl 
+              font-bold leading-tight text-white 
+              flex flex-col sm:flex-row justify-start text-center sm:text-left
+            "
+            >
+              {/* 로고 */}
+              <div className="w-90 h-15 sm:w-200 sm:h-35 -translate-x-4 sm:translate-x-0 relative">
+                <Image src={'/icons/logo@2x_invert.png'} alt="modoo_logo" fill />
               </div>
-              와 &nbsp;
-              <span className="block bg-gradient-to-r from-cyan-100 via-indigo-300 to-purple-300 bg-clip-text text-transparent">
-                함께하는 기관
+
+              {/* 모바일에서만 줄바꿈, 데스크탑은 한 줄 */}
+              <span className="block sm:inline mt-2 sm:mt-0 text-center">
+                와&nbsp;
+                <span className="bg-gradient-to-r from-cyan-100 via-indigo-300 to-purple-300 bg-clip-text text-transparent">
+                  함께하는 기관
+                </span>
               </span>
             </div>
-            <p className="text-xl md:text-2xl lg:text-3xl text-cyan-100 max-w-4xl mx-auto leading-relaxed">
-              모두하나대축제 2025의 성공을 위해
+
+            <p className="text-md sm:text-xl md:text-2xl lg:text-3xl text-cyan-100 max-w-4xl mx-auto leading-relaxed">
+              모두하나대축제 2025의 성공을 위해&nbsp;
               <br className="hidden sm:block" />
               함께 노력하는 소중한 파트너들을 소개합니다
             </p>
           </div>
 
+
+
+
           {/* 파트너 로고 스크롤 배너 */}
           <div className={`transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 py-6 mx-auto max-w-6xl overflow-hidden">
               <h3 className="text-center text-lg font-semibold text-cyan-200 mb-4">함께하는 파트너들</h3>
-              
+
               {/* 로고 스크롤 컨테이너 */}
               <div className="relative overflow-hidden">
                 <div className="flex animate-scroll whitespace-nowrap">
@@ -125,7 +141,7 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* 그라디언트 페이드 효과 */}
                 <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-white/10 to-transparent pointer-events-none"></div>
                 <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-white/10 to-transparent pointer-events-none"></div>
@@ -158,10 +174,10 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
           <div className={`transition-all duration-1000 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="flex flex-col items-center space-y-3 text-white/70 mt-8">
               <span className="text-sm font-medium">파트너들을 만나보세요</span>
-              <svg 
-                className="w-6 h-6 animate-bounce" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-6 h-6 animate-bounce"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />

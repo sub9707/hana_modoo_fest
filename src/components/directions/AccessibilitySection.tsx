@@ -140,7 +140,7 @@ export default function AccessibilitySection() {
                 추가적인 지원이 필요하시거나 궁금한 사항이 있으시면 언제든지 연락해 주세요
               </p>
             </div>
-            <div className="mt-6 text-center text-md font-bold text-gray-500">
+            <div className="mt-6 text-center text-sm sm:text-md text-md font-bold text-gray-500">
               <p>전화: 02-2133-5000 | 이메일: accessibility@seoulsingleparent.or.kr</p>
             </div>
           </div>
