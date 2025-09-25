@@ -89,8 +89,7 @@ function initiateOAuth(
   const state = generateState()
 
   // 서버 기준으로 프로덕션 URL 사용
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
-  const redirectUri = `${baseUrl}/api/auth/oauth`
+  const redirectUri = getRedirectUri(request)
 
   console.log('Initiating OAuth for provider:', provider)
   console.log('Redirect URI:', redirectUri)
@@ -197,7 +196,7 @@ async function getAccessToken(
   request: NextRequest
 ): Promise<{ success: boolean; accessToken?: string; refreshToken?: string }> {
   try {
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth`
+    const redirectUri = getRedirectUri(request)
 
     console.log(`🔑 Getting ${provider} access token...`)
     console.log('Redirect URI:', redirectUri)
@@ -391,4 +390,13 @@ async function handleExistingUserLogin(
 function generateState(): string {
   return Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
+}
+
+function getRedirectUri(request: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+  if (!baseUrl) {
+    console.error('❌ NEXT_PUBLIC_APP_URL이 설정되지 않았습니다.')
+    throw new Error('NEXT_PUBLIC_APP_URL 환경변수를 반드시 설정해야 합니다.')
+  }
+  return `${baseUrl}/api/auth/oauth`
 }
