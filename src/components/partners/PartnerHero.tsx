@@ -51,15 +51,13 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
         <div className={`text-center space-y-8 xl:space-y-12 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
 
           {/* 메인 제목 */}
-          {/* 메인 제목 */}
           <div className="space-y-6">
             <div className="
               w-full translate-0 sm:-translate-x-8 
               text-4xl md:text-6xl lg:text-7xl xl:text-8xl 
-              font-bold leading-tight text-white 
+              font-bold leading-tight text-white
               flex flex-col sm:flex-row justify-start text-center sm:text-left
-            "
-            >
+            ">
               {/* 로고 */}
               <div className="w-90 h-15 sm:w-200 sm:h-35 -translate-x-4 sm:translate-x-0 relative">
                 <Image src={'/icons/logo@2x_invert.png'} alt="modoo_logo" fill />
@@ -80,8 +78,6 @@ export default function PartnerHero({ partnersData }: PartnerHeroProps) {
               함께 노력하는 소중한 파트너들을 소개합니다
             </p>
           </div>
-
-
 
 
           {/* 파트너 로고 스크롤 배너 */}

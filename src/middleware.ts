@@ -3,13 +3,17 @@ import type { RowDataPacket } from 'mysql2/promise'
 
 // 사용자 역할 타입 정의
 export type Role = 'admin' | 'editor' | 'user'
+export type SignupMethod = 'phone' | 'naver' | 'kakao'
 
-// 데이터베이스 사용자 타입 정의
+// 데이터베이스 사용자 타입 정의 (SNS 정보 포함)
 interface DatabaseUser extends RowDataPacket {
   id: string
   name: string
   username: string
   role: Role
+  signup_method: SignupMethod
+  email?: string
+  profile_image?: string
   session_expires_at: string | null
   last_activity_at: string | null
 }
@@ -20,6 +24,9 @@ interface MiddlewareUser {
   name: string
   username: string
   role: Role
+  signup_method: SignupMethod
+  email?: string
+  profile_image?: string
   session_expires_at: Date | null
   last_activity_at: Date | null
 }
@@ -117,13 +124,16 @@ async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
   }
 }
 
-// 사용자 데이터 변환 함수
+// 사용자 데이터 변환 함수 (SNS 정보 포함)
 function transformDatabaseUser(dbUser: DatabaseUser): MiddlewareUser {
   return {
     id: dbUser.id,
     name: dbUser.name,
     username: dbUser.username,
     role: dbUser.role,
+    signup_method: dbUser.signup_method,
+    email: dbUser.email,
+    profile_image: dbUser.profile_image,
     session_expires_at: dbUser.session_expires_at ? new Date(dbUser.session_expires_at) : null,
     last_activity_at: dbUser.last_activity_at ? new Date(dbUser.last_activity_at) : null
   }
@@ -186,12 +196,17 @@ async function updateUserActivity(userId: string): Promise<void> {
   }
 }
 
-// 사용자 인증 함수
+// 사용자 인증 함수 (SNS 계정 정보 포함)
 async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | null> {
   if (!sessionToken) return null
 
+  // SNS 계정 정보와 함께 사용자 정보 조회
   const dbUser = await queryDatabase<DatabaseUser>(
-    'SELECT id, name, username, role, session_expires_at, last_activity_at FROM users WHERE session_token = ?',
+    `SELECT 
+       u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
+       u.session_expires_at, u.last_activity_at
+     FROM users u
+     WHERE u.session_token = ?`,
     [sessionToken]
   )
 
@@ -206,6 +221,28 @@ async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | 
   }
 
   return user
+}
+
+// SNS 계정 정보 조회 함수
+async function getSocialAccounts(userId: string): Promise<any[]> {
+  try {
+    const mysql = await import('mysql2/promise')
+    const config = getDatabaseConfig()
+    const connection = await mysql.default.createConnection(config)
+    
+    const [rows] = await connection.execute(
+      `SELECT provider, provider_id, provider_email, provider_name, provider_profile_image
+       FROM social_accounts 
+       WHERE user_id = ?`,
+      [userId]
+    )
+    
+    await connection.end()
+    return Array.isArray(rows) ? rows as any[] : []
+  } catch (error) {
+    console.error('Error fetching social accounts:', error)
+    return []
+  }
 }
 
 // 리다이렉트 URL 생성 함수
@@ -229,6 +266,16 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
     sameSite: 'lax' as const,
     path: '/',
   }
+}
+
+// 가입 방법별 메시지 생성
+function getSignupMethodMessage(signupMethod: SignupMethod): string {
+  const messages = {
+    phone: '전화번호로 가입한 계정입니다.',
+    naver: '네이버 계정으로 가입한 계정입니다.',
+    kakao: '카카오 계정으로 가입한 계정입니다.'
+  }
+  return messages[signupMethod]
 }
 
 // 메인 미들웨어 함수
@@ -263,6 +310,17 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     if (user) {
       const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/dashboard'
       return NextResponse.redirect(new URL(callbackUrl, request.url))
+    }
+    return response
+  }
+
+  // 회원가입 페이지 접근 처리
+  if (pathname === '/register') {
+    if (user) {
+      const dashboardUrl = createRedirectUrl(request, '/dashboard', {
+        message: '이미 로그인된 상태입니다.'
+      })
+      return NextResponse.redirect(dashboardUrl)
     }
     return response
   }
@@ -317,9 +375,20 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    // 사용자 정보를 헤더에 추가 (선택사항 - 클라이언트에서 사용할 수 있음)
+    // 사용자 정보를 헤더에 추가 (클라이언트에서 사용 가능)
     response.headers.set('x-user-id', user.id)
     response.headers.set('x-user-role', user.role)
+    response.headers.set('x-user-signup-method', user.signup_method)
+    
+    // SNS 사용자의 경우 추가 정보
+    if (user.signup_method !== 'phone') {
+      if (user.email) {
+        response.headers.set('x-user-email', user.email)
+      }
+      if (user.profile_image) {
+        response.headers.set('x-user-profile-image', user.profile_image)
+      }
+    }
   }
 
   return response

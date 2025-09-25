@@ -12,9 +12,21 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**.seoul.kr'
+      },
+      {
+        protocol: 'https',
+        hostname: 'ssl.pstatic.net', // 네이버 프로필 이미지
+      },
+      {
+        protocol: 'http',
+        hostname: 'k.kakaocdn.net', // 카카오 프로필 이미지
+      },
+      {
+        protocol: 'https',
+        hostname: 'k.kakaocdn.net', // 카카오 프로필 이미지 (HTTPS)
       }
     ],
-    
+
   },
   async headers() {
     return [

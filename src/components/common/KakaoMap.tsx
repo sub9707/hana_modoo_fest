@@ -70,18 +70,12 @@ export default function KakaoMap({
         }}
         level={3}
         zoomable={true}
-        onLoad={() => {
-          console.log('카카오 맵이 성공적으로 로드되었습니다.');
-        }}
       >
         {/* 마커 */}
         <MapMarker
           position={{
             lat: coordinates.lat,
             lng: coordinates.lng,
-          }}
-          onClick={() => {
-            console.log('마커가 클릭되었습니다!');
           }}
         />
         

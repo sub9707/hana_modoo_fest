@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@/types/auth'
 
 interface AuthContextType {
@@ -23,21 +23,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  // 쿠키에서 세션 토큰 확인하는 함수
-  const hasSessionToken = useCallback(() => {
-    if (typeof document === 'undefined') return false
-    return document.cookie.includes('session-token=')
-  }, [])
-
   // NextJS 15: useCallback으로 함수 메모이제이션
   const refreshUser = useCallback(async () => {
-    // 🔥 세션 토큰이 없으면 API 호출하지 않음
-    if (!hasSessionToken()) {
-      setUser(null)
-      return
-    }
-
+    
     try {
+      
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
@@ -47,31 +37,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
         },
       })
       
+      
       if (response.ok) {
         const { user: userData } = await response.json()
         setUser(userData)
       } else if (response.status === 401) {
-        // 인증 실패 시 사용자 상태 클리어
+        setUser(null)
+      } else {
         setUser(null)
       }
     } catch (error) {
-      console.error('Auth refresh error:', error)
+      console.error('🚨 Auth refresh error:', error)
       setUser(null)
     }
-  }, [hasSessionToken])
+  }, [])
 
-  // NextJS 15: 로그인 처리 개선
   const login = useCallback((userData: User) => {
     setUser(userData)
-    // NextJS 15: 서버 컴포넌트 리프레시
-    router.refresh()
-  }, [router])
+  }, [])
 
   // NextJS 15: 로그아웃 처리 개선
   const logout = useCallback(() => {
     setUser(null)
-    // NextJS 15: 서버 컴포넌트 리프레시
-    router.refresh()
   }, [router])
 
   // NextJS 15: 초기 인증 상태 확인 최적화
@@ -91,22 +78,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     checkAuthStatus()
 
-    // NextJS 15: 컴포넌트 언마운트 시 정리
     return () => {
       mounted = false
     }
   }, [refreshUser])
 
-  // 🔥 수정된 부분: 세션 토큰이 있을 때만 리프레시
+  // 포커스 이벤트에서 리프레시 (쿠키 체크 제거)
   useEffect(() => {
     const handleFocus = () => {
-      if (!isLoading && document.visibilityState === 'visible' && hasSessionToken()) {
+      if (!isLoading && document.visibilityState === 'visible') {
         refreshUser()
       }
     }
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && hasSessionToken()) {
+      if (document.visibilityState === 'visible') {
         handleFocus()
       }
     }
@@ -118,9 +104,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       window.removeEventListener('focus', handleFocus)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isLoading, refreshUser, hasSessionToken])
+  }, [isLoading, refreshUser])
 
-  // NextJS 15: Context value 메모이제이션
+  // Context value 메모이제이션
   const contextValue = {
     user,
     isLoading,
@@ -136,7 +122,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 }
 
-// NextJS 15: useAuth 훅 개선
 export function useAuth() {
   const context = useContext(AuthContext)
   
@@ -147,7 +132,6 @@ export function useAuth() {
   return context
 }
 
-// NextJS 15: 추가 훅들
 export function useRequireAuth() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
@@ -182,4 +166,26 @@ export function useRequireRole(requiredRole: 'admin' | 'editor' | 'user') {
   }, [user, isLoading, requiredRole, router])
 
   return { user, isLoading, hasPermission: user ? roleHierarchy[user.role] >= roleHierarchy[requiredRole] : false }
+}
+
+// SNS 로그인 후 인증 상태 새로고침
+export function useAuthRefresh() {
+  const { refreshUser } = useAuth()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const shouldRefresh = searchParams.get('auth_refresh')
+    
+    if (shouldRefresh === 'true') {
+      // 파라미터 제거
+      const url = new URL(window.location.href)
+      url.searchParams.delete('auth_refresh')
+      window.history.replaceState({}, '', url.pathname + url.search)
+      
+      // 잠시 후 인증 상태 새로고침
+      setTimeout(() => {
+        refreshUser()
+      }, 100)
+    }
+  }, [searchParams, refreshUser])
 }

@@ -191,7 +191,7 @@ export async function extendSession() {
     }
 }
 
-export async function loginWithRedirect(formData: FormData, redirectTo: string = '/dashboard') {
+export async function loginWithRedirect(formData: FormData, redirectTo: string = '/') {
     const result = await loginAction(formData)
 
     if (result.success) {

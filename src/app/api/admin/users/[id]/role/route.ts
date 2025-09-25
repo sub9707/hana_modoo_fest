@@ -55,9 +55,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const updatedUser = await updateUserRole(params.userId, role)
 
-    // 로그 기록 (선택사항)
-    console.log(`User role changed: ${existingUser.name} (${params.userId}) from ${existingUser.role} to ${role} by ${currentUser.name} (${currentUser.id})`)
-
     return NextResponse.json({
       message: `${existingUser.name}님의 역할이 ${role}(으)로 변경되었습니다.`,
       user: updatedUser,
