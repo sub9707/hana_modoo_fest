@@ -4,13 +4,13 @@ import { getUserById, updateUserRole, getAdminCount } from '@/lib/users-service'
 import { Role } from '@/types/auth'
 
 interface RouteParams {
-  params: {
-    userId: string
-  }
+  params: Promise<{ id: string }>
 }
+
 
 // PATCH: 사용자 역할 변경
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+   const { id } = await params
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -33,27 +33,27 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // 사용자 존재 확인
-    const existingUser = await getUserById(params.userId)
+    const existingUser = await getUserById(id)
     if (!existingUser) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 })
     }
 
     // 자기 자신의 관리자 권한을 제거하려는 시도 방지
-    if (currentUser.id === params.userId && existingUser.role === 'admin' && role !== 'admin') {
-      return NextResponse.json({ 
-        error: '자신의 관리자 권한을 제거할 수 없습니다.' 
+    if (currentUser.id === id && existingUser.role === 'admin' && role !== 'admin') {
+      return NextResponse.json({
+        error: '자신의 관리자 권한을 제거할 수 없습니다.'
       }, { status: 400 })
     }
 
     // 이미 같은 역할인 경우
     if (existingUser.role === role) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: '이미 해당 역할을 가지고 있습니다.',
-        user: existingUser 
+        user: existingUser
       })
     }
 
-    const updatedUser = await updateUserRole(params.userId, role)
+    const updatedUser = await updateUserRole(id, role)
 
     return NextResponse.json({
       message: `${existingUser.name}님의 역할이 ${role}(으)로 변경되었습니다.`,
@@ -72,6 +72,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 // GET: 역할 변경 가능 여부 확인
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const { id } = await params
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // 사용자 존재 확인
-    const existingUser = await getUserById(params.userId)
+    const existingUser = await getUserById(id)
     if (!existingUser) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 })
     }
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let restrictions: string[] = []
 
     // 자기 자신인 경우
-    if (currentUser.id === params.userId) {
+    if (currentUser.id === id) {
       if (existingUser.role === 'admin') {
         availableRoles = ['admin'] // 자신의 관리자 권한은 제거 불가
         canChangeRole = false

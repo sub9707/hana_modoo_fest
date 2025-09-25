@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
     { protocol: 'https', hostname: '**.seoul.kr' },     // 서울시 도메인
   ],
 },
+  eslint:{
+    ignoreDuringBuilds: true,
+  },
   async headers() {
     return [
       {

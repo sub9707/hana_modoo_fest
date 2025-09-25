@@ -3,13 +3,12 @@ import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
 import { getUserById, updateUser, deleteUser, UpdateUserData } from '@/lib/users-service'
 
 interface RouteParams {
-  params: {
-    userId: string
-  }
+  params: Promise<{ id: string }>
 }
 
 // GET: 특정 사용자 정보 조회
 export async function GET(request: NextRequest, { params }: RouteParams) {
+  const { id } = await params
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: '관리자 권한이 필요합니다.' }, { status: 403 })
     }
 
-    const user = await getUserById(params.userId)
+    const user = await getUserById(id)
     if (!user) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 })
     }
@@ -39,6 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PUT: 사용자 정보 업데이트
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const { id } = await params
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     // 자기 자신의 관리자 권한을 제거하려는 시도 방지
-    if (currentUser.id === params.userId && role !== 'admin') {
+    if (currentUser.id === id && role !== 'admin') {
       return NextResponse.json({ 
         error: '자신의 관리자 권한을 제거할 수 없습니다.' 
       }, { status: 400 })
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       role
     }
 
-    const updatedUser = await updateUser(params.userId, userData)
+    const updatedUser = await updateUser(id, userData)
     return NextResponse.json(updatedUser)
   } catch (error) {
     console.error('Error updating user:', error)
@@ -100,6 +100,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 // DELETE: 사용자 삭제
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const { id } = await params
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -113,13 +114,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     // 자기 자신을 삭제하려는 시도 방지
-    if (currentUser.id === params.userId) {
+    if (currentUser.id === id) {
       return NextResponse.json({ 
         error: '자신의 계정을 삭제할 수 없습니다.' 
       }, { status: 400 })
     }
 
-    await deleteUser(params.userId)
+    await deleteUser(id)
     return NextResponse.json({ message: '사용자가 성공적으로 삭제되었습니다.' })
   } catch (error) {
     console.error('Error deleting user:', error)

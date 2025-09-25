@@ -95,7 +95,8 @@ export async function getUserById(userId: string): Promise<User | null> {
         last_login_at, 
         last_activity_at, 
         created_at, 
-        updated_at
+        updated_at,
+        signup_method
       FROM users 
       WHERE id = ?
     `, [userId])
@@ -114,7 +115,8 @@ export async function getUserById(userId: string): Promise<User | null> {
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,
-      updated_at: user.updated_at
+      updated_at: user.updated_at,
+      signup_method: user.signup_method
     }
   } catch (error) {
     console.error('Error fetching user by ID:', error)
@@ -163,17 +165,17 @@ export async function createUser(userData: CreateUserData): Promise<User> {
         password_hash, password_salt, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      userId, 
-      userData.name, 
-      userData.username, 
-      userData.company || null, 
-      userData.gender, 
-      userData.birth_date, 
-      userData.phone, 
+      userId,
+      userData.name,
+      userData.username,
+      userData.company || null,
+      userData.gender,
+      userData.birth_date,
+      userData.phone,
       userData.role,
-      passwordHash, 
-      salt, 
-      now, 
+      passwordHash,
+      salt,
+      now,
       now
     ])
 
@@ -212,13 +214,13 @@ export async function updateUser(userId: string, userData: UpdateUserData): Prom
       SET name = ?, company = ?, gender = ?, birth_date = ?, phone = ?, role = ?, updated_at = ?
       WHERE id = ?
     `, [
-      userData.name, 
-      userData.company || null, 
-      userData.gender, 
-      userData.birth_date, 
-      userData.phone, 
-      userData.role, 
-      now, 
+      userData.name,
+      userData.company || null,
+      userData.gender,
+      userData.birth_date,
+      userData.phone,
+      userData.role,
+      now,
       userId
     ])
 
@@ -307,7 +309,7 @@ export async function deleteUser(userId: string): Promise<void> {
         'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
         [userId]
       )
-      
+
       // 사용자 삭제
       await connection.execute('DELETE FROM users WHERE id = ?', [userId])
     })
@@ -340,7 +342,7 @@ export async function getUserStats(): Promise<UserStats> {
   try {
     const users = await getAllUsers()
     const now = new Date()
-    
+
     return {
       total: users.length,
       admin: users.filter(u => u.role === 'admin').length,

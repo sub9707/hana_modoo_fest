@@ -6,7 +6,7 @@ import type { ApiResponse } from '@/types/event'
 // 상품 수량 업데이트 (관리자만)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -19,7 +19,7 @@ export async function PATCH(
 
     const body = await request.json()
     const { current_quantity } = body
-    const prizeId = params.id
+    const { id: prizeId } = await context.params
 
     if (current_quantity === undefined || current_quantity < 0) {
       return NextResponse.json<ApiResponse>(
