@@ -177,9 +177,10 @@ async function handleOAuthCallback(
 
     // 3. 새 사용자 - 회원가입 페이지로 이동
     const userDataParam = encodeURIComponent(JSON.stringify(userResponse.userData))
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
     return NextResponse.redirect(new URL(
       `/register?provider=${provider}&user_data=${userDataParam}&redirect=${encodeURIComponent(redirect)}`,
-      request.url
+      baseUrl
     ))
 
   } catch (error) {
@@ -393,6 +394,18 @@ function generateState(): string {
 }
 
 function getRedirectUri(request: NextRequest) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
-  return `${baseUrl}/api/auth/oauth`
+  // 환경변수를 우선 사용
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+
+  if (baseUrl) {
+    return `${baseUrl}/api/auth/oauth`
+  }
+
+  // 환경변수가 없는 경우 fallback
+  const protocol = request.headers.get('x-forwarded-proto') || 'http'
+  const host = request.headers.get('x-forwarded-host') ||
+    request.headers.get('host') ||
+    'localhost:3000'
+
+  return `${protocol}://${host}/api/auth/oauth`
 }
