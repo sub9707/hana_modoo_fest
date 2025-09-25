@@ -92,6 +92,7 @@ export default function PartnerCard({ partner, size = 'medium' }: PartnerCardPro
 
   const categoryColors = getCategoryColor(partner.category)
   const sizeClasses = getSizeClasses()
+  const hasLogo = !!partner.logo && !imageError
 
   return (
     <div
@@ -107,7 +108,7 @@ export default function PartnerCard({ partner, size = 'medium' }: PartnerCardPro
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-300 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       {/* 카드 콘텐츠 */}
-      <div className={`relative ${sizeClasses.container} space-y-4`}>
+      <div className={`relative ${sizeClasses.container} ${hasLogo ? 'space-y-4' : 'space-y-2'}`}>
         {/* 헤더 - 카테고리와 링크 아이콘 */}
         <div className="flex justify-between items-start">
           <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${categoryColors.bg} ${categoryColors.text} ${categoryColors.border} border backdrop-blur-sm`}>
@@ -126,12 +127,12 @@ export default function PartnerCard({ partner, size = 'medium' }: PartnerCardPro
           )}
         </div>
 
-        {/* 로고 */}
-        <div className={`flex justify-center items-center ${sizeClasses.logoHeight} p-3`}>
-          {!imageError && partner.logo ? (
+        {/* 로고 (로고가 있을 때만 렌더) */}
+        {hasLogo && (
+          <div className={`flex justify-center items-center ${sizeClasses.logoHeight} p-3`}>
             <div className="relative w-full h-full">
               <Image
-                src={partner.logo}
+                src={partner.logo as string}
                 alt={`${partner.name} 로고`}
                 fill
                 className="object-contain transition-all duration-500 group-hover:scale-110 filter group-hover:brightness-110"
@@ -139,17 +140,8 @@ export default function PartnerCard({ partner, size = 'medium' }: PartnerCardPro
                 priority={false}
               />
             </div>
-          ) : (
-            <div className={`flex items-center justify-center w-full h-full bg-gradient-to-br ${categoryColors.gradient} rounded-xl text-white shadow-inner`}>
-              <div className="text-center">
-                <div className="text-2xl font-bold mb-1">
-                  {partner.name.substring(0, 2)}
-                </div>
-                <div className="text-xs opacity-80">LOGO</div>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* 기관명 */}
         <h3 className={`${sizeClasses.title} font-bold text-gray-900 text-center group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:${categoryColors.gradient} group-hover:bg-clip-text transition-all duration-300`}>

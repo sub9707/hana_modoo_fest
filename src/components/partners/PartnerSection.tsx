@@ -19,7 +19,7 @@ interface PartnerSectionProps {
 
 export default function PartnerSection({
   title,
-  subtitle, 
+  subtitle,
   description,
   partners,
   icon,
@@ -63,11 +63,11 @@ export default function PartnerSection({
               </div>
               {title}
             </div>
-            
+
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
               {subtitle}
             </h2>
-            
+
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               {description}
             </p>
@@ -83,7 +83,9 @@ export default function PartnerSection({
           </div>
 
           {/* 파트너 그리드 */}
-          <div className={`grid ${getGridClasses()} gap-6 transition-all duration-500 ${isAnimating ? 'opacity-75 scale-95' : 'opacity-100 scale-100'}`}>
+          <div
+            className={`grid ${displayedPartners.length === 1 ? 'grid-cols-1 place-items-center' : getGridClasses()} gap-6 transition-all duration-500 ${isAnimating ? 'opacity-75 scale-95' : 'opacity-100 scale-100'}`}
+          >
             {displayedPartners.map((partner, index) => (
               <div
                 key={partner.id}
@@ -107,10 +109,10 @@ export default function PartnerSection({
                 <span className="mr-2">
                   {showAll ? `접기` : `${partners.length - initialDisplay}개 더보기`}
                 </span>
-                <svg 
+                <svg
                   className={`w-5 h-5 transition-transform duration-300 ${showAll ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

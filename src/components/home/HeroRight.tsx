@@ -19,7 +19,7 @@ export default function HeroRight({ animationStage }: HeroRightProps) {
                     : 'opacity-0 translate-y-6'
             }`}
         >
-          <VideoPlayer src="/videos/main/sample_video.mp4"/>
+          <VideoPlayer src="/videos/main/home_video.mp4"/>
         </div>
         
         {/* 캐릭터 이미지 */}
