@@ -11,16 +11,6 @@ interface KakaoAddressSearchProps {
   disabled?: boolean
 }
 
-declare global {
-  interface Window {
-    daum: {
-      Postcode: new (options: any) => {
-        open: () => void
-      }
-    }
-  }
-}
-
 export default function KakaoAddressSearch({ 
   onAddressSelect, 
   placeholder = "주소를 검색해주세요",

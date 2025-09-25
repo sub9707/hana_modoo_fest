@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    domains: ['localhost', 't1.kakaocdn.net'],
+    domains: ['localhost', 't1.kakaocdn.net', 'img1.kakaocdn.net','ssl.pstatic.net' ],
     remotePatterns: [
       {
         protocol: 'https',

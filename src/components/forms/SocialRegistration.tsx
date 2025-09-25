@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, User, Loader2, Check, AlertCircle, Search } from 'lucide-react'
+import { ArrowLeft, User, Loader2, Check, AlertCircle, Search, Phone, Calendar, UserCheck } from 'lucide-react'
 import Image from 'next/image'
-import { useAuth } from '@/contexts/AuthContext' // 추가
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 interface SocialRegistrationProps {
   socialData: {
@@ -24,30 +25,95 @@ interface SocialRegistrationProps {
   onBack: () => void
 }
 
+// 모든 필드를 선택적으로 만든 고정 스키마
 const socialUserInfoSchema = z.object({
   address: z.string().min(1, '주소를 입력해주세요'),
   addressDetail: z.string().optional(),
-  zipCode: z.string().min(5, '우편번호를 입력해주세요')
+  zipCode: z.string().min(5, '우편번호를 입력해주세요'),
+  name: z.string().min(2, '이름을 입력해주세요').optional(),
+  phone: z.string()
+    .min(11, '전화번호를 올바르게 입력해주세요')
+    .regex(/^01[0-9]{9}$/, '올바른 전화번호 형식이 아닙니다')
+    .optional(),
+  gender: z.enum(['male', 'female', 'none'], { message: '성별을 선택해주세요' }).optional(),
+  birthDate: z.string()
+    .min(1, '생년월일을 입력해주세요')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '올바른 날짜 형식이 아닙니다')
+    .optional()
+}).superRefine((data, ctx) => {
+  // 런타임에서 동적 검증 - socialData에 없는 정보만 필수로 체크
+  const socialData = (window as any).__tempSocialData
+
+  if (!socialData?.name && !data.name) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '이름을 입력해주세요',
+      path: ['name']
+    })
+  }
+
+  if (!socialData?.mobile && !data.phone) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '전화번호를 입력해주세요',
+      path: ['phone']
+    })
+  }
+
+  if ((!socialData?.gender || socialData.gender === 'none') && !data.gender) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '성별을 선택해주세요',
+      path: ['gender']
+    })
+  }
+
+  if ((!socialData?.birthyear || !socialData?.birthday) && !data.birthDate) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: '생년월일을 입력해주세요',
+      path: ['birthDate']
+    })
+  }
 })
 
 type SocialUserInfoFormData = z.infer<typeof socialUserInfoSchema>
 
-export default function SocialRegistration({ 
-  socialData, 
-  onComplete, 
-  onBack 
+export default function SocialRegistration({
+  socialData,
+  onComplete,
+  onBack
 }: SocialRegistrationProps) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
-  const { login, refreshUser } = useAuth() // 추가
+  const { login, refreshUser } = useAuth()
+  const router = useRouter()
+
+  // URL에서 원래 가려던 경로 추출
+  const searchParams = new URLSearchParams(window.location.search)
+  const originalRedirect = searchParams.get('redirect') || '/'
+
+  // 부족한 정보 체크
+  const missingInfo = {
+    name: !socialData?.name,
+    phone: !socialData?.mobile,
+    gender: !socialData?.gender || socialData.gender === 'none',
+    birthDate: !socialData?.birthyear || !socialData?.birthday
+  }
 
   const form = useForm<SocialUserInfoFormData>({
     resolver: zodResolver(socialUserInfoSchema),
     defaultValues: {
       address: '',
       addressDetail: '',
-      zipCode: ''
+      zipCode: '',
+      name: socialData?.name || '',
+      phone: socialData?.mobile?.replace(/-/g, '') || '',
+      gender: socialData?.gender === 'M' ? 'male' : socialData?.gender === 'F' ? 'female' : 'none',
+      birthDate: socialData?.birthyear && socialData?.birthday
+        ? `${socialData.birthyear}-${socialData.birthday}`
+        : ''
     }
   })
 
@@ -92,10 +158,10 @@ export default function SocialRegistration({
     }
 
     new window.daum.Postcode({
-      oncomplete: function(data) {
+      oncomplete: function (data) {
         form.setValue('zipCode', data.zonecode)
         form.setValue('address', data.roadAddress || data.jibunAddress)
-        
+
         const addressDetailInput = document.querySelector('input[name="addressDetail"]') as HTMLInputElement
         if (addressDetailInput) {
           addressDetailInput.focus()
@@ -108,6 +174,13 @@ export default function SocialRegistration({
     }).open()
   }
 
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/[^\d]/g, '')
+    if (numbers.length <= 3) return numbers
+    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`
+  }
+
   const handleSubmit = async (data: SocialUserInfoFormData) => {
     if (!socialData) {
       setError('SNS 인증 정보가 없습니다.')
@@ -118,43 +191,61 @@ export default function SocialRegistration({
     setIsLoading(true)
 
     try {
-      let birthDate = ''
-      if (socialData.birthday && socialData.birthyear) {
-        birthDate = `${socialData.birthyear}-${socialData.birthday}`
-      } else if (socialData.birthyear) {
-        birthDate = `${socialData.birthyear}-01-01`
-      } else {
-        birthDate = ''
+      // 최종 데이터 준비
+      const finalData = {
+        // SNS에서 받은 데이터 우선 사용
+        name: socialData.name || data.name,
+        phone: socialData.mobile?.replace(/-/g, '') || data.phone?.replace(/-/g, ''),
+        gender: socialData.gender === 'M' ? 'male' : socialData.gender === 'F' ? 'female' : data.gender,
+        email: socialData.email,
+        profileImage: socialData.profileImage,
+        signupMethod: socialData.provider,
+        socialId: socialData.id,
+
+        // 생년월일 처리
+        birthDate: socialData.birthyear && socialData.birthday
+          ? `${socialData.birthyear}-${socialData.birthday}`
+          : data.birthDate,
+
+        // 사용자가 입력한 주소 정보
+        address: data.address,
+        addressDetail: data.addressDetail,
+        zipCode: data.zipCode,
+        autoGenerate: true
       }
+
+      console.log('Final registration data:', finalData)
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: socialData.name,
-          phone: socialData.mobile?.replace(/-/g, ''),
-          gender: socialData.gender === 'M' ? 'male' : socialData.gender === 'F' ? 'female' : 'none',
-          email: socialData.email,
-          profileImage: socialData.profileImage,
-          signupMethod: socialData.provider,
-          socialId: socialData.id,
-          birthDate: birthDate,
-          address: data.address,
-          addressDetail: data.addressDetail,
-          zipCode: data.zipCode,
-          autoGenerate: true
-        })
+        body: JSON.stringify(finalData)
       })
 
       const result = await response.json()
 
-      if (response.ok) { 
-        // API 응답이 비어있지만 회원가입은 성공했으므로 OAuth 로그인으로 바로 이동
-        const oauthLoginUrl = `/api/auth/oauth?provider=${socialData.provider}&redirect=${encodeURIComponent('/dashboard?signup_success=true')}`
-        
-        // 바로 OAuth 로그인 실행 (이미 가입된 사용자이므로 로그인 플로우 실행)
-        window.location.href = oauthLoginUrl
-        
+      if (response.ok) {
+        console.log('Registration successful:', result)
+
+        if (result.user && result.autoLogin) {
+          console.log('Auto-login successful, setting user in context')
+
+          // 즉시 AuthContext에 사용자 정보 설정 (UI 즉시 업데이트)
+          login(result.user)
+
+          // 원래 가려던 페이지 또는 홈으로 SPA 방식 이동
+          const finalRedirect = originalRedirect && originalRedirect !== '/dashboard'
+            ? originalRedirect
+            : '/'
+
+          router.push(
+            `${finalRedirect}${finalRedirect.includes('?') ? '&' : '?'}signup_success=true`
+          )
+        } else {
+          console.log('Auto-login failed, redirecting to login')
+          router.push('/login?message=가입완료. 로그인해주세요')
+        }
+
         return
       } else {
         setError(result.error || '회원가입에 실패했습니다')
@@ -169,7 +260,7 @@ export default function SocialRegistration({
 
   const getProviderInfo = () => {
     if (!socialData) return { name: '', color: '', bgColor: '' }
-    
+
     const providerConfig = {
       naver: {
         name: '네이버',
@@ -182,7 +273,7 @@ export default function SocialRegistration({
         bgColor: 'bg-[#FEE500]'
       }
     }
-    
+
     return providerConfig[socialData.provider]
   }
 
@@ -190,7 +281,7 @@ export default function SocialRegistration({
 
   if (!socialData) {
     return (
-      <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100">
+      <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
         <div className="text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">오류가 발생했습니다</h2>
@@ -208,7 +299,7 @@ export default function SocialRegistration({
   }
 
   return (
-    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100">
+    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         {/* 헤더 */}
         <div className="flex items-center mb-6">
@@ -223,7 +314,9 @@ export default function SocialRegistration({
               {providerInfo.name} 계정으로 가입
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              추가 정보를 입력해주세요
+              {Object.values(missingInfo).some(missing => missing)
+                ? '부족한 정보를 입력해주세요'
+                : '주소 정보를 입력해주세요'}
             </p>
           </div>
         </div>
@@ -260,7 +353,7 @@ export default function SocialRegistration({
                 </span>
               </div>
               <p className="text-sm font-medium text-gray-900 mt-1">
-                {socialData.name || '이름 없음'}
+                {socialData.name || '이름 정보 없음'}
               </p>
               <div className="text-xs text-gray-600 space-y-0.5 mt-1">
                 {socialData.email && <p>📧 {socialData.email}</p>}
@@ -272,7 +365,7 @@ export default function SocialRegistration({
             </div>
           </div>
           <div className="mt-3 text-xs text-green-700 bg-green-50 rounded px-2 py-1">
-            ✅ 위 정보는 {providerInfo.name}에서 자동으로 가져와 적용됩니다
+            ✅ {providerInfo.name}에서 받은 정보는 자동으로 입력됩니다
           </div>
         </div>
 
@@ -285,7 +378,113 @@ export default function SocialRegistration({
 
         {/* 입력 폼 */}
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          
+
+          {/* 부족한 개인정보 입력 섹션 */}
+          {Object.values(missingInfo).some(missing => missing) && (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-6">
+              <h3 className="text-sm font-medium text-yellow-800 mb-3">
+                ⚠️ 추가 정보 입력 필요
+              </h3>
+              <div className="space-y-4">
+
+                {/* 이름 입력 */}
+                {missingInfo.name && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <User className="inline h-4 w-4 mr-1" />
+                      이름 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      {...form.register('name')}
+                      type="text"
+                      disabled={isLoading}
+                      placeholder="실명을 입력해주세요"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {form.formState.errors.name && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {form.formState.errors.name.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* 전화번호 입력 */}
+                {missingInfo.phone && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <Phone className="inline h-4 w-4 mr-1" />
+                      휴대폰 번호 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      {...form.register('phone')}
+                      type="tel"
+                      disabled={isLoading}
+                      placeholder="010-0000-0000"
+                      onChange={(e) => {
+                        const formatted = formatPhone(e.target.value)
+                        e.target.value = formatted
+                        form.setValue('phone', formatted.replace(/-/g, ''))
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {form.formState.errors.phone && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {form.formState.errors.phone.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* 성별 선택 */}
+                {missingInfo.gender && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <UserCheck className="inline h-4 w-4 mr-1" />
+                      성별 <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      {...form.register('gender')}
+                      disabled={isLoading}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                      <option value="">선택해주세요</option>
+                      <option value="male">남성</option>
+                      <option value="female">여성</option>
+                      <option value="none">선택안함</option>
+                    </select>
+                    {form.formState.errors.gender && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {form.formState.errors.gender.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* 생년월일 입력 */}
+                {missingInfo.birthDate && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <Calendar className="inline h-4 w-4 mr-1" />
+                      생년월일 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      {...form.register('birthDate')}
+                      type="date"
+                      disabled={isLoading}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {form.formState.errors.birthDate && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {form.formState.errors.birthDate.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* 우편번호 및 기본주소 */}
           <div className="space-y-3">
             <div>
@@ -389,7 +588,7 @@ export default function SocialRegistration({
         {/* 안내사항 */}
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-xs text-blue-700">
-            <strong>간편 가입:</strong> {providerInfo.name} 계정으로 간편하게 가입됩니다. 
+            <strong>간편 가입:</strong> {providerInfo.name} 계정으로 간편하게 가입됩니다.
             별도의 비밀번호 설정 없이 {providerInfo.name} 로그인만으로 이용하실 수 있습니다.
           </p>
           <p className="text-xs text-blue-600 mt-1">
@@ -400,7 +599,7 @@ export default function SocialRegistration({
         {process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_KAKAO_JS_KEY && (
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-xs text-yellow-700">
-              ⚠️ <strong>개발자 알림:</strong> NEXT_PUBLIC_KAKAO_JS_KEY 환경변수가 설정되지 않았습니다. 
+              ⚠️ <strong>개발자 알림:</strong> NEXT_PUBLIC_KAKAO_JS_KEY 환경변수가 설정되지 않았습니다.
               우편번호 검색 기능이 제한될 수 있습니다.
             </p>
           </div>

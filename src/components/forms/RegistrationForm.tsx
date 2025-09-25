@@ -89,7 +89,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 font-paper">
       {/* 1. 참가자 정보 (수정 불가) */}
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">

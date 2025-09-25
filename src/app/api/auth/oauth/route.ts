@@ -23,7 +23,7 @@ const OAUTH_CONFIG: Record<'naver' | 'kakao', OAuthConfig> = {
   },
   kakao: {
     clientId: process.env.KAKAO_CLIENT_ID!, // REST API 키
-    clientSecret: undefined, // 카카오는 Client Secret 불필요
+    clientSecret: process.env.KAKAO_CLIENT_SECRET!,
     authUrl: 'https://kauth.kakao.com/oauth/authorize',
     tokenUrl: 'https://kauth.kakao.com/oauth/token',
     userUrl: 'https://kapi.kakao.com/v2/user/me',
@@ -88,11 +88,11 @@ function initiateOAuth(
 ) {
   const state = generateState()
   const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth`
-  
+
   console.log('Initiating OAuth for provider:', provider)
   console.log('Redirect URI:', redirectUri)
   console.log('Client ID:', config.clientId?.substring(0, 8) + '...')
-  
+
   const params = new URLSearchParams({
     client_id: config.clientId,
     redirect_uri: redirectUri,
@@ -107,7 +107,7 @@ function initiateOAuth(
 
   const authUrl = `${config.authUrl}?${params.toString()}`
   console.log('Final auth URL:', authUrl)
-  
+
   return NextResponse.redirect(authUrl)
 }
 
@@ -146,7 +146,7 @@ async function handleOAuthCallback(
 
     // 기존 사용자 확인
     const { queryOne } = await import('@/lib/mysql/connection')
-    
+
     // 1. SNS 계정으로 이미 가입된 사용자 확인
     const existingSocialUser = await queryOne(
       'SELECT u.* FROM users u JOIN social_accounts sa ON u.id = sa.user_id WHERE sa.provider = ? AND sa.provider_id = ?',
@@ -167,7 +167,7 @@ async function handleOAuthCallback(
 
       if (existingEmailUser) {
         return NextResponse.redirect(new URL(
-          `/register?message=해당%20이메일로%20이미%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`, 
+          `/register?message=해당%20이메일로%20이미%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
           request.url
         ))
       }
@@ -195,7 +195,11 @@ async function getAccessToken(
 ): Promise<{ success: boolean; accessToken?: string; refreshToken?: string }> {
   try {
     const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth`
-    
+
+    console.log(`🔑 Getting ${provider} access token...`)
+    console.log('Redirect URI:', redirectUri)
+    console.log('Client ID:', config.clientId?.substring(0, 8) + '...')
+
     const tokenParams = new URLSearchParams({
       grant_type: 'authorization_code',
       client_id: config.clientId,
@@ -204,35 +208,60 @@ async function getAccessToken(
     })
 
     // 네이버만 Client Secret 추가
-    if (provider === 'naver' && config.clientSecret) {
+    if (config.clientSecret) {
       tokenParams.append('client_secret', config.clientSecret)
     }
 
+    // 카카오의 경우 Content-Type이 중요
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    // 카카오는 Authorization 헤더 방식도 지원
+    if (provider === 'kakao') {
+      headers['Accept'] = 'application/json'
+    }
+
+    console.log(`📡 Sending token request to: ${config.tokenUrl}`)
+    console.log('Request params:', Object.fromEntries(tokenParams.entries()))
+
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers,
       body: tokenParams.toString()
     })
 
+    console.log('Token response status:', response.status)
+
     if (!response.ok) {
-      throw new Error(`Token request failed: ${response.status}`)
+      const errorText = await response.text()
+      console.error(`❌ Token request failed (${response.status}):`, errorText)
+      throw new Error(`Token request failed: ${response.status} - ${errorText}`)
     }
 
     const data = await response.json()
-    
+    console.log(`✅ ${provider} token response:`, {
+      hasAccessToken: !!data.access_token,
+      hasRefreshToken: !!data.refresh_token,
+      tokenType: data.token_type,
+      expiresIn: data.expires_in
+    })
+
+    if (!data.access_token) {
+      console.error('❌ No access token in response:', data)
+      throw new Error('No access token received')
+    }
+
     return {
       success: true,
       accessToken: data.access_token,
       refreshToken: data.refresh_token
     }
   } catch (error) {
-    console.error('Get access token error:', error)
+    console.error(`🚨 ${provider} get access token error:`, error)
     return { success: false }
   }
 }
-
 // 사용자 정보 획득
 async function getUserInfo(
   provider: 'naver' | 'kakao',
@@ -252,12 +281,12 @@ async function getUserInfo(
     }
 
     const data = await response.json()
-    
+
     // 디버깅: API 응답 전체 로그
     console.log(`${provider} API response:`, JSON.stringify(data, null, 2))
-    
+
     let userData
-    
+
     if (provider === 'naver') {
       const profile = data.response
       userData = {
@@ -274,7 +303,7 @@ async function getUserInfo(
     } else if (provider === 'kakao') {
       const kakaoAccount = data.kakao_account || {}
       const profile = kakaoAccount.profile || {}
-      
+
       userData = {
         id: data.id.toString(),
         email: kakaoAccount.email,
@@ -343,9 +372,10 @@ async function handleExistingUserLogin(
     })
 
     // SNS 로그인 성공 시 특별한 플래그를 추가하여 클라이언트에서 인증 상태 새로고침
-    const finalRedirectUrl = new URL(redirect, request.url)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
+    const finalRedirectUrl = new URL(redirect, baseUrl)
     finalRedirectUrl.searchParams.set('auth_refresh', 'true')
-    
+
     return NextResponse.redirect(finalRedirectUrl)
 
   } catch (error) {
@@ -356,6 +386,6 @@ async function handleExistingUserLogin(
 
 // State 값 생성
 function generateState(): string {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15)
+  return Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
 }

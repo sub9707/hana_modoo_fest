@@ -19,7 +19,7 @@ export default function RegistrationMethod({ onMethodSelect, message }: Registra
   }
 
   return (
-    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100">
+    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">

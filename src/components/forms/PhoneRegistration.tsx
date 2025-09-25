@@ -101,7 +101,7 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
 
       if (response.ok) {
         setPhone(data.phone)
-        setTimeLeft(300) // 5분
+        setTimeLeft(180)
         setCanResend(false)
         setStep('verification')
         setSuccess('인증번호가 발송되었습니다')
@@ -194,7 +194,7 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
       const result = await response.json()
 
       if (response.ok) {
-        setTimeLeft(300)
+        setTimeLeft(180)
         setCanResend(false)
         setSuccess('인증번호가 재발송되었습니다')
       } else {
@@ -222,7 +222,7 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
   }
 
   return (
-    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100">
+    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         {/* 헤더 */}
         <div className="flex items-center mb-6">

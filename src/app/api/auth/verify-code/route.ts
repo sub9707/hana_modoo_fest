@@ -1,3 +1,4 @@
+// src/app/api/auth/verify-code/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { query, queryOne } from '@/lib/mysql/connection'
