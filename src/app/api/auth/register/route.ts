@@ -437,7 +437,7 @@ export async function OPTIONS() {
     headers: {
       'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : process.env.NEXT_PUBLIC_APP_URL || '',
+        : process.env.APP_URL || '',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Credentials': 'true',
