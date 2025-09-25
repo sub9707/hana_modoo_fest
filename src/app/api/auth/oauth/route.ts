@@ -87,7 +87,10 @@ function initiateOAuth(
   redirect: string
 ) {
   const state = generateState()
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/oauth`
+
+  // 서버 기준으로 프로덕션 URL 사용
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
+  const redirectUri = `${baseUrl}/api/auth/oauth`
 
   console.log('Initiating OAuth for provider:', provider)
   console.log('Redirect URI:', redirectUri)
@@ -100,7 +103,7 @@ function initiateOAuth(
     state: `${state}:${provider}:${encodeURIComponent(redirect)}`
   })
 
-  // 카카오만 scope 추가 (네이버는 scope 사용 안함)
+  // 카카오만 scope 추가
   if (provider === 'kakao') {
     params.append('scope', config.scope)
   }
