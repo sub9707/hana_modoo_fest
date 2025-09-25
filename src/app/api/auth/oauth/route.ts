@@ -91,9 +91,6 @@ function initiateOAuth(
   // 서버 기준으로 프로덕션 URL 사용
   const redirectUri = getRedirectUri(request)
 
-  console.log('Initiating OAuth for provider:', provider)
-  console.log('Redirect URI:', redirectUri)
-  console.log('Client ID:', config.clientId?.substring(0, 8) + '...')
 
   const params = new URLSearchParams({
     client_id: config.clientId,
@@ -108,7 +105,6 @@ function initiateOAuth(
   }
 
   const authUrl = `${config.authUrl}?${params.toString()}`
-  console.log('Final auth URL:', authUrl)
 
   return NextResponse.redirect(authUrl)
 }
@@ -142,9 +138,6 @@ async function handleOAuthCallback(
     if (!userResponse.success || !userResponse.userData) {
       return NextResponse.redirect(new URL('/register?message=SNS%20사용자%20정보%20획득에%20실패했습니다', request.url))
     }
-
-    // 디버깅: 받아온 사용자 정보 로그
-    console.log(`${provider} user data:`, userResponse.userData)
 
     const { queryOne } = await import('@/lib/mysql/connection')
 
@@ -201,8 +194,6 @@ async function handleOAuthCallback(
         }
         const existingMethod = methodNames[existingPhoneUser.signup_method] || '다른 방법'
         
-        console.log(`Phone ${normalizedPhone} already registered with method: ${existingPhoneUser.signup_method}`)
-        
         return NextResponse.redirect(new URL(
           `/register?message=해당%20전화번호로%20이미%20${encodeURIComponent(existingMethod)}%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
           request.url
@@ -211,8 +202,6 @@ async function handleOAuthCallback(
     }
 
     // 4. 새 사용자 - 회원가입 페이지로 이동
-    console.log(`New user detected for ${provider}, redirecting to registration form`)
-    
     const userDataParam = encodeURIComponent(JSON.stringify(userResponse.userData))
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
     return NextResponse.redirect(new URL(
@@ -236,10 +225,6 @@ async function getAccessToken(
   try {
     const redirectUri = getRedirectUri(request)
 
-    console.log(`🔑 Getting ${provider} access token...`)
-    console.log('Redirect URI:', redirectUri)
-    console.log('Client ID:', config.clientId?.substring(0, 8) + '...')
-
     const tokenParams = new URLSearchParams({
       grant_type: 'authorization_code',
       client_id: config.clientId,
@@ -262,16 +247,12 @@ async function getAccessToken(
       headers['Accept'] = 'application/json'
     }
 
-    console.log(`📡 Sending token request to: ${config.tokenUrl}`)
-    console.log('Request params:', Object.fromEntries(tokenParams.entries()))
-
     const response = await fetch(config.tokenUrl, {
       method: 'POST',
       headers,
       body: tokenParams.toString()
     })
 
-    console.log('Token response status:', response.status)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -280,12 +261,6 @@ async function getAccessToken(
     }
 
     const data = await response.json()
-    console.log(`✅ ${provider} token response:`, {
-      hasAccessToken: !!data.access_token,
-      hasRefreshToken: !!data.refresh_token,
-      tokenType: data.token_type,
-      expiresIn: data.expires_in
-    })
 
     if (!data.access_token) {
       console.error('❌ No access token in response:', data)
@@ -322,9 +297,6 @@ async function getUserInfo(
 
     const data = await response.json()
 
-    // 디버깅: API 응답 전체 로그
-    console.log(`${provider} API response:`, JSON.stringify(data, null, 2))
-
     let userData
 
     if (provider === 'naver') {
@@ -355,9 +327,6 @@ async function getUserInfo(
         ageRange: kakaoAccount.age_range // 연령대 (1~9, 10~14, 15~19, 20~29, 등)
       }
     }
-
-    // 디버깅: 매핑된 사용자 데이터 로그
-    console.log(`${provider} mapped user data:`, userData)
 
     return {
       success: true,

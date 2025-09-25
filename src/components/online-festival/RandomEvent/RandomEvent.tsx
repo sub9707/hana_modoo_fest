@@ -8,6 +8,7 @@ import { useRouletteEvent } from '@/hooks/useRoulette'
 import RouletteWheel from './RouletteWheel'
 import WinnerAnnouncement from './WinnerAnnouncement'
 import RouletteResultModal from './RouletteResultModal'
+import MyWinnings from './MyWinnings'
 
 export default function RandomEvent() {
   const { user } = useAuth()
@@ -130,7 +131,7 @@ export default function RandomEvent() {
                 </div>
                 <div className="flex items-start space-x-3">
                   <span className="text-festival-orange font-bold">•</span>
-                  <span>기프티콘은 축제 당일 현장에서 교환 가능합니다</span>
+                  <span>기프티콘은 가입된 전화번호로 전달됩니다.</span>
                 </div>
               </div>
             </div>
@@ -185,6 +186,9 @@ export default function RandomEvent() {
             </div>
           )}
         </div>
+
+        {/* 내 당첨 내역 - 로그인한 유저만 표시 */}
+        <MyWinnings />
       </div>
 
       {/* 룰렛 결과 모달 */}
