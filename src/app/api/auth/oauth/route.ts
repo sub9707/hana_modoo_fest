@@ -374,7 +374,7 @@ async function handleExistingUserLogin(
     })
 
     // SNS 로그인 성공 시 특별한 플래그를 추가하여 클라이언트에서 인증 상태 새로고침
-    const baseUrl = process.env.APP_URL || `http://${request.headers.get('host')}`
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
     const finalRedirectUrl = new URL(redirect, baseUrl)
     finalRedirectUrl.searchParams.set('auth_refresh', 'true')
 
@@ -393,10 +393,6 @@ function generateState(): string {
 }
 
 function getRedirectUri(request: NextRequest) {
-  const baseUrl = process.env.APP_URL
-  if (!baseUrl) {
-    console.error('❌ NEXT_PUBLIC_APP_URL이 설정되지 않았습니다.')
-    throw new Error('NEXT_PUBLIC_APP_URL 환경변수를 반드시 설정해야 합니다.')
-  }
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
   return `${baseUrl}/api/auth/oauth`
 }
