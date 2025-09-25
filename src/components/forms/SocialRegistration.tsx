@@ -337,7 +337,7 @@ export default function SocialRegistration({
                     target.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
                   }}
                 />
-                <div className="fallback-icon hidden absolute inset-0 flex items-center justify-center bg-gray-300">
+                <div className="fallback-icon absolute inset-0 flex items-center justify-center bg-gray-300">
                   <User className="h-6 w-6 text-gray-600" />
                 </div>
               </div>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PreRegistration from './PreRegistration'
 import QuizEvent from './Quiz/QuizEvent'
 import SupportComments from './SupportComment/SupportComments'
-import RandomEvent from './RandomEvent'
+import RandomEvent from './RandomEvent/RandomEvent'
 import FamilyWriting from './FamilyWriting/FamilyWriting'
 
 interface Tab {
