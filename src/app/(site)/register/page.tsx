@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import PhoneRegistration from '@/components/forms/PhoneRegistration'
 import SocialRegistration from '@/components/forms/SocialRegistration'
 import RegistrationMethod from '@/components/forms/RegistrationMethod'
+import { AlertCircle, ArrowLeft } from 'lucide-react'
 
 // SocialData 타입 정의 (SocialRegistration과 일치)
 interface SocialData {
@@ -21,9 +22,11 @@ interface SocialData {
 
 export default function RegisterPage() {
   const searchParams = useSearchParams()
-  const [registrationStep, setRegistrationStep] = useState<'method' | 'phone' | 'social' | 'complete'>('method')
+  const router = useRouter()
+  const [registrationStep, setRegistrationStep] = useState<'method' | 'phone' | 'social' | 'complete' | 'blocked'>('method')
   const [socialData, setSocialData] = useState<SocialData | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [isExistingUser, setIsExistingUser] = useState(false)
 
   useEffect(() => {
     // URL 파라미터에서 메시지 확인
@@ -33,10 +36,20 @@ export default function RegisterPage() {
 
     if (urlMessage) {
       setMessage(urlMessage)
+      
+      // 이미 가입된 사용자 관련 메시지인지 확인
+      const duplicateKeywords = ['이미', '가입된', '계정이', '전화번호로', '이메일로']
+      const isDuplicate = duplicateKeywords.some(keyword => urlMessage.includes(keyword))
+      
+      if (isDuplicate) {
+        setIsExistingUser(true)
+        setRegistrationStep('blocked')
+        return // 중복 사용자인 경우 여기서 처리 종료
+      }
     }
 
-    // SNS로부터 리다이렉트된 경우
-    if (provider && userData) {
+    // SNS로부터 리다이렉트된 경우 (중복이 아닌 경우에만)
+    if (provider && userData && !isExistingUser) {
       try {
         const decodedUserData = JSON.parse(decodeURIComponent(userData))
         
@@ -50,7 +63,7 @@ export default function RegisterPage() {
           gender: decodedUserData.gender,
           birthday: decodedUserData.birthday,
           mobile: decodedUserData.mobile || decodedUserData.phone_number,
-          birthyear: decodedUserData.birthyear || decodedUserData.birth_year // 네이버 출생연도
+          birthyear: decodedUserData.birthyear || decodedUserData.birth_year
         }
 
         setSocialData(mappedSocialData)
@@ -85,6 +98,7 @@ export default function RegisterPage() {
     // 소셜 데이터 초기화
     setSocialData(null)
     setMessage(null)
+    setIsExistingUser(false)
     setRegistrationStep('method')
     
     // URL 파라미터도 정리
@@ -95,15 +109,88 @@ export default function RegisterPage() {
     window.history.replaceState({}, '', url.pathname)
   }
 
+  const handleGoToLogin = () => {
+    router.push('/login')
+  }
+
+  const handleGoToHome = () => {
+    router.push('/')
+  }
+
+  // 중복 사용자 차단 화면
+  const renderBlockedScreen = () => {
+    return (
+      <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
+        <div className="text-center">
+          {/* 아이콘 */}
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-6">
+            <AlertCircle className="h-8 w-8 text-blue-600" />
+          </div>
+          
+          {/* 제목 */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            이미 가입된 계정입니다
+          </h2>
+          
+          {/* 메시지 */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800 text-sm leading-relaxed">
+              {message}
+            </p>
+          </div>
+          
+          {/* 안내 텍스트 */}
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            기존에 가입하신 방법으로 로그인해주세요.<br />
+            로그인에 문제가 있으시면 고객센터로 문의해주세요.
+          </p>
+          
+          {/* 액션 버튼들 */}
+          <div className="space-y-3">
+            <button
+              onClick={handleGoToLogin}
+              className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              로그인 페이지로 이동
+            </button>
+            
+            <button
+              onClick={handleGoToHome}
+              className="w-full px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              메인으로 돌아가기
+            </button>
+            
+            <div className="pt-4 border-t border-gray-200">
+              <p className="text-xs text-gray-500 mb-2">
+                로그인에 문제가 있으신가요?
+              </p>
+              <a
+                href="mailto:support@example.com"
+                className="text-xs text-blue-600 hover:text-blue-800 underline"
+              >
+                고객센터 문의하기
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const renderCurrentStep = () => {
     switch (registrationStep) {
+      case 'blocked':
+        return renderBlockedScreen()
+        
       case 'method':
         return (
           <RegistrationMethod 
             onMethodSelect={handleMethodSelect}
-            message={message}
+            message={!isExistingUser ? message : null} // 중복 사용자 메시지는 여기서 표시하지 않음
           />
         )
+        
       case 'phone':
         return (
           <PhoneRegistration 
@@ -111,6 +198,7 @@ export default function RegisterPage() {
             onBack={handleBackToMethod}
           />
         )
+        
       case 'social':
         return (
           <SocialRegistration 
@@ -119,6 +207,7 @@ export default function RegisterPage() {
             onBack={handleBackToMethod}
           />
         )
+        
       case 'complete':
         return (
           <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
@@ -154,6 +243,7 @@ export default function RegisterPage() {
             </div>
           </div>
         )
+        
       default:
         return null
     }

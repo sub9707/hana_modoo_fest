@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { loginAction } from '@/lib/actions/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { User } from '@/types/auth'
+import Image from 'next/image'
 
 // 로그인 폼 스키마
 const loginSchema = z.object({
@@ -20,63 +21,71 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 // SNS 버튼 컴포넌트
-function SocialLoginButton({
-  provider,
-  onClick,
-  isLoading
-}: {
-  provider: 'naver' | 'kakao'
-  onClick: () => void
-  isLoading: boolean
-}) {
-  const providerConfig = {
-    naver: {
-      name: '네이버',
-      bgColor: 'bg-[#03C75A]',
-      hoverColor: 'hover:bg-[#02B350]',
-      textColor: 'text-white',
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M13.6 10L8.4 3.6V10H5.2V16.4H8.4V10L13.6 16.4V10H16.8V3.6H13.6V10Z" />
-        </svg>
-      )
-    },
-    kakao: {
-      name: '카카오',
-      bgColor: 'bg-[#FEE500]',
-      hoverColor: 'hover:bg-[#FDD835]',
-      textColor: 'text-[#191919]',
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10 3C6.13 3 3 5.79 3 9.25C3 11.49 4.23 13.4 6.08 14.56L5.28 17.73C5.21 17.99 5.5 18.21 5.74 18.05L9.57 15.85C9.71 15.86 9.85 15.86 10 15.86C13.87 15.86 17 13.07 17 9.61C17 6.15 13.87 3.36 10 3.36V3Z" />
-        </svg>
-      )
-    }
-  }
-
-  const config = providerConfig[provider]
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={isLoading}
-      className={`
-        w-full flex justify-center items-center py-3 px-4 border border-transparent 
-        text-sm font-medium rounded-lg transition-all duration-200
-        ${config.bgColor} ${config.hoverColor} ${config.textColor}
-        ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-lg'}
+function SocialLoginButton({ provider, onClick, isLoading }: { provider: 'naver' | 'kakao', onClick: () => void, isLoading: boolean }) {
+  if (provider === "naver") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={isLoading}
+        className={`
+        relative w-full h-15 flex justify-center items-center py-3 px-4 rounded-lg 
+        bg-[#03C75A] hover:bg-[#02B350] text-white transition-all duration-200
+        ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:shadow-lg"}
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500
       `}
-    >
-      {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-      ) : (
-        <span className="mr-2">{config.icon}</span>
-      )}
-      {config.name}로 시작하기
-    </button>
-  )
+      >
+        {/* 로고: 왼쪽 고정 */}
+        {!isLoading && (
+          <div className="absolute left-4">
+            <Image
+              src="/images/common/naver-logo.png"
+              alt="네이버 로고"
+              width={25}
+              height={25}
+            />
+          </div>
+        )}
+
+        {/* 중앙 콘텐츠 */}
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <span className="text-center text-xl">네이버로 시작하기</span>
+        )}
+      </button>
+    )
+  }
+
+  if (provider === "kakao") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={isLoading}
+        className={`
+          w-full rounded-lg overflow-hidden 
+          ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90"}
+        `}
+      >
+        {isLoading ? (
+          <div className="flex justify-center py-3">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        ) : (
+          <Image
+            src="/images/common/kakao_login_large_wide.png"
+            alt="카카오 로그인 버튼"
+            width={320}
+            height={48}
+            className="w-full h-auto"
+          />
+        )}
+      </button>
+    )
+  }
+
+  return null
 }
 
 export default function LoginForm() {
@@ -219,7 +228,7 @@ export default function LoginForm() {
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              사용자명 또는 전화번호
+              사용자명
             </label>
             <div className="mt-1">
               <input
@@ -237,7 +246,7 @@ export default function LoginForm() {
                   }
                   ${isLoading || socialLoading !== null ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'}
                 `}
-                placeholder="사용자명 또는 전화번호를 입력하세요"
+                placeholder="사용자명을 입력하세요"
               />
               {errors.username && (
                 <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>

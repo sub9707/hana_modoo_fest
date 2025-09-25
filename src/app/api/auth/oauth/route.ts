@@ -146,7 +146,6 @@ async function handleOAuthCallback(
     // 디버깅: 받아온 사용자 정보 로그
     console.log(`${provider} user data:`, userResponse.userData)
 
-    // 기존 사용자 확인
     const { queryOne } = await import('@/lib/mysql/connection')
 
     // 1. SNS 계정으로 이미 가입된 사용자 확인
@@ -163,19 +162,57 @@ async function handleOAuthCallback(
     // 2. 동일한 이메일로 다른 방법으로 가입된 사용자 확인 (이메일이 있는 경우)
     if (userResponse.userData.email) {
       const existingEmailUser = await queryOne(
-        'SELECT * FROM users WHERE email = ?',
+        'SELECT id, signup_method FROM users WHERE email = ?',
         [userResponse.userData.email]
       )
 
       if (existingEmailUser) {
+        const methodNames = {
+          phone: '전화번호',
+          naver: '네이버',
+          kakao: '카카오'
+        }
+        const existingMethod = methodNames[existingEmailUser.signup_method] || '다른 방법'
+        
         return NextResponse.redirect(new URL(
-          `/register?message=해당%20이메일로%20이미%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
+          `/register?message=해당%20이메일로%20이미%20${encodeURIComponent(existingMethod)}%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
           request.url
         ))
       }
     }
 
-    // 3. 새 사용자 - 회원가입 페이지로 이동
+    // *** 3. 전화번호 중복 확인 추가 (핵심 수정 부분) ***
+    if (userResponse.userData.mobile) {
+      // 전화번호 정규화 (하이픈 제거)
+      const normalizedPhone = userResponse.userData.mobile.replace(/-/g, '')
+      
+      console.log(`Checking phone duplication for: ${normalizedPhone}`)
+      
+      const existingPhoneUser = await queryOne(
+        'SELECT id, signup_method FROM users WHERE phone = ?',
+        [normalizedPhone]
+      )
+
+      if (existingPhoneUser) {
+        const methodNames = {
+          phone: '전화번호',
+          naver: '네이버',
+          kakao: '카카오'
+        }
+        const existingMethod = methodNames[existingPhoneUser.signup_method] || '다른 방법'
+        
+        console.log(`Phone ${normalizedPhone} already registered with method: ${existingPhoneUser.signup_method}`)
+        
+        return NextResponse.redirect(new URL(
+          `/register?message=해당%20전화번호로%20이미%20${encodeURIComponent(existingMethod)}%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
+          request.url
+        ))
+      }
+    }
+
+    // 4. 새 사용자 - 회원가입 페이지로 이동
+    console.log(`New user detected for ${provider}, redirecting to registration form`)
+    
     const userDataParam = encodeURIComponent(JSON.stringify(userResponse.userData))
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `http://${request.headers.get('host')}`
     return NextResponse.redirect(new URL(
