@@ -1,9 +1,10 @@
-// app/api/event/roulette/spin/route.ts (TypeScript 타입 오류 완전 수정)
+// app/api/event/roulette/spin/route.ts (UUID 테이블 지원으로 수정)
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { getRedisClient, isRedisHealthy } from '@/lib/redis/connection'
 import { headers } from 'next/headers'
+import { randomUUID } from 'crypto'
 import type { SpinResponse, PrizeWithProbability } from '@/types/event'
 import type { RedisClient } from '@/lib/redis/connection'
 
@@ -29,15 +30,15 @@ export async function POST(request: NextRequest) {
 
     // IP 및 User Agent 정보 수집
     const headersList = await headers()
-    const ip_address = headersList.get('x-forwarded-for') || 
-                      headersList.get('x-real-ip') || 
-                      'unknown'
+    const ip_address = headersList.get('x-forwarded-for') ||
+      headersList.get('x-real-ip') ||
+      'unknown'
     const user_agent = headersList.get('user-agent') || 'unknown'
 
     // Redis 상태 확인 및 클라이언트 가져오기
     const redisHealthy = await isRedisHealthy()
-    let redis: RedisClient  | null = null
-    
+    let redis: RedisClient | null = null
+
     if (redisHealthy) {
       try {
         redis = await getRedisClient()
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Redis를 사용한 일일 참여 제한 확인 (우선순위)
     let hasParticipatedToday = false
-    
+
     if (redis) {
       try {
         const redisParticipation = await redis.get(REDIS_KEYS.DAILY_PARTICIPATION(user.id, today))
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
         // Redis 에러 시 아래 DB 체크로 fallback
       }
     }
-    
+
     // Redis 실패하거나 없는 경우 DB 확인
     if (!redis || !hasParticipatedToday) {
       const todayParticipation = await queryOne(
@@ -161,13 +162,13 @@ export async function POST(request: NextRequest) {
         try {
           const timestamp = Date.now()
           const requestId = `request:${timestamp}:${user.id}`
-          
+
           // node-redis v4+ 올바른 사용법
           await redis.zAdd(REDIS_KEYS.SERVER_LOAD, {
             score: timestamp,
             value: requestId
           })
-          
+
           // 5분 이전 데이터 정리
           const fiveMinutesAgo = timestamp - (5 * 60 * 1000)
           await redis.zRemRangeByScore(REDIS_KEYS.SERVER_LOAD, fiveMinutesAgo, timestamp)
@@ -180,7 +181,7 @@ export async function POST(request: NextRequest) {
       const result = await transaction(async (connection) => {
         // 캐시된 상품 조회 시도 (Redis)
         let activePrizes: any[] | null = null
-        
+
         if (redis) {
           try {
             const cachedPrizes = await redis.get(REDIS_KEYS.PRIZES_CACHE)
@@ -219,7 +220,7 @@ export async function POST(request: NextRequest) {
         // 확률 계산 및 상품 선택
         const totalProbability = activePrizes.reduce((sum: number, prize: any) => sum + parseFloat(prize.probability), 0)
         const random = Math.random() * totalProbability
-        
+
         let accumulator = 0
         let selectedPrize: PrizeWithProbability | null = null
 
@@ -247,14 +248,15 @@ export async function POST(request: NextRequest) {
           throw new Error('상품 선택 과정에서 오류가 발생했습니다.')
         }
 
-        // 참여 기록 생성
-        const participationResult = await connection.execute(
-          `INSERT INTO event_participations (user_id, participation_date, ip_address, user_agent)
-           VALUES (?, ?, ?, ?)`,
-          [user.id, today, ip_address.substring(0, 45), user_agent.substring(0, 500)]
-        )
+        // UUID 미리 생성
+        const participationId = randomUUID()
 
-        const participationId = String((participationResult[0] as any).insertId)
+        // 참여 기록 생성 (UUID 명시적으로 지정)
+        const participationResult = await connection.execute(
+          `INSERT INTO event_participations (id, user_id, participation_date, ip_address, user_agent)
+           VALUES (?, ?, ?, ?, ?)`,
+          [participationId, user.id, today, ip_address.substring(0, 45), user_agent.substring(0, 500)]
+        )
 
         let winnerId: string | undefined = undefined
 
@@ -269,13 +271,14 @@ export async function POST(request: NextRequest) {
             throw new Error('상품 수량이 부족합니다.')
           }
 
-          const winnerResult = await connection.execute(
-            `INSERT INTO event_winners (participation_id, user_id, prize_id)
-             VALUES (?, ?, ?)`,
-            [participationId, user.id, selectedPrize.id]
-          )
+          // 당첨자 ID도 미리 생성
+          winnerId = randomUUID()
 
-          winnerId = String((winnerResult[0] as any).insertId)
+          const winnerResult = await connection.execute(
+            `INSERT INTO event_winners (id, participation_id, user_id, prize_id)
+             VALUES (?, ?, ?, ?)`,
+            [winnerId, participationId, user.id, selectedPrize.id]
+          )
 
           // Redis 캐시 무효화 (상품 수량 변경으로 인해)
           if (redis) {
@@ -310,9 +313,9 @@ export async function POST(request: NextRequest) {
           tomorrow.setDate(tomorrow.getDate() + 1)
           tomorrow.setHours(0, 0, 0, 0)
           const ttl = Math.floor((tomorrow.getTime() - Date.now()) / 1000)
-          
+
           await redis.setEx(REDIS_KEYS.DAILY_PARTICIPATION(user.id, today), ttl, '1')
-          
+
           // 쿨다운 설정 (5분)
           await redis.setEx(REDIS_KEYS.COOLDOWN(user.id), 300, '1')
         } catch (error) {
@@ -328,9 +331,9 @@ export async function POST(request: NextRequest) {
     } catch (transactionError) {
       console.error('Roulette transaction error:', transactionError)
       return NextResponse.json<SpinResponse>(
-        { 
-          success: false, 
-          error: transactionError instanceof Error ? transactionError.message : '룰렛 처리 중 오류가 발생했습니다.' 
+        {
+          success: false,
+          error: transactionError instanceof Error ? transactionError.message : '룰렛 처리 중 오류가 발생했습니다.'
         },
         { status: 500 }
       )
