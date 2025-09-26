@@ -71,7 +71,7 @@ function HeroLeft({ animationStage }: HeroLeftProps) {
                             행사 일정
                         </h3>
                         <p className="text-gray-800 text-sm sm:text-xl font-semibold">2025. 10. 18(토)</p>
-                        <p className="text-gray-700">11:00 - 16:00</p>
+                        <p className="text-gray-700">11:00 - 17:00</p>
                     </div>
                     <div className="flex-1 pl-4 border-l border-white/50">
                         <h3

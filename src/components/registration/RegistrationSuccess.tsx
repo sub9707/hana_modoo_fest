@@ -284,7 +284,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                     color: '#9ca3af'
                                 }}>
                                     <div className="mb-2 font-medium">주최: 서울특별시 | 주관: 서울특별시한부모가족지원센터</div>
-                                    <div>문의: 02-000-0000 | info@moduhana2025.seoul.kr</div>
+                                    <div>02-861-3020 | hanbumo1@seoul.go.kr</div>
                                 </div>
                             </div>
                         </div>

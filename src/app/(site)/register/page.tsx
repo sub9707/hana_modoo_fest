@@ -166,7 +166,7 @@ export default function RegisterPage() {
                 로그인에 문제가 있으신가요?
               </p>
               <a
-                href="mailto:support@example.com"
+                href="mailto:hanbumo1@seoul.go.kr"
                 className="text-xs text-blue-600 hover:text-blue-800 underline"
               >
                 고객센터 문의하기

@@ -7,7 +7,7 @@ function JoinFestival() {
     <section className="py-30 mx-auto px-4 flex flex-col items-center text-center bg-gradient-to-b from-white to-purple-50">
       <div className='container mx-auto px-4 flex flex-col items-center'>
         <h1 className='w-full text-3xl sm:text-7xl font-extrabold bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent italic mb-6 '>지금 바로 참여하세요!</h1>
-        <p className='text-sm sm:text-lg font-medium text-gray-700'>모두가 함께 만들어가는 따뜻한 축제,<br /> 모두하나대축제 2025에서<br className='flex sm:hidden' />새로운 연결과 소중한 추억을 만들어보세요.
+        <p className='text-sm sm:text-lg font-medium text-gray-700'>모두가 함께 만들어가는 따뜻한 축제,<br />2025 모두하나대축제에서&nbsp;<br className='flex sm:hidden' />새로운 연결과 소중한 추억을 만들어보세요.
         </p>
         <div className='w-full flex justify-center items-center gap-6 mt-10 mb-10'>
           <AboutCTAButton href="/registration" text="사전참가 신청하기" />

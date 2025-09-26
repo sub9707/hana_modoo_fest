@@ -11,6 +11,35 @@
 .orange-gradient { background: linear-gradient(to right, #fb923c, #f472b6); } 
 
 .text-gradient { background: linear-gradient(to right, #fb923c, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } 
+
+/* 글로벌 스타일 클래스 */
+/* prose 전체 스타일 적용 */
+.prose { max-width: none; /* 필요 시 */}
+
+/* 단락 줄간격 */
+.prose p { line-height: 2rem; } 
+
+/* 리스트 줄간격 */
+.prose ul li,
+.prose ol li { line-height: 2rem;}
+
+/* 제목 줄간격 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 { line-height: 2rem;  } 
+
+.prose h3 {font-size: 1.3rem;margin-block:0.7rem; font-weight: 600; }
+
+/* 모바일에서 데스크탑으로 넘어갈 때 늘리기 */
+@media (min-width: 640px){
+ .prose p { line-height: 2rem; } 
+ .prose ul li,
+ .prose ol li { line-height: 2rem; } 
+ }
+
  /************************* 컴포넌트 *************************/
 
  /* 카드 호버 그림자 효과 */

@@ -22,13 +22,21 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
   const renderContent = () => {
     if (news.contentType === 'html') {
       return (
-        <div 
-          className="prose prose-sm sm:prose-lg max-w-none prose-headings:leading-tight prose-p:leading-7 sm:prose-p:leading-8"
+        <div
+          className="
+    prose prose-sm sm:prose-lg max-w-none
+    prose-headings:leading-tight sm:prose-headings:leading-snug
+    !prose-p:leading-8 sm:!prose-p:leading-10
+    !prose-li:leading-7 sm:!prose-li:leading-9
+    prose-ul:mt-4 prose-ol:mt-4
+    prose-strong:text-gray-800
+    px-4 sm:px-6
+  "
           dangerouslySetInnerHTML={{ __html: news.content }}
         />
       )
     }
-    
+
     return (
       <div className="prose prose-sm sm:prose-lg max-w-none">
         <p className="text-gray-700 whitespace-pre-line text-sm sm:text-base leading-7 sm:leading-8">
@@ -49,7 +57,7 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
           <span className="text-lg">←</span>
           <span className="text-sm sm:text-base font-medium">목록으로 돌아가기</span>
         </button>
-        
+
         {/* 모바일: 세로 레이아웃 */}
         <div className="block sm:hidden space-y-3 mb-4">
           <div className="flex items-center gap-2">
@@ -85,12 +93,12 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
             <span>{news.date}</span>
           </div>
         </div>
-        
+
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 leading-tight">
           {news.title}
         </h1>
       </div>
-      
+
       {/* 내용 */}
       <div className="p-4 sm:p-6">
         {/* 요약 */}
@@ -131,7 +139,7 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
             </div>
           </div>
         )}
-        
+
         {/* 하단 정보 */}
         <div className="pt-4 border-t border-gray-200">
           <div className="text-xs text-gray-500">

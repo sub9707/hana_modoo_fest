@@ -42,18 +42,18 @@ export default function Footer() {
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <Phone className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                      <a href="tel:02-123-4567" className="text-sm hover:text-purple-600 transition-colors">
-                        02-123-4567
+                      <a href="tel:02-861-3020" className="text-sm hover:text-purple-600 transition-colors">
+                        02-861-3020
                       </a>
                     </div>
                     
                     <div className="flex items-center space-x-2">
                       <Mail className="w-4 h-4 text-purple-500 flex-shrink-0" />
                       <a 
-                        href="mailto:info@moduhana2025.seoul.kr" 
+                        href="mailto:hanbumo1@seoul.go.kr" 
                         className="text-sm hover:text-purple-600 transition-colors"
                       >
-                        info@moduhana2025.seoul.kr
+                        hanbumo1@seoul.go.kr
                       </a>
                     </div>
                   </div>

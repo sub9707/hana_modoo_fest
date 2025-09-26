@@ -66,7 +66,7 @@ export default function NewsFilters({
   return (
     <div className="space-y-6">
       {/* 검색 섹션 */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white shadow-md overflow-hidden">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-800">검색</h3>
@@ -90,7 +90,7 @@ export default function NewsFilters({
               onChange={handleSearchChange}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-4 pr-10 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             />
             <div className="absolute right-3 top-3">
               {searchInput ? (
@@ -107,7 +107,7 @@ export default function NewsFilters({
           </div>
           
           {searchParams.search && (
-            <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+            <div className="mt-3 p-2 bg-blue-50">
               <span className="text-sm text-blue-800">
                 '<strong>{searchParams.search}</strong>' 검색 중
               </span>
@@ -117,7 +117,7 @@ export default function NewsFilters({
       </div>
 
       {/* 카테고리 필터 */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white shadow-md overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4">카테고리</h3>
           <div className="space-y-2">
@@ -127,7 +127,7 @@ export default function NewsFilters({
                 <button
                   key={category.id}
                   onClick={() => handleCategoryChange(category.id)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-all duration-200 ${
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all duration-200 ${
                     isActive
                       ? 'bg-blue-50 border-2 border-blue-300 text-blue-700 shadow-sm'
                       : 'hover:bg-gray-50 text-gray-700 border-2 border-transparent hover:border-gray-200'
@@ -151,13 +151,13 @@ export default function NewsFilters({
       </div>
 
       {/* 정렬 옵션 */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white shadow-md overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4">정렬</h3>
           <select 
             value={searchParams.sort || 'newest'}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+            className="w-full px-4 py-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
           >
             <option value="newest">최신순</option>
             <option value="oldest">오래된순</option>
@@ -169,11 +169,11 @@ export default function NewsFilters({
 
       {/* 필터 초기화 */}
       {hasActiveFilters && (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="bg-white shadow-md overflow-hidden">
           <div className="p-6">
             <button
               onClick={clearAllFilters}
-              className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium"
+              className="w-full px-4 py-3 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200 font-medium"
             >
               🔄 모든 필터 초기화
             </button>
@@ -183,7 +183,7 @@ export default function NewsFilters({
 
       {/* 현재 필터 상태 표시 */}
       {hasActiveFilters && (
-        <div className="bg-blue-50 rounded-xl border border-blue-200 overflow-hidden">
+        <div className="bg-blue-50 border border-blue-200 overflow-hidden">
           <div className="p-6">
             <h4 className="text-sm font-semibold text-blue-800 mb-3">적용된 필터</h4>
             <div className="space-y-2">

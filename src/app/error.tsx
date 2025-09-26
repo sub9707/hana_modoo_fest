@@ -74,14 +74,14 @@ export default function Error({ error, reset }: ErrorProps) {
           <div className="space-y-2 text-sm text-slate-600">
             <p>
               <span className="font-medium">전화:</span> 
-              <a href="tel:02-123-4567" className="text-blue-600 hover:text-blue-700 ml-1">
-                02-123-4567
+              <a href="tel:02-861-3020" className="text-blue-600 hover:text-blue-700 ml-1">
+                02-861-3020
               </a>
             </p>
             <p>
               <span className="font-medium">이메일:</span>
-              <a href="mailto:info@moduhana2025.seoul.kr" className="text-blue-600 hover:text-blue-700 ml-1">
-                info@moduhana2025.seoul.kr
+              <a href="mailto:hanbumo1@seoul.go.kr" className="text-blue-600 hover:text-blue-700 ml-1">
+                hanbumo1@seoul.go.kr
               </a>
             </p>
           </div>

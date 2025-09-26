@@ -22,7 +22,7 @@ export default function NewsCard({ news, onClick }: NewsCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group active:scale-98"
+      className="bg-white shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group active:scale-98"
     >
       <div className="p-4 sm:p-6">
         {/* 상단 뱃지 및 메타 정보 */}

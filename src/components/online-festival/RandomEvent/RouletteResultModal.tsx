@@ -152,7 +152,7 @@ export default function RouletteResultModal({
                       </p>
                                        
                       <div className="text-sm space-y-1 text-blue-600">
-                        <p>문의사항이 있을 시, 02-1234-1234로 연락 부탁드립니다.</p>
+                        <p>문의사항이 있을 시, 02-861-3020로 연락 부탁드립니다.</p>
                       </div>
                     </div>
                   </div>

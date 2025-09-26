@@ -141,7 +141,7 @@ export default function AccessibilitySection() {
               </p>
             </div>
             <div className="mt-6 text-center text-sm sm:text-md text-md font-bold text-gray-500">
-              <p>전화: 02-2133-5000 | 이메일: accessibility@seoulsingleparent.or.kr</p>
+              <p>전화: 02-861-3020 | 이메일: hanbumo1@seoul.go.kr</p>
             </div>
           </div>
         </div>
