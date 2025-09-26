@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
-import { getUserById, updateUserRole, getAdminCount } from '@/lib/users-service'
+import { getUserById, updateUserRole, getAdminCount } from '@/lib/services/users-service'
 import { Role } from '@/types/auth'
 
 interface RouteParams {

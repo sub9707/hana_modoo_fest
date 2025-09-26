@@ -3,7 +3,6 @@ import { Inter, Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/provider/Provider'
 import { paperlogy } from '@/fonts/Paperlogy'
-import ErrorBoundary from '@/components/common/ErrorBoundary'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,11 +29,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${inter.variable} ${notoSansKR.variable} ${paperlogy.variable}`}>
       <body className="min-h-screen bg-background font-noto-sans antialiased">
-        <ErrorBoundary componentName="RootLayout">
           <Providers>
             {children}
           </Providers>
-        </ErrorBoundary>
       </body>
     </html>
   )

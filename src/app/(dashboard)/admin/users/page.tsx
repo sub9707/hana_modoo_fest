@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { requireAuth, requireRole } from '@/lib/mysql/server'
 import UserStats from '@/components/admin/UserManagement/UserStats'
 import UsersManagementClient from '@/components/admin/UserManagement/UserManagementClient'
-import { getAllUsers, getUserStats } from '@/lib/users-service'
+import { getAllUsers, getUserStats } from '@/lib/services/users-service'
 
 export default async function UsersPage() {
   try {

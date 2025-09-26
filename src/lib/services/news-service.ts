@@ -1,5 +1,5 @@
 // lib/news-service.ts - 업데이트된 뉴스 서비스
-import { query, queryOne, transaction } from './mysql/connection'
+import { query, queryOne, transaction } from '../mysql/connection'
 import { NewsItem, NewsListResponse, NewsSearchParams, NewsAttachment, NewsEditorImage } from '@/types/Board'
 
 export class NewsService {

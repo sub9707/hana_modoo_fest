@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import NewsContainer from '@/components/news/NewsContainer'
 import NewsHero from '@/components/news/NewsHero'
-import { NewsService } from '@/lib/news-service'
+import { NewsService } from '@/lib/services/news-service'
 
 export const metadata: Metadata = {
   title: '공지/소식 | 모두하나대축제 2025',

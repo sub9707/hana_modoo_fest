@@ -7,7 +7,7 @@ import ChartSection from './ChartSection'
 import UserTable from './UserTable'
 import UserModal from './UserModal'
 import { User } from '@/types/auth'
-import { UserStats } from '@/lib/users-service'
+import { UserStats } from '@/lib/services/users-service'
 
 type SortField = 'name' | 'username' | 'company' | 'role' | 'created_at' | 'last_login_at'
 type SortOrder = 'asc' | 'desc'

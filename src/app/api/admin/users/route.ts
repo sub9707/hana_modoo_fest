@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
-import { getAllUsers, createUser, CreateUserData } from '@/lib/users-service'
+import { getAllUsers, createUser, CreateUserData } from '@/lib/services/users-service'
 
 // GET: 사용자 목록 조회
 export async function GET(request: NextRequest) {

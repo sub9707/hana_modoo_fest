@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
-import { getAllUsers } from '@/lib/users-service'
+import { getAllUsers } from '@/lib/services/users-service'
 import * as XLSX from 'xlsx'
 
 // POST: 사용자 목록 엑셀 내보내기

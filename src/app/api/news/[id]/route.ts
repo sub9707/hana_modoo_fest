@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { NewsService } from '@/lib/news-service'
+import { NewsService } from '@/lib/services/news-service'
 
 interface Params {
   params: Promise<{

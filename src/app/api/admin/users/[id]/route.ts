@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
-import { getUserById, updateUser, deleteUser, UpdateUserData } from '@/lib/users-service'
+import { getUserById, updateUser, deleteUser, UpdateUserData } from '@/lib/services/users-service'
 
 interface RouteParams {
   params: Promise<{ id: string }>

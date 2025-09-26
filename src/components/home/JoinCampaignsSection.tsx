@@ -8,27 +8,19 @@ function JoinCampaignsSection() {
       label: "사전접수 참여자"
     },
     {
-      number: "817",
-      label: "퀴즈이벤트"
-    },
-    {
       number: "1,786",
       label: "응원 댓글"
     },
     {
       number: "103",
-      label: "가족추제 글짓기"
-    },
-    {
-      number: "1,183",
-      label: "랜덤룰렛 이벤트"
+      label: "가족주제 글짓기"
     }
   ]
 
   return (
     <section className="py-16">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="bg-gradient-to-r from-orange-300 to-pink-400 rounded-3xl p-12 text-center text-white">
+        <div className="bg-gradient-to-r from-orange-300 to-pink-400 rounded-3xl p-12 text-center text-white relative">
           {/* 헤더 영역 */}
           <div className="flex items-center justify-between mb-12 max-w-6xl ml-0 sm:ml-20 translate-x-0 sm:translate-x-1/3">
             {/* 텍스트 영역 */}
@@ -50,7 +42,7 @@ function JoinCampaignsSection() {
           </div>
 
           {/* 통계 그리드 */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {campaignStats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-2xl lg:text-3xl font-black mb-2">
@@ -61,9 +53,9 @@ function JoinCampaignsSection() {
                 </div>
               </div>
             ))}
-            <div className='absolute translate-y-35 translate-x-25 w-45 h-35 sm:hidden'>
-              <Image src={'/images/main/join_left.webp'} alt='참여 좌측 캐릭터' fill />
-            </div>
+          </div>
+          <div className='absolute right-0 bottom-0 w-40 h-30 sm:hidden'>
+            <Image src={'/images/main/join_left.webp'} alt='참여 좌측 캐릭터' fill />
           </div>
         </div>
       </div>

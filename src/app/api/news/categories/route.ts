@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { NewsService } from '@/lib/news-service'
+import { NewsService } from '@/lib/services/news-service'
 
 export async function GET() {
   try {
