@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Filter, RefreshCw } from 'lucide-react'
+import { Filter, RefreshCw, Zap } from 'lucide-react'
 import CommentItem from './CommentItem'
 
 interface Comment {
@@ -25,16 +25,19 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   const [page, setPage] = useState(1)
   const [sortBy, setSortBy] = useState<'latest' | 'popular'>('latest')
   const [error, setError] = useState('')
+  const [lastLoadTime, setLastLoadTime] = useState<number | null>(null)
+  const [showPerformanceInfo, setShowPerformanceInfo] = useState(false)
   
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadingRef = useRef<HTMLDivElement | null>(null)
 
-  // 댓글 목록 초기화 및 첫 페이지 로드
+  // 댓글 목록 초기화 및 첫 페이지 로드 (성능 개선)
   const loadComments = useCallback(async (isRefresh = false) => {
     if (isLoading) return
 
     setIsLoading(true)
     setError('')
+    const startTime = Date.now()
 
     try {
       const targetPage = isRefresh ? 1 : page
@@ -47,6 +50,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       }
 
       const data = await response.json()
+      const loadTime = Date.now() - startTime
 
       if (isRefresh) {
         setComments(data.comments)
@@ -57,6 +61,18 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       }
 
       setHasMore(data.hasMore)
+      setLastLoadTime(loadTime)
+
+      // 개발 환경에서 성능 정보 표시
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`댓글 로딩 시간: ${loadTime}ms`, data.fromCache ? '(캐시)' : '(DB)')
+        if (data.processingTime) {
+          console.log(`서버 처리 시간: ${data.processingTime}ms`)
+        }
+        setShowPerformanceInfo(true)
+        setTimeout(() => setShowPerformanceInfo(false), 3000)
+      }
+
     } catch (error) {
       setError(error instanceof Error ? error.message : '댓글을 불러오는데 실패했습니다.')
     } finally {
@@ -113,6 +129,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     loadComments(true)
   }, [])
 
+  // 좋아요 토글 핸들러 (즉시 UI 업데이트)
   const handleLikeToggle = (commentId: string, isLiked: boolean, newLikes: number) => {
     setComments(prev =>
       prev.map(comment =>
@@ -146,6 +163,14 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>새로고침</span>
           </button>
+          
+          {/* 개발 환경에서 성능 정보 표시 */}
+          {process.env.NODE_ENV === 'development' && showPerformanceInfo && lastLoadTime && (
+            <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+              <Zap className="w-3 h-3" />
+              <span>{lastLoadTime}ms</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -192,12 +217,12 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
           className="flex justify-center py-8"
         >
           {isLoading ? (
-            <div className="flex items-center space-x-2 text-purple-600">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
-              <span>댓글을 불러오는 중...</span>
+            <div className="flex items-center space-x-2 text-gray-500">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              <span>로딩 중...</span>
             </div>
           ) : (
-            <div className="text-gray-500">
+            <div className="text-gray-400 text-sm">
               스크롤하여 더 많은 댓글 보기
             </div>
           )}
@@ -206,19 +231,8 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
 
       {/* 더 이상 댓글이 없을 때 */}
       {!hasMore && comments.length > 0 && (
-        <div className="text-center py-8">
-          <div className="text-gray-500">모든 댓글을 불러왔습니다</div>
-        </div>
-      )}
-
-      {/* 댓글이 없을 때 */}
-      {!isLoading && comments.length === 0 && !error && (
-        <div className="text-center py-12">
-          <div className="text-4xl mb-4">💭</div>
-          <h3 className="text-lg font-semibold text-gray-600 mb-2">
-            아직 응원 메시지가 없어요
-          </h3>
-          <p className="text-gray-500">첫 번째 응원 메시지를 남겨보세요!</p>
+        <div className="text-center py-8 text-gray-400 text-sm">
+          모든 댓글을 확인했습니다
         </div>
       )}
     </div>

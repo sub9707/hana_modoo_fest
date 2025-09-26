@@ -1,12 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
+import { getRedisClient, isRedisHealthy } from '@/lib/redis/connection'
 
-// 최근 댓글 조회 (슬라이더용)
+// Redis 키 상수 추가
+const REDIS_KEYS = {
+  RECENT_COMMENTS: 'comments:recent'
+} as const
+
+// 최근 댓글 조회 (슬라이더용) - Redis 캐싱 적용
 export async function GET(request: NextRequest) {
+  const startTime = Date.now()
+  
   try {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '5')
-
+    
+    const redis = await isRedisHealthy() ? await getRedisClient() : null
+    
+    if (redis) {
+      // Redis에서 최근 댓글 조회
+      const cachedComments = await redis.lRange(REDIS_KEYS.RECENT_COMMENTS, 0, limit - 1)
+      
+      if (cachedComments.length > 0) {
+        const recentComments = cachedComments.map(comment => JSON.parse(comment))
+        console.log(`[${Date.now() - startTime}ms] Redis 최근 댓글 조회 완료`)
+        return NextResponse.json({ 
+          comments: recentComments,
+          fromCache: true,
+          processingTime: Date.now() - startTime
+        })
+      }
+    }
+    
+    // 캐시 미스 시 DB에서 조회
+    console.log(`[${Date.now() - startTime}ms] DB 최근 댓글 조회 시작`)
+    
     const recentComments = await query(`
       SELECT 
         sc.id,
@@ -19,9 +47,23 @@ export async function GET(request: NextRequest) {
       ORDER BY sc.created_at DESC
       LIMIT ?
     `, [limit])
+    
+    console.log(`[${Date.now() - startTime}ms] DB 최근 댓글 조회 완료`)
+    
+    // Redis에 캐시 저장
+    if (redis && recentComments.length > 0) {
+      const multi = redis.multi()
+      recentComments.forEach(comment => {
+        multi.lPush(REDIS_KEYS.RECENT_COMMENTS, JSON.stringify(comment))
+      })
+      multi.expire(REDIS_KEYS.RECENT_COMMENTS, 300) // 5분 캐시
+      await multi.exec()
+    }
 
-    return NextResponse.json({
-      comments: recentComments
+    return NextResponse.json({ 
+      comments: recentComments,
+      fromCache: false,
+      processingTime: Date.now() - startTime
     })
 
   } catch (error) {

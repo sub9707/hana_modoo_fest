@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Heart, Gift } from 'lucide-react'
+import { MessageCircle, Heart, Gift, Zap } from 'lucide-react'
 import RecentCommentsSlider from './RecentCommentsSlider'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
@@ -9,23 +9,39 @@ import CommentList from './CommentList'
 interface Stats {
   totalComments: number
   totalLikes: number
+  fromCache?: boolean
+  processingTime?: number
 }
 
 export default function SupportComments() {
   const [stats, setStats] = useState<Stats>({ totalComments: 0, totalLikes: 0 })
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
+  const [showStatsPerformance, setShowStatsPerformance] = useState(false)
 
   useEffect(() => {
     fetchStats()
   }, [refreshTrigger])
 
   const fetchStats = async () => {
+    const startTime = Date.now()
+    
     try {
       const response = await fetch('/api/support-comments/stats')
       if (response.ok) {
         const data = await response.json()
         setStats(data)
+        
+        // 개발 환경에서 성능 정보 표시
+        if (process.env.NODE_ENV === 'development') {
+          const loadTime = Date.now() - startTime
+          console.log(`통계 로딩 시간: ${loadTime}ms`, data.fromCache ? '(캐시)' : '(DB)')
+          if (data.processingTime) {
+            console.log(`서버 처리 시간: ${data.processingTime}ms`)
+          }
+          setShowStatsPerformance(true)
+          setTimeout(() => setShowStatsPerformance(false), 3000)
+        }
       }
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -64,7 +80,15 @@ export default function SupportComments() {
 
         {/* 통계 */}
         <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6">
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg relative">
+            {/* 개발 환경에서 성능 정보 표시 */}
+            {process.env.NODE_ENV === 'development' && showStatsPerformance && stats.fromCache && (
+              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                <Zap className="w-3 h-3" />
+                <span>캐시</span>
+              </div>
+            )}
+            
             <div className="flex items-center justify-center mb-2">
               <MessageCircle className="w-5 h-5 text-purple-500 mr-2" />
               <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
@@ -74,7 +98,15 @@ export default function SupportComments() {
             <div className="text-sm md:text-base text-gray-600 font-medium">총 응원글</div>
           </div>
           
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg relative">
+            {/* 개발 환경에서 성능 정보 표시 */}
+            {process.env.NODE_ENV === 'development' && showStatsPerformance && stats.fromCache && (
+              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                <Zap className="w-3 h-3" />
+                <span>캐시</span>
+              </div>
+            )}
+            
             <div className="flex items-center justify-center mb-2">
               <Heart className="w-5 h-5 text-pink-500 mr-2" />
               <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">

@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart } from 'lucide-react'
+import { Heart, Clock } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Comment {
-  id: string // UUID 형태로 변경
+  id: string
   message: string
   likes: number
   created_at: string
   author_name: string
-  user_id: string // UUID 형태로 변경
+  user_id: string
   isLiked?: boolean
 }
 
@@ -22,10 +22,18 @@ interface CommentItemProps {
 export default function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
   const { user } = useAuth()
   const [isLiking, setIsLiking] = useState(false)
+  const [showProcessingTime, setShowProcessingTime] = useState(false)
+  const [lastProcessingTime, setLastProcessingTime] = useState<number | null>(null)
 
   const handleLike = async () => {
     if (!user || isLiking) return
 
+    // 🚀 즉시 UI 업데이트 (낙관적 업데이트)
+    const newIsLiked = !comment.isLiked
+    const newLikes = comment.likes + (newIsLiked ? 1 : -1)
+    
+    // UI를 즉시 업데이트
+    onLikeToggle(comment.id, newIsLiked, newLikes)
     setIsLiking(true)
 
     try {
@@ -36,12 +44,39 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
       const data = await response.json()
 
       if (response.ok) {
-        onLikeToggle(comment.id, data.isLiked, data.likes)
+        // 서버 응답과 동기화 (이미 낙관적으로 업데이트했으므로 차이가 있을 때만)
+        if (data.isLiked !== newIsLiked || data.likes !== newLikes) {
+          onLikeToggle(comment.id, data.isLiked, data.likes)
+        }
+        
+        // 개발 환경에서 처리 시간 표시
+        if (process.env.NODE_ENV === 'development' && data.processingTime) {
+          setLastProcessingTime(data.processingTime)
+          setShowProcessingTime(true)
+          setTimeout(() => setShowProcessingTime(false), 3000)
+        }
+        
+        // Redis 캐시 사용 여부 로그
+        if (data.fromCache) {
+          console.log('💾 Redis 캐시에서 처리됨')
+        }
       } else {
+        // 에러 시 원래 상태로 복원
+        onLikeToggle(comment.id, !!comment.isLiked, comment.likes)
         console.error('Failed to toggle like:', data.error)
+        
+        // 사용자에게 에러 메시지 표시 (선택사항)
+        if (data.error && data.error !== '좋아요 처리에 실패했습니다.') {
+          alert(data.error)
+        }
       }
     } catch (error) {
+      // 네트워크 에러 시 원래 상태로 복원
+      onLikeToggle(comment.id, !!comment.isLiked, comment.likes)
       console.error('Error toggling like:', error)
+      
+      // 네트워크 에러 메시지
+      alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsLiking(false)
     }
@@ -68,7 +103,15 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
   }
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-6 hover:bg-white/80 transition-all duration-200 group">
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-6 hover:bg-white/80 transition-all duration-200 group relative">
+      {/* 개발 환경에서 처리 시간 표시 */}
+      {showProcessingTime && lastProcessingTime && (
+        <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+          <Clock className="w-3 h-3" />
+          <span>{lastProcessingTime}ms</span>
+        </div>
+      )}
+      
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -93,26 +136,32 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
         <button
           onClick={handleLike}
           disabled={!user || isLiking}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 ${
+          className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 transform ${
             comment.isLiked
-              ? 'bg-gradient-to-r from-pink-100 to-red-100 text-pink-600 border border-pink-200'
-              : user
-              ? 'bg-gray-100 text-gray-600 hover:bg-gradient-to-r hover:from-pink-50 hover:to-red-50 hover:text-pink-500 border border-gray-200 hover:border-pink-200'
-              : 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-100'
-          } ${isLiking ? 'animate-pulse' : ''}`}
-          title={!user ? '로그인 후 좋아요를 누를 수 있습니다' : ''}
+              ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg scale-105'
+              : 'bg-gray-100 text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:scale-105'
+          } ${
+            isLiking 
+              ? 'opacity-75 cursor-not-allowed' 
+              : user 
+                ? 'cursor-pointer hover:shadow-md active:scale-95' 
+                : 'cursor-not-allowed opacity-50'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           <Heart 
             className={`w-4 h-4 transition-all duration-200 ${
-              comment.isLiked ? 'fill-current scale-110' : ''
-            }`} 
+              comment.isLiked ? 'fill-current' : ''
+            } ${isLiking ? 'animate-pulse' : ''}`} 
           />
-          <span className="text-sm font-medium">{comment.likes}</span>
+          <span className="font-medium">
+            {comment.likes.toLocaleString()}
+          </span>
+          {isLiking && <span className="text-xs">처리중...</span>}
         </button>
 
-        {comment.user_id === user?.id && (
-          <div className="px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
-            <span className="text-xs font-medium text-purple-700">내가 작성</span>
+        {!user && (
+          <div className="text-xs text-gray-400">
+            로그인 후 좋아요를 누를 수 있습니다
           </div>
         )}
       </div>
