@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   remotePatterns: [
     { protocol: 'http', hostname: 'localhost' },
     { protocol: 'https', hostname: 't1.kakaocdn.net' },
+    { protocol: 'http', hostname: 'img1.kakaocdn.net' },
     { protocol: 'https', hostname: 'img1.kakaocdn.net' },
     { protocol: 'https', hostname: 'ssl.pstatic.net' }, // 네이버 프로필 이미지
     { protocol: 'http', hostname: 'k.kakaocdn.net' },   // 카카오 (HTTP)
