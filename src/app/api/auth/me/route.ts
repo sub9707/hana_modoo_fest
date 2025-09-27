@@ -1,82 +1,109 @@
-// app/api/auth/me/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { queryOne } from '@/lib/mysql/connection'
+import { getCurrentUserAction } from '@/lib/actions/auth'
 
-export async function GET() {
+// 캐시를 위한 간단한 메모리 저장소 (프로덕션에서는 Redis 사용 권장)
+const userCache = new Map<string, { user: any; timestamp: number }>()
+const CACHE_DURATION = 5 * 60 * 1000 // 5분
+
+export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session-token')?.value
 
+    // 세션 토큰이 없으면 즉시 401 반환 (빠른 응답)
     if (!sessionToken) {
       return NextResponse.json(
-        { error: 'No session token found' },
-        { status: 401 }
+        { error: '로그인이 필요합니다.' },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        }
       )
     }
 
-    // 사용자 정보 조회
-    const user = await queryOne(
-      `SELECT id, name, username, gender, birth_date, phone, role, 
-              created_at, last_login_at, last_activity_at, session_expires_at
-       FROM users 
-       WHERE session_token = ?`,
-      [sessionToken]
-    )
-
-    if (!user) {
+    // 캐시 확인 (같은 세션 토큰에 대한 최근 요청)
+    const cached = userCache.get(sessionToken)
+    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+        { user: cached.user },
+        {
+          headers: {
+            'Cache-Control': 'private, max-age=300', // 5분 캐시
+            'X-Cache': 'HIT'
+          }
+        }
       )
     }
 
-    // 세션 만료 확인
-    if (user.session_expires_at && new Date(user.session_expires_at) < new Date()) {
-      // 만료된 세션 정리
-      await queryOne(
-        'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
-        [user.id]
-      )
+    // 데이터베이스에서 사용자 정보 조회
+    const result = await getCurrentUserAction()
+
+    if (result.error) {
+      // 캐시에서 제거
+      userCache.delete(sessionToken)
       
       return NextResponse.json(
-        { error: 'Session expired' },
-        { status: 401 }
+        { error: result.error },
+        { 
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        }
       )
     }
 
-    // 민감한 정보 제거
-    const { session_expires_at, ...safeUser } = user
+    // 성공 시 캐시에 저장
+    userCache.set(sessionToken, {
+      user: result.user,
+      timestamp: Date.now()
+    })
 
-    // NextJS 15: 응답 헤더 개선
+    // 캐시 크기 제한 (메모리 누수 방지)
+    if (userCache.size > 1000) {
+      const oldestKey = userCache.keys().next().value
+      if (typeof oldestKey === 'string') {
+        userCache.delete(oldestKey)
+      }
+    }
+
     return NextResponse.json(
-      { user: safeUser },
-      { 
-        status: 200,
+      { user: result.user },
+      {
         headers: {
-          'Cache-Control': 'no-store, max-age=0',
+          'Cache-Control': 'private, max-age=300', // 5분 캐시
+          'X-Cache': 'MISS'
         }
       }
     )
 
   } catch (error) {
-    console.error('Get current user error:', error)
+    console.error('Auth me API error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: '서버 오류가 발생했습니다.' },
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      }
     )
   }
 }
 
-// NextJS 15: OPTIONS 메서드 지원 추가 (CORS 대응)
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_APP_URL || '',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+// 캐시 정리를 위한 주기적 작업 (선택사항)
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now()
+    for (const [key, value] of userCache.entries()) {
+      if (now - value.timestamp > CACHE_DURATION * 2) {
+        userCache.delete(key)
+      }
+    }
+  }, CACHE_DURATION)
 }
