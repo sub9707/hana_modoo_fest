@@ -170,13 +170,6 @@ export default function RandomEvent() {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {prize.type !== 'none' && (
-                      <div className="text-xs text-gray-500">
-                        {prize.current_quantity > 999 ? '충분' : `${prize.current_quantity}개 남음`}
-                      </div>
-                    )}
-                  </div>
                 </div>
               ))}
             </div>
