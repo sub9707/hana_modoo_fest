@@ -20,7 +20,7 @@ function formatNumber(num: number): string {
 // 서버 컴포넌트에서 데이터 fetch
 async function getCampaignStatsData() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
                    (process.env.NODE_ENV === 'production' 
                      ? 'https://moduhana2025.seoul.kr' 
                      : 'http://localhost:3000')
