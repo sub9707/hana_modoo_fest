@@ -1,60 +1,48 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Send, Lock, Clock } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
 
-interface CommentFormProps {
-  onCommentSubmitted: () => void
-}
-
-export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
-  const { user } = useAuth()
+export default function CommentForm({ onCommentSubmitted }: { onCommentSubmitted: () => void }) {
   const [message, setMessage] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [remainingTime, setRemainingTime] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  // 1. 페이지 로드 시 localStorage에서 쿨타임 확인 (즉시 표시)
   useEffect(() => {
-    let interval: NodeJS.Timeout
-
-    if (remainingTime > 0) {
-      interval = setInterval(() => {
-        setRemainingTime((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+    const checkLocalCooltime = () => {
+      const lastCommentTime = localStorage.getItem('lastCommentTime')
+      if (lastCommentTime) {
+        const elapsed = Math.floor((Date.now() - parseInt(lastCommentTime)) / 1000)
+        const remaining = Math.max(0, 30 - elapsed)
+        setRemainingTime(remaining)
+      }
     }
 
-    return () => {
-      if (interval) clearInterval(interval)
+    checkLocalCooltime()
+  }, [])
+
+  // 2. 쿨타임 타이머
+  useEffect(() => {
+    if (remainingTime > 0) {
+      const timer = setInterval(() => {
+        setRemainingTime(prev => {
+          const newTime = prev - 1
+          if (newTime <= 0) {
+            localStorage.removeItem('lastCommentTime')
+            return 0
+          }
+          return newTime
+        })
+      }, 1000)
+
+      return () => clearInterval(timer)
     }
   }, [remainingTime])
 
+  // 3. 댓글 제출 (서버에서 최종 검증)
   const handleSubmit = async () => {
-    if (!user) {
-      setError('로그인이 필요합니다.')
-      return
-    }
-
-    if (!message.trim()) {
-      setError('메시지를 입력해주세요.')
-      return
-    }
-
-    if (message.length > 200) {
-      setError('메시지는 200자 이내로 입력해주세요.')
-      return
-    }
-
-    if (remainingTime > 0) {
-      setError(`${remainingTime}초 후에 다시 작성할 수 있습니다.`)
-      return
-    }
+    if (!message.trim() || isSubmitting || remainingTime > 0) return
 
     setIsSubmitting(true)
     setError('')
@@ -62,29 +50,32 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
     try {
       const response = await fetch('/api/support-comments', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: message.trim() }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message.trim() })
       })
 
       const data = await response.json()
 
       if (response.ok) {
+        // 성공: localStorage에 시간 저장 + 쿨타임 시작
+        localStorage.setItem('lastCommentTime', Date.now().toString())
+        setRemainingTime(30)
         setMessage('')
-        setRemainingTime(30) // 30초 제한 시작
         onCommentSubmitted()
-        setError('')
       } else {
-        setError(data.error || '댓글 작성에 실패했습니다.')
-
-        // 429 에러 (Too Many Requests)인 경우 남은 시간 파싱
-        if (response.status === 429 && data.error) {
-          const timeMatch = data.error.match(/(\d+)초/)
-          if (timeMatch) {
-            setRemainingTime(parseInt(timeMatch[1]))
+        // 실패: 서버 쿨타임 에러 처리
+        if (response.status === 429) {
+          // 서버에서 정확한 남은 시간을 알려줌
+          const match = data.error.match(/(\d+)초/)
+          if (match) {
+            const serverRemainingTime = parseInt(match[1])
+            setRemainingTime(serverRemainingTime)
+            // localStorage도 서버 시간에 맞춰 업데이트
+            const serverLastCommentTime = Date.now() - (30 - serverRemainingTime) * 1000
+            localStorage.setItem('lastCommentTime', serverLastCommentTime.toString())
           }
         }
+        setError(data.error || '댓글 작성에 실패했습니다.')
       }
     } catch (error) {
       setError('네트워크 오류가 발생했습니다.')
@@ -93,90 +84,45 @@ export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey && !isSubmitting) {
-      handleSubmit()
-    }
-  }
-
-  const isDisabled = isSubmitting || remainingTime > 0 || !user
-  const buttonText = !user
-    ? '로그인 후 이용하세요'
-    : remainingTime > 0
-      ? `${remainingTime}초 후 작성 가능`
-      : isSubmitting
-        ? '작성 중...'
-        : '응원글 등록'
-
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 mb-8">
-      <div className="flex items-center space-x-2 mb-4">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900">응원 메시지 남기기</h3>
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6">
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="따뜻한 응원 메시지를 남겨주세요..."
+        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+        rows={4}
+        maxLength={200}
+      />
+      
+      <div className="flex justify-between items-center mt-4">
+        <div className="text-sm text-gray-500">
+          {message.length}/200
+        </div>
+        
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting || remainingTime > 0 || !message.trim()}
+          className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+            isSubmitting || remainingTime > 0 || !message.trim()
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg'
+          }`}
+        >
+          {remainingTime > 0 
+            ? `${remainingTime}초 후 작성 가능`
+            : isSubmitting 
+              ? '작성 중...' 
+              : '응원글 등록'
+          }
+        </button>
       </div>
-
-      {!user && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex items-start space-x-2">
-            <Lock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-            <span className="text-sm text-amber-700 leading-relaxed">
-              응원 메시지를 남기려면 로그인이 필요합니다.
-            </span>
-          </div>
+      
+      {error && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600 text-sm">{error}</p>
         </div>
       )}
-
-      <div className="space-y-4">
-        <textarea
-          placeholder={user ? "따뜻한 응원 메시지를 남겨주세요..." : "로그인 후 응원 메시지를 남겨보세요"}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyPress}
-          disabled={!user}
-          className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:bg-white transition-all resize-none disabled:bg-gray-50 disabled:text-gray-500 text-sm sm:text-base"
-          rows={4}
-          maxLength={200}
-        />
-
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-          <div className="flex items-center justify-between sm:justify-start sm:space-x-4">
-            <span className="text-sm text-gray-500">
-              {message.length}/200
-            </span>
-            {remainingTime > 0 && (
-              <div className="flex items-center space-x-1 text-amber-600">
-                <Clock className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  {remainingTime}초 후 작성 가능
-                </span>
-              </div>
-            )}
-          </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={isDisabled || !message.trim()}
-            className={`flex items-center justify-center space-x-2 w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-xl transition-all ${isDisabled || !message.trim()
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl active:scale-95 sm:hover:scale-105'
-              }`}
-          >
-            {!user ? (
-              <Lock className="w-4 h-4" />
-            ) : remainingTime > 0 ? (
-              <Clock className="w-4 h-4" />
-            ) : (
-              <Send className="w-4 h-4" />
-            )}
-            <span>{buttonText}</span>
-          </button>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600 leading-relaxed">{error}</p>
-          </div>
-        )}
-      </div>
     </div>
   )
 }
