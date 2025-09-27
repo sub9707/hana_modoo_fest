@@ -197,9 +197,9 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
       const response = await fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          phone, 
-          code: data.code 
+        body: JSON.stringify({
+          phone,
+          code: data.code
         })
       })
 
@@ -240,7 +240,23 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
       if (response.ok) {
         onComplete()
       } else {
-        setError(result.error || '회원가입에 실패했습니다')
+        // 12시간 재가입 제한 에러 특별 처리
+        if (result.blocked && result.reason === 'recent_deletion') {
+          setError(
+            `회원탈퇴 후 12시간이 지나야 재가입이 가능합니다. ` +
+            `${result.remainingHours}시간 후 다시 시도해주세요.`
+          )
+        } else if (result.blocked) {
+          // 기타 블랙리스트 에러
+          setError(
+            result.error +
+            (result.blockedUntil ?
+              ` (해제 예정: ${new Date(result.blockedUntil).toLocaleDateString()})` : '')
+          )
+        } else {
+          // 일반 에러
+          setError(result.error || '회원가입에 실패했습니다')
+        }
       }
     } catch (error) {
       console.error('Registration error:', error)
@@ -320,8 +336,8 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
           <div className="flex items-center">
             <div className={`
               flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-              ${step === 'phone' 
-                ? 'bg-blue-600 text-white' 
+              ${step === 'phone'
+                ? 'bg-blue-600 text-white'
                 : 'bg-green-600 text-white'
               }
             `}>
@@ -333,11 +349,11 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
           <div className="flex items-center">
             <div className={`
               flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-              ${step === 'phone' 
-                ? 'bg-gray-300 text-gray-600' 
+              ${step === 'phone'
+                ? 'bg-gray-300 text-gray-600'
                 : step === 'verification'
-                ? 'bg-blue-600 text-white'
-                : 'bg-green-600 text-white'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-green-600 text-white'
               }
             `}>
               {step === 'userinfo' ? <Check className="h-4 w-4" /> : '2'}
@@ -348,8 +364,8 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
           <div className="flex items-center">
             <div className={`
               flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-              ${step !== 'userinfo' 
-                ? 'bg-gray-300 text-gray-600' 
+              ${step !== 'userinfo'
+                ? 'bg-gray-300 text-gray-600'
                 : 'bg-blue-600 text-white'
               }
             `}>

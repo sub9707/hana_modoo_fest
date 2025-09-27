@@ -5,6 +5,7 @@ import { createHash, randomBytes } from 'crypto'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { checkBlacklist, trackSignupPattern } from '@/utils/blacklist'
 import { cookies } from 'next/headers'
+import { checkRecentDeletion } from '@/app/(site)/my-page/delete-account/actions'
 
 // 회원가입 스키마 (전화번호 가입)
 const phoneRegistrationSchema = z.object({
@@ -59,6 +60,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const data = registrationSchema.parse(body)
     const clientIp = getClientIp(request)
+
+    const deletionCheck = await checkRecentDeletion(data.phone)
+    if (!deletionCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: deletionCheck.error,
+          blocked: true,
+          remainingHours: deletionCheck.remainingHours,
+          reason: 'recent_deletion'
+        },
+        { status: 403 }
+      )
+    }
 
     // 블랙리스트 체크 (가입 시도 전)
     const blacklistResult = await checkBlacklist(
@@ -141,7 +155,8 @@ export async function POST(request: NextRequest) {
       // 비즈니스 로직 에러
       if (error.message.includes('중복') ||
         error.message.includes('인증') ||
-        error.message.includes('존재')) {
+        error.message.includes('존재')||
+        error.message.includes('탈퇴')) {
         return NextResponse.json(
           { error: error.message },
           { status: 409 }

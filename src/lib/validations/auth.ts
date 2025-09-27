@@ -127,6 +127,26 @@ export const changePasswordSchema = z.object({
   path: ['newPassword']
 })
 
+// 회원 탈퇴 스키마
+export const deleteAccountSchema = z.object({
+  password: z.string()
+    .min(1, '현재 비밀번호를 입력해주세요'),
+  reason: z.enum([
+    'privacy_concern',
+    'service_dissatisfaction', 
+    'no_longer_needed',
+    'duplicate_account',
+    'other'
+  ]).optional(),
+  reasonDetail: z.string()
+    .max(500, '상세 사유는 500자 이내로 입력해주세요')
+    .optional(),
+  confirmDelete: z.boolean()
+    .refine(val => val === true, '탈퇴 확인이 필요합니다'),
+  agreeRestriction: z.boolean()
+    .refine(val => val === true, '재가입 제한 안내에 동의해주세요')
+})
+
 // 프로필 업데이트 스키마
 export const profileUpdateSchema = z.object({
   name: z.string()
@@ -179,6 +199,7 @@ export type VerificationCodeData = z.infer<typeof verificationCodeSchema>
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordData = z.infer<typeof resetPasswordSchema>
 export type ChangePasswordData = z.infer<typeof changePasswordSchema>
+export type DeleteAccountData = z.infer<typeof deleteAccountSchema>
 export type ProfileUpdateData = z.infer<typeof profileUpdateSchema>
 export type OAuthProviderData = z.infer<typeof oauthProviderSchema>
 export type OAuthCallbackData = z.infer<typeof oauthCallbackSchema>
@@ -209,6 +230,10 @@ export function validateChangePassword(data: unknown): ChangePasswordData {
   return changePasswordSchema.parse(data)
 }
 
+export function validateDeleteAccount(data: unknown): DeleteAccountData {
+  return deleteAccountSchema.parse(data)
+}
+
 // 안전한 검증 함수들 (에러를 throw하지 않음)
 export function safeValidateLogin(data: unknown) {
   return loginSchema.safeParse(data)
@@ -220,6 +245,10 @@ export function safeValidatePhoneRegistration(data: unknown) {
 
 export function safeValidateChangePassword(data: unknown) {
   return changePasswordSchema.safeParse(data)
+}
+
+export function safeValidateDeleteAccount(data: unknown) {
+  return deleteAccountSchema.safeParse(data)
 }
 
 // 에러 메시지 변환 함수

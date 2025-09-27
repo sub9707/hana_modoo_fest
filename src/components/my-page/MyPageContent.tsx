@@ -48,15 +48,6 @@ export function MyPageContent({ user }: MyPageContentProps) {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">프로필 정보</h2>
-          <div className="flex space-x-2">
-            <button
-              onClick={handleUpdateActivity}
-              disabled={isActivityUpdating}
-              className="text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
-            >
-              {isActivityUpdating ? '업데이트 중...' : '활동 시간 갱신'}
-            </button>
-          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,6 +203,20 @@ export function MyPageContent({ user }: MyPageContentProps) {
             현재 마이페이지는 정보 확인용으로만 제공됩니다. 
             정보 수정이 필요한 경우 관리자에게 문의해주세요.
           </p>
+        </div>
+
+        {/* 위험 구역 */}
+        <div className="mt-8 pt-6 border-t border-red-200">
+          <h3 className="text-sm font-medium text-red-800 mb-2">위험 구역</h3>
+          <p className="text-sm text-red-600 mb-4">
+            회원 탈퇴 후 12시간이 지나야 재가입할 수 있으니 주의해주세요.
+          </p>
+          <Link
+            href="/my-page/delete-account"
+            className="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+          >
+            회원 탈퇴
+          </Link>
         </div>
       </section>
     </div>
