@@ -6,6 +6,7 @@ import PhoneRegistration from '@/components/forms/PhoneRegistration'
 import SocialRegistration from '@/components/forms/SocialRegistration'
 import RegistrationMethod from '@/components/forms/RegistrationMethod'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
+import PhoneRegistrationTest from '@/components/forms/PhoneRegistration_test'
 
 // SocialData 타입 정의 (SocialRegistration과 일치)
 interface SocialData {
@@ -193,7 +194,7 @@ export default function RegisterPage() {
         
       case 'phone':
         return (
-          <PhoneRegistration 
+          <PhoneRegistrationTest
             onComplete={handleRegistrationComplete}
             onBack={handleBackToMethod}
           />

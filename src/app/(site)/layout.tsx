@@ -86,7 +86,7 @@ export default function SiteLayout({
                         "name": "모두하나대축제 2025",
                         "description": "서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.",
                         "startDate": "2025-10-18T11:00:00+09:00",
-                        "endDate": "2025-10-18T16:00:00+09:00",
+                        "endDate": "2025-10-18T17:00:00+09:00",
                         "location": {
                             "@type": "Place",
                             "name": "여의도공원 문화의마당",

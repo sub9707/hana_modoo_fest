@@ -47,7 +47,7 @@ function SocialLoginButton({ provider, onClick, isLoading }: { provider: 'naver'
           </div>
         )}
 
-        {/* 중앙 콘텐츠 */}
+        {/* 중앙 컨텐츠 */}
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
@@ -315,19 +315,29 @@ export default function LoginForm() {
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
           </div>
+          {/* 회원가입 및 비밀번호 찾기 링크 + 안내 텍스트 */}
+          <div className="flex flex-col items-center space-y-2 text-sm">
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-500">비밀번호를 잊으셨나요?</span>
+              <Link
+                href="/forgot-password"
+                className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+              >
+                비밀번호 변경
+              </Link>
+            </div>
 
-          {/* 회원가입 링크 */}
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              아직 계정이 없으신가요?{' '}
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-500">아직 계정이 없으신가요?</span>
               <Link
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
               >
                 회원가입
               </Link>
-            </p>
+            </div>
           </div>
+
 
           {/* 테스트 계정 정보 (개발 환경에서만 표시) */}
           {process.env.NODE_ENV === 'development' && (

@@ -71,7 +71,7 @@ export default function PreRegistration() {
             <div className="text-2xl mb-3">📅</div>
             <h4 className="font-semibold text-gray-900 mb-2">축제 날짜</h4>
             <p className="text-gray-600">2025년 10월 18일 (토)</p>
-            <p className="text-gray-600">11:00 - 16:00</p>
+            <p className="text-gray-600">11:00 - 17:00</p>
           </div>
           <div>
             <div className="text-2xl mb-3">📍</div>

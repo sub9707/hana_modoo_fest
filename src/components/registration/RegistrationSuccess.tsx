@@ -260,7 +260,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                         </h3>
                                         <div className="grid grid-cols-3 gap-6 text-center">
                                             {[
-                                                { icon: '📅', title: '일시', line1: '2025.10.18 (토)', line2: '11:00-16:00' },
+                                                { icon: '📅', title: '일시', line1: '2025.10.18 (토)', line2: '11:00-17:00' },
                                                 { icon: '📍', title: '장소', line1: '여의도공원', line2: '문화의마당' },
                                                 { icon: '🎟️', title: '입장', line1: '무료 입장', line2: '접수번호 지참' }
                                             ].map((item, index) => (

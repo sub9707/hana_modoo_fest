@@ -30,7 +30,7 @@ const venueData = {
   detailAddress: '서울특별시 영등포구 여의도공원',
   date: '2025년 10월 18일 (토)',
   time: '오전 11:00 - 오후 4:00',
-  operatingHours: '2025. 10. 18 (토) 11:00 - 16:00',
+  operatingHours: '2025. 10. 18 (토) 11:00 - 17:00',
   admission: '무료 (사전신청 권장)',
   coordinates: {
     lat: 37.5246435,

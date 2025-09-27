@@ -1,6 +1,7 @@
 // app/api/health/route.ts
 import { NextResponse } from 'next/server'
 import { healthCheck } from '@/lib/mysql/connection'
+import { checkSensHealth, checkCredentials } from '@/lib/sens/health'
 
 // 환경별 응답 시간 기준 설정
 const getResponseTimeThresholds = () => {
@@ -26,46 +27,99 @@ export async function GET() {
   const startTime = Date.now()
   
   try {
-    // 간단한 헬스체크만 수행
-    const dbHealthy = await Promise.race([
-      healthCheck(),
-      // 타임아웃 설정 (5초)
-      new Promise<boolean>((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 5000)
-      )
+    // 병렬로 헬스체크 수행
+    const [dbResult, sensResult] = await Promise.allSettled([
+      // 데이터베이스 헬스체크 (타임아웃 5초)
+      Promise.race([
+        healthCheck(),
+        new Promise<boolean>((_, reject) => 
+          setTimeout(() => reject(new Error('Database timeout')), 5000)
+        )
+      ]),
+      // SENS 헬스체크 (타임아웃 10초)
+      Promise.race([
+        checkSensHealth(),
+        new Promise<any>((_, reject) => 
+          setTimeout(() => reject(new Error('SENS timeout')), 10000)
+        )
+      ])
     ])
     
     const responseTime = Date.now() - startTime
     const thresholds = getResponseTimeThresholds()
     
-    // 서버 부하 상태 판단 (더 관대한 기준)
+    // 데이터베이스 상태
+    const dbHealthy = dbResult.status === 'fulfilled' && dbResult.value === true
+    const dbError = dbResult.status === 'rejected' ? dbResult.reason?.message : null
+    
+    // SENS 상태
+    const sensHealthy = sensResult.status === 'fulfilled' && sensResult.value.isHealthy
+    const sensStatus = sensResult.status === 'fulfilled' ? sensResult.value : null
+    const sensError = sensResult.status === 'rejected' ? sensResult.reason?.message : null
+    
+    // 전체 서비스 상태 판단
+    let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
     let load: 'low' | 'medium' | 'high' = 'low'
     
+    // 상태 우선순위: unhealthy > degraded > healthy
     if (!dbHealthy) {
+      overallStatus = 'unhealthy'
       load = 'high'
+    } else if (!sensHealthy) {
+      overallStatus = 'degraded'
+      load = 'medium'
     } else if (responseTime > thresholds.poor) {
+      overallStatus = 'degraded'
       load = 'high'
     } else if (responseTime > thresholds.fair) {
       load = 'medium'
-    } else {
-      load = 'low'
     }
 
     const response = {
-      status: dbHealthy ? 'healthy' : 'unhealthy',
+      status: overallStatus,
       load,
       timestamp: new Date().toISOString(),
       responseTime: `${responseTime}ms`,
-      database: dbHealthy ? 'healthy' : 'unhealthy',
+      
+      // 개별 서비스 상태
+      services: {
+        database: {
+          status: dbHealthy ? 'healthy' : 'unhealthy',
+          error: dbError
+        },
+        sms: {
+          status: sensHealthy ? 'healthy' : (sensStatus?.status || 'unhealthy'),
+          provider: 'SENS',
+          message: sensStatus?.message,
+          credentials: sensStatus?.details?.credentials || false,
+          apiConnection: sensStatus?.details?.apiConnection || false,
+          responseTime: sensStatus?.details?.responseTime ? `${sensStatus.details.responseTime}ms` : undefined,
+          error: sensError
+        }
+      },
+      
+      // 환경 정보
       environment: process.env.NODE_ENV,
-      thresholds
+      thresholds,
+      
+      // 추가 정보 (개발 환경에서만)
+      ...(process.env.NODE_ENV === 'development' && {
+        details: {
+          sensCredentials: checkCredentials(),
+          registeredSenders: sensStatus?.details?.senderNumbers || []
+        }
+      })
     }
 
+    const statusCode = overallStatus === 'healthy' ? 200 : 
+                      overallStatus === 'degraded' ? 206 : 503
+
     return NextResponse.json(response, { 
-      status: 200,
+      status: statusCode,
       headers: {
         'Cache-Control': 'no-store, max-age=0',
-        'X-Response-Time': `${responseTime}ms`
+        'X-Response-Time': `${responseTime}ms`,
+        'X-Service-Status': overallStatus
       }
     })
     
@@ -78,14 +132,55 @@ export async function GET() {
       load: 'high',
       timestamp: new Date().toISOString(),
       responseTime: `${responseTime}ms`,
-      database: 'unhealthy',
+      
+      services: {
+        database: { status: 'unknown' },
+        sms: { status: 'unknown', provider: 'SENS' }
+      },
+      
       error: error instanceof Error ? error.message : 'Unknown error',
       environment: process.env.NODE_ENV
     }, { 
       status: 503,
       headers: {
         'Cache-Control': 'no-store, max-age=0',
-        'X-Response-Time': `${responseTime}ms`
+        'X-Response-Time': `${responseTime}ms`,
+        'X-Service-Status': 'unhealthy'
+      }
+    })
+  }
+}
+
+// SENS 전용 헬스체크 엔드포인트
+export async function POST() {
+  try {
+    const sensHealth = await checkSensHealth()
+    
+    return NextResponse.json({
+      success: sensHealth.isHealthy,
+      ...sensHealth
+    }, {
+      status: sensHealth.isHealthy ? 200 : 503,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0'
+      }
+    })
+    
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      isHealthy: false,
+      status: 'unhealthy',
+      message: error instanceof Error ? error.message : 'SENS health check failed',
+      details: {
+        credentials: false,
+        apiConnection: false,
+        lastChecked: new Date().toISOString()
+      }
+    }, { 
+      status: 503,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0'
       }
     })
   }

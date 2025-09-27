@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Phone, MessageSquare, Loader2, Check, Clock } from 'lucide-react'
+import { ArrowLeft, Phone, MessageSquare, Loader2, Check, Clock, Search } from 'lucide-react'
 
 interface PhoneRegistrationProps {
   onComplete: () => void
@@ -26,7 +26,7 @@ const verificationSchema = z.object({
     .regex(/^\d{6}$/, '숫자만 입력해주세요')
 })
 
-// 사용자 정보 스키마
+// 사용자 정보 스키마 (주소 필드 추가)
 const userInfoSchema = z.object({
   name: z.string().min(2, '이름은 2글자 이상 입력해주세요'),
   username: z.string()
@@ -40,7 +40,11 @@ const userInfoSchema = z.object({
   birthDate: z.string()
     .min(1, '생년월일을 입력해주세요')
     .regex(/^\d{4}-\d{2}-\d{2}$/, '올바른 날짜 형식이 아닙니다'),
-  company: z.string().optional()
+  company: z.string().optional(),
+  // 주소 필드 추가
+  address: z.string().min(1, '주소를 입력해주세요'),
+  addressDetail: z.string().optional(),
+  zipCode: z.string().min(5, '우편번호를 입력해주세요')
 }).refine(data => data.password === data.confirmPassword, {
   message: '비밀번호가 일치하지 않습니다',
   path: ['confirmPassword']
@@ -58,6 +62,41 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [canResend, setCanResend] = useState(false)
+  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
+
+  // 카카오 우편번호 API 스크립트 로드
+  useEffect(() => {
+    const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY
+
+    if (!kakaoKey) {
+      console.warn('NEXT_PUBLIC_KAKAO_JS_KEY 환경변수가 설정되지 않았습니다.')
+      return
+    }
+
+    if (window.daum?.Postcode) {
+      setIsKakaoLoaded(true)
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    script.async = true
+    script.onload = () => {
+      setIsKakaoLoaded(true)
+    }
+    script.onerror = () => {
+      console.error('카카오 우편번호 API 로드에 실패했습니다.')
+    }
+
+    document.head.appendChild(script)
+
+    return () => {
+      const existingScript = document.querySelector('script[src*="postcode.v2.js"]')
+      if (existingScript) {
+        document.head.removeChild(existingScript)
+      }
+    }
+  }, [])
 
   // 타이머 효과
   useEffect(() => {
@@ -81,8 +120,40 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
 
   // 사용자 정보 폼
   const userInfoForm = useForm<UserInfoFormData>({
-    resolver: zodResolver(userInfoSchema)
+    resolver: zodResolver(userInfoSchema),
+    defaultValues: {
+      address: '',
+      addressDetail: '',
+      zipCode: ''
+    }
   })
+
+  // 주소 검색 함수
+  const handleSearchAddress = () => {
+    if (!window.daum?.Postcode) {
+      alert('우편번호 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+      return
+    }
+
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        userInfoForm.setValue('zipCode', data.zonecode)
+        userInfoForm.setValue('address', data.roadAddress || data.jibunAddress)
+
+        // 상세주소 입력 필드로 포커스 이동
+        setTimeout(() => {
+          const addressDetailInput = document.querySelector('input[name="addressDetail"]') as HTMLInputElement
+          if (addressDetailInput) {
+            addressDetailInput.focus()
+          }
+        }, 100)
+
+        userInfoForm.trigger(['zipCode', 'address'])
+      },
+      width: 100,
+      height: 400
+    }).open()
+  }
 
   // 전화번호 인증 요청
   const handlePhoneSubmit = async (data: PhoneFormData) => {
@@ -556,6 +627,82 @@ export default function PhoneRegistration({ onComplete, onBack }: PhoneRegistrat
                     {userInfoForm.formState.errors.birthDate.message}
                   </p>
                 )}
+              </div>
+            </div>
+
+            {/* 주소 입력 섹션 */}
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                  우편번호 <span className="text-red-500">*</span>
+                </label>
+                <div className="mt-1 flex space-x-2">
+                  <input
+                    {...userInfoForm.register('zipCode')}
+                    type="text"
+                    disabled={isLoading}
+                    placeholder="12345"
+                    readOnly
+                    className="flex-1 appearance-none block px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50"
+                  />
+                  <button
+                    type="button"
+                    disabled={isLoading || !isKakaoLoaded}
+                    onClick={handleSearchAddress}
+                    className={`
+                      px-4 py-2 border text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
+                      ${isLoading || !isKakaoLoaded
+                        ? 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
+                        : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                      }
+                    `}
+                    title={!isKakaoLoaded ? '우편번호 검색 서비스 로딩 중...' : '우편번호 검색'}
+                  >
+                    <Search className="h-4 w-4" />
+                  </button>
+                </div>
+                {!isKakaoLoaded && (
+                  <p className="mt-1 text-xs text-blue-600">
+                    우편번호 검색 서비스를 준비하고 있습니다...
+                  </p>
+                )}
+                {userInfoForm.formState.errors.zipCode && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {userInfoForm.formState.errors.zipCode.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                  기본주소 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  {...userInfoForm.register('address')}
+                  type="text"
+                  disabled={isLoading}
+                  placeholder="우편번호 검색 버튼을 클릭하세요"
+                  readOnly
+                  className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50"
+                />
+                {userInfoForm.formState.errors.address && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {userInfoForm.formState.errors.address.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="addressDetail" className="block text-sm font-medium text-gray-700">
+                  상세주소 (선택사항)
+                </label>
+                <input
+                  {...userInfoForm.register('addressDetail')}
+                  type="text"
+                  disabled={isLoading}
+                  placeholder="상세주소를 입력하세요 (동, 호수 등)"
+                  className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
               </div>
             </div>
 

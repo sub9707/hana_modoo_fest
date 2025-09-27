@@ -12,7 +12,7 @@ export default function RegistrationHero() {
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="text-3xl mb-2">📅</div>
             <div className="font-bold">2025. 10. 18 (토)</div>
-            <div className="opacity-90">11:00 - 16:00</div>
+            <div className="opacity-90">11:00 - 17:00</div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
             <div className="text-3xl mb-2">📍</div>
