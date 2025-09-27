@@ -136,13 +136,6 @@ export default function NewsFilters({
                   <span className={`font-medium ${isActive ? 'text-blue-700' : 'text-gray-700'}`}>
                     {category.name}
                   </span>
-                  <span className={`text-sm px-2 py-1 rounded-full transition-colors ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {category.count.toLocaleString()}
-                  </span>
                 </button>
               )
             })}

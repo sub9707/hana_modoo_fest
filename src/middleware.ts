@@ -38,7 +38,7 @@ const PROTECTED_PATHS = [
   '/settings',
   '/my-page',
   '/registration',
-  '/registration/success'
+  '/registration/success',
 ] as const
 
 const ADMIN_PATHS = ['/admin'] as const

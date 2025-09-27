@@ -25,8 +25,7 @@ export default function AdminPage() {
           </h1>
           
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            축제의 모든 것을 효율적으로 관리할 수 있는 통합 관리 시스템입니다. <br/>
-            회원부터 축제, 갤러리까지 한 번에 관리하세요.
+            모두하나대축제를 효율적으로 관리할 수 있는 통합 관리 시스템입니다. <br/>
           </p>
 
           <div className="flex justify-center items-center space-x-6 text-sm text-gray-500">

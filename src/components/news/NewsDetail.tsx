@@ -20,7 +20,8 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
   }
 
   const renderContent = () => {
-    if (news.contentType === 'html') {
+    // 더 관대한 조건으로 변경
+    if (news.contentType === 'html' || news.content.includes('<')) {
       return (
         <div
           className="
@@ -114,31 +115,6 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
         <div className="mb-6">
           {renderContent()}
         </div>
-
-        {/* 첨부파일 */}
-        {news.attachments && news.attachments.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">첨부파일</h3>
-            <div className="space-y-2 sm:space-y-3">
-              {news.attachments.map((attachment) => (
-                <div key={attachment.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <span className="text-lg sm:text-xl text-gray-400">📎</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800 text-sm sm:text-base truncate leading-tight">
-                      {attachment.originalFilename}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {(attachment.fileSize / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                  <button className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-xs sm:text-sm font-medium whitespace-nowrap">
-                    다운로드
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* 하단 정보 */}
         <div className="pt-4 border-t border-gray-200">

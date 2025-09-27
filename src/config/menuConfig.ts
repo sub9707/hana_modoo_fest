@@ -28,17 +28,11 @@ export const menuItems: MenuItem[] = [
     ]
   },
   {
-    id: 'notices',
+    id: 'news',
     title: '공지 관리',
     icon: Bell,
-    path: '/admin/notices'
+    path: '/admin/news'
   },
-  // {
-  //   id: 'gallery',
-  //   title: '갤러리 관리',
-  //   icon: Image,
-  //   path: '/admin/gallery'
-  // },
   {
     id: 'users',
     title: '회원 관리',

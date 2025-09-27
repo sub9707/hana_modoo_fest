@@ -54,3 +54,20 @@ export interface NewsSearchParams {
   limit?: number
   cursor?: string
 }
+
+export interface NewsFormData {
+  title: string;
+  category: string;
+  summary?: string;
+  content: string;
+  content_type: 'text' | 'html' | 'markdown';
+  important: boolean;
+}
+
+export type NewsListParams = {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  important?: boolean;
+}
