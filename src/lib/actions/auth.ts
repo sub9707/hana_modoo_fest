@@ -1,16 +1,11 @@
+// src/lib/actions/auth.ts
 'use server'
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import { createHash, randomBytes } from 'crypto'
 import { query, queryOne } from '@/lib/mysql/connection'
-
-// 로그인 스키마
-const loginSchema = z.object({
-    username: z.string().min(1, '사용자명을 입력해주세요'),
-    password: z.string().min(1, '비밀번호를 입력해주세요'),
-})
+import { loginSchema } from '@/lib/validations/auth'
 
 // 비밀번호 해시화
 const hashPassword = (password: string, salt: string): string => {
@@ -114,89 +109,75 @@ export async function logoutAction() {
         if (sessionToken) {
             // 데이터베이스에서 세션 토큰 제거
             await query(
-                `UPDATE users SET 
-                 session_token = NULL, 
-                 session_expires_at = NULL
-                 WHERE session_token = ?`,
+                'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE session_token = ?',
                 [sessionToken]
             )
         }
 
         // 쿠키 삭제
-        cookieStore.delete('session-token')
-
-    } catch (error) {
-        console.error('Logout error:', error)
-    }
-
-    redirect('/login')
-}
-
-// 사용자 정보 업데이트 (마지막 활동 시간)
-export async function updateUserActivity() {
-    try {
-        const cookieStore = await cookies()
-        const sessionToken = cookieStore.get('session-token')?.value
-
-        if (!sessionToken) return
-
-        await query(
-            `UPDATE users SET last_activity_at = ? WHERE session_token = ?`,
-            [
-                new Date().toISOString().slice(0, 19).replace('T', ' '),
-                sessionToken
-            ]
-        )
-
-    } catch (error) {
-        console.error('Update activity error:', error)
-    }
-}
-
-// 세션 연장
-export async function extendSession() {
-    try {
-        const cookieStore = await cookies()
-        const sessionToken = cookieStore.get('session-token')?.value
-
-        if (!sessionToken) return false
-
-        const newExpiresAt = new Date()
-        newExpiresAt.setDate(newExpiresAt.getDate() + 7)
-
-        const result = await query(
-            `UPDATE users SET session_expires_at = ? WHERE session_token = ?`,
-            [
-                newExpiresAt.toISOString().slice(0, 19).replace('T', ' '),
-                sessionToken
-            ]
-        )
-
-        if (!result || result.affectedRows === 0) return false
-
-        // 쿠키 갱신
-        cookieStore.set('session-token', sessionToken, {
+        cookieStore.set('session-token', '', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
-            expires: newExpiresAt,
+            expires: new Date(0),
             path: '/'
         })
 
-        return true
+        return { success: true }
 
     } catch (error) {
-        console.error('Extend session error:', error)
-        return false
+        console.error('Logout error:', error)
+        return {
+            error: '로그아웃 처리 중 오류가 발생했습니다.'
+        }
     }
 }
 
-export async function loginWithRedirect(formData: FormData, redirectTo: string = '/') {
-    const result = await loginAction(formData)
+// 현재 사용자 정보 조회
+export async function getCurrentUserAction() {
+    try {
+        const cookieStore = await cookies()
+        const sessionToken = cookieStore.get('session-token')?.value
 
-    if (result.success) {
-        redirect(redirectTo)
+        if (!sessionToken) {
+            return { error: '로그인이 필요합니다.' }
+        }
+
+        const user = await queryOne(
+            `SELECT id, name, username, gender, birth_date, phone, role, 
+                    created_at, last_login_at, last_activity_at, session_expires_at
+             FROM users 
+             WHERE session_token = ?`,
+            [sessionToken]
+        )
+
+        if (!user) {
+            return { error: '사용자를 찾을 수 없습니다.' }
+        }
+
+        // 세션 만료 확인
+        if (user.session_expires_at && new Date(user.session_expires_at) < new Date()) {
+            // 만료된 세션 정리
+            await query(
+                'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
+                [user.id]
+            )
+            
+            return { error: '세션이 만료되었습니다.' }
+        }
+
+        // 민감한 정보 제거
+        const { session_expires_at, ...safeUser } = user
+
+        return {
+            success: true,
+            user: safeUser
+        }
+
+    } catch (error) {
+        console.error('Get current user error:', error)
+        return {
+            error: '사용자 정보를 불러오는 중 오류가 발생했습니다.'
+        }
     }
-
-    return result
 }

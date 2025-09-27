@@ -1,3 +1,4 @@
+// src/app/(site)/login/page.tsx
 'use client'
 
 import LoginForm from '@/components/forms/LoginForm'
@@ -9,7 +10,11 @@ export default function LoginPage() {
   const { user, isLoading } = useAuth()
   const searchParams = useSearchParams()
   const message = searchParams.get("message")
-  const redirectPath = searchParams.get("redirect") || "/"
+  
+  // callbackUrl과 redirect 모두 지원
+  const callbackUrl = searchParams.get("callbackUrl")
+  const redirectParam = searchParams.get("redirect")
+  const redirectPath = callbackUrl || redirectParam || "/"
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -20,7 +25,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (message) {
-      alert(message)
+      alert(decodeURIComponent(message))
     }
   }, [message])
 
@@ -43,7 +48,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 font-paper">
       <div className="w-full max-w-md space-y-8 -mt-16">
-        <LoginForm />
+        <LoginForm redirectTo={redirectPath} />
       </div>
     </div>
   )
