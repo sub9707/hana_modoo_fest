@@ -1,8 +1,9 @@
-// src/app/my-page/components/ClientWrapper.tsx
+// src/components/my-page/ClientWrapper.tsx
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface ClientWrapperProps {
   children: React.ReactNode
@@ -11,6 +12,8 @@ interface ClientWrapperProps {
 export function ClientWrapper({ children }: ClientWrapperProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { refreshUser } = useAuth()
+  const hasProcessedAuthRefresh = useRef(false)
 
   useEffect(() => {
     // URL 파라미터 확인
@@ -41,16 +44,19 @@ export function ClientWrapper({ children }: ClientWrapperProps) {
     }
 
     // SNS 로그인 후 인증 상태 새로고침이 필요한 경우
-    if (authRefresh === 'true') {
+    if (authRefresh === 'true' && !hasProcessedAuthRefresh.current) {
+      hasProcessedAuthRefresh.current = true
+      
       // URL에서 auth_refresh 파라미터 제거
       const newUrl = new URL(window.location.href)
       newUrl.searchParams.delete('auth_refresh')
       router.replace(newUrl.pathname + newUrl.search)
       
-      // 페이지 새로고침으로 인증 상태 반영
-      window.location.reload()
+      // Context의 refreshUser를 사용하여 인증 상태 새로고침
+      // window.location.reload() 대신 사용하여 무한 루프 방지
+      refreshUser()
     }
-  }, [searchParams, router])
+  }, [searchParams, router, refreshUser])
 
   return <>{children}</>
 }

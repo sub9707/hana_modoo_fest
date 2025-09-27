@@ -26,19 +26,34 @@ interface SocialLoginButtonProps {
 function SocialLoginButton({ provider, onClick, isLoading }: SocialLoginButtonProps) {
   if (provider === "naver") {
     return (
+
       <button
         type="button"
         onClick={onClick}
         disabled={isLoading}
         className={`
-          w-full bg-green-500 text-white rounded-lg py-3 font-medium flex items-center justify-center
-          ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600 transition-colors"}
-        `}
+    relative w-full bg-green-500 text-white rounded-lg py-3 font-medium flex items-center justify-center
+    ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600 transition-colors"}
+  `}
       >
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <span className="text-center text-xl">네이버로 시작하기</span>
+          <>
+            {/* 왼쪽 끝 로고 */}
+            <div className="absolute left-4 flex items-center">
+              <Image
+                src="/images/common/naver-logo.png"
+                alt="네이버 로고"
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+            </div>
+
+            {/* 가운데 텍스트 */}
+            <span className="text-xl">네이버로 시작하기</span>
+          </>
         )}
       </button>
     )

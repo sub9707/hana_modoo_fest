@@ -170,10 +170,6 @@ export default function DeleteAccountPage() {
                   <MessageSquare className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                   SNS 계정 연결 정보
                 </li>
-                <li className="flex items-start">
-                  <Shield className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                  로그인 세션 및 인증 정보
-                </li>
               </ul>
               <p className="text-sm text-red-700 mt-3 font-medium">
                 ⚠️ 탈퇴 후에는 동일한 정보로 재가입하실 수 있습니다. 

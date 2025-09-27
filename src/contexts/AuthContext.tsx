@@ -1,13 +1,14 @@
+// src/contexts/AuthContext.tsx
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@/types/auth'
 
 interface AuthContextType {
   user: User | null
   isLoading: boolean
-  login: (userData: User) => void
+  login: (user: User) => void
   logout: () => void
   refreshUser: () => Promise<void>
 }
@@ -15,7 +16,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 interface AuthProviderProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -23,97 +24,97 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  // NextJS 15: useCallback으로 함수 메모이제이션
-  const refreshUser = useCallback(async () => {
-    
+  // 사용자 정보 가져오기
+  const fetchUser = useCallback(async (): Promise<User | null> => {
     try {
-      
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
+        cache: 'no-store'
       })
-      
-      
+
       if (response.ok) {
-        const { user: userData } = await response.json()
-        setUser(userData)
-      } else if (response.status === 401) {
-        setUser(null)
+        const userData = await response.json()
+        return userData.user
       } else {
-        setUser(null)
+        return null
       }
     } catch (error) {
-      console.error('🚨 Auth refresh error:', error)
-      setUser(null)
+      console.error('Failed to fetch user:', error)
+      return null
     }
   }, [])
 
-  const login = useCallback((userData: User) => {
-    setUser(userData)
-  }, [])
-
-  // NextJS 15: 로그아웃 처리 개선
-  const logout = useCallback(() => {
-    setUser(null)
-  }, [router])
-
-  // NextJS 15: 초기 인증 상태 확인 최적화
+  // 초기 사용자 정보 로드
   useEffect(() => {
     let mounted = true
 
-    const checkAuthStatus = async () => {
-      if (!mounted) return
-      
+    const loadUser = async () => {
       setIsLoading(true)
-      await refreshUser()
-      
-      if (mounted) {
-        setIsLoading(false)
+      try {
+        const userData = await fetchUser()
+        if (mounted) {
+          setUser(userData)
+        }
+      } catch (error) {
+        console.error('Error loading user:', error)
+        if (mounted) {
+          setUser(null)
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
     }
 
-    checkAuthStatus()
+    loadUser()
 
     return () => {
       mounted = false
     }
-  }, [refreshUser])
+  }, [fetchUser])
 
-  // 포커스 이벤트에서 리프레시 (쿠키 체크 제거)
-  useEffect(() => {
-    const handleFocus = () => {
-      if (!isLoading && document.visibilityState === 'visible') {
-        refreshUser()
-      }
+  // 사용자 정보 새로고침
+  const refreshUser = useCallback(async () => {
+    try {
+      const userData = await fetchUser()
+      setUser(userData)
+    } catch (error) {
+      console.error('Error refreshing user:', error)
+      setUser(null)
     }
+  }, [fetchUser])
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        handleFocus()
-      }
+  // 로그인
+  const login = useCallback((userData: User) => {
+    setUser(userData)
+  }, [])
+
+  // 로그아웃
+  const logout = useCallback(async () => {
+    try {
+      setUser(null)
+      // 서버에 로그아웃 요청
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      router.push('/')
     }
-
-    window.addEventListener('focus', handleFocus)
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    return () => {
-      window.removeEventListener('focus', handleFocus)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
-  }, [isLoading, refreshUser])
+  }, [router])
 
   // Context value 메모이제이션
-  const contextValue = {
+  const contextValue = useMemo(() => ({
     user,
     isLoading,
     login,
     logout,
     refreshUser
-  }
+  }), [user, isLoading, login, logout, refreshUser])
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -124,11 +125,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  
+
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
-  
+
   return context
 }
 
@@ -175,13 +176,13 @@ export function useAuthRefresh() {
 
   useEffect(() => {
     const shouldRefresh = searchParams.get('auth_refresh')
-    
+
     if (shouldRefresh === 'true') {
       // 파라미터 제거
       const url = new URL(window.location.href)
       url.searchParams.delete('auth_refresh')
       window.history.replaceState({}, '', url.pathname + url.search)
-      
+
       // 잠시 후 인증 상태 새로고침
       setTimeout(() => {
         refreshUser()

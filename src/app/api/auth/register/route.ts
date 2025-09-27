@@ -5,7 +5,7 @@ import { createHash, randomBytes } from 'crypto'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { checkBlacklist, trackSignupPattern } from '@/utils/blacklist'
 import { cookies } from 'next/headers'
-import { checkRecentDeletion } from '@/app/(site)/my-page/delete-account/actions'
+import { checkRecentDeletion } from '@/utils/deletion-check'
 
 // 회원가입 스키마 (전화번호 가입)
 const phoneRegistrationSchema = z.object({
