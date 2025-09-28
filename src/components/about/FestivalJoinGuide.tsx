@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import styles from './FestivalJoinGuide.module.css';
 import NodeGraph from './NodeGraph';
 import Image from 'next/image';
+import NetworkSection from './NetworkSection';
 
 function FestivalJoinGuide() {
     const [hoveredItem, setHoveredItem] = useState<number | null>(null);
@@ -107,8 +108,7 @@ function FestivalJoinGuide() {
 
                 {/* 그래프 영역 */}
                 <div className="w-full h-100 flex items-center justify-center mb-16">
-                    그래프 구현 예정
-                    {/* <NodeGraph />/ */}
+                    <NetworkSection />
                 </div>
 
                 {/* 참여 방법 영역 - 최적화된 렌더링 */}

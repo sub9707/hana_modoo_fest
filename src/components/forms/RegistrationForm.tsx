@@ -6,6 +6,8 @@ import { useState } from 'react'
 import type { User } from '@/types/auth'
 import type { RegistrationFormData, AddressSearchResult } from '@/types/registration'
 import KakaoAddressSearch from './KakaoAddressSearch'
+import Link from 'next/link'
+import { ExternalLink } from 'lucide-react'
 
 interface RegistrationFormProps {
   user: User
@@ -14,7 +16,7 @@ interface RegistrationFormProps {
 export default function RegistrationForm({ user }: RegistrationFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   const {
     register,
     handleSubmit,
@@ -98,7 +100,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
             로그인된 계정 정보로 자동 입력됩니다.
           </p>
         </div>
-        
+
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -131,15 +133,15 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
             해당하는 참가 유형을 선택해주세요.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {participantTypes.map((type) => (
             <label
               key={type.id}
               className={`
                 relative flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all
-                ${watch('participant_type') === type.id 
-                  ? 'border-orange-500 bg-orange-50' 
+                ${watch('participant_type') === type.id
+                  ? 'border-orange-500 bg-orange-50'
                   : 'border-gray-200 hover:border-orange-300 hover:bg-orange-25'
                 }
               `}
@@ -179,7 +181,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
             함께 참석할 동반자 정보를 입력해주세요. (본인 제외)
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="companions" className="block text-sm font-medium text-gray-700 mb-2">
@@ -192,9 +194,8 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
                 min: { value: 0, message: '동반자 수는 0명 이상이어야 합니다.' },
                 max: { value: 10, message: '동반 인원은 10명을 초과할 수 없습니다.' }
               })}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                errors.companions ? 'border-red-300' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${errors.companions ? 'border-red-300' : 'border-gray-300'
+                }`}
             >
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                 <option key={num} value={num}>{num}명</option>
@@ -206,7 +207,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
               </p>
             )}
           </div>
-          
+
           {companions > 0 && (
             <div className="md:col-span-2">
               <label htmlFor="companion_details" className="block text-sm font-medium text-gray-700 mb-2">
@@ -232,7 +233,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
             ⚠️ 행사 경품을 받을 주소입니다. 정확히 입력해주세요!
           </p>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -289,7 +290,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
         <div className="border-b border-gray-200 pb-4">
           <h3 className="text-xl font-bold text-gray-800 mb-2">특별 요청사항</h3>
         </div>
-        
+
         <div>
           <label htmlFor="special_requests" className="block text-sm font-medium text-gray-700 mb-2">
             기타 요청사항 (선택)
@@ -308,42 +309,98 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">
           <h3 className="text-xl font-bold text-gray-800 mb-2">개인정보 처리 동의</h3>
+          <p className="text-sm text-gray-600">
+            모두하나대축제 2025 참가를 위한 개인정보 수집 및 이용에 대한 동의입니다.
+          </p>
         </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-start">
-            <input
-              type="checkbox"
-              id="privacy_consent"
-              {...register('privacy_consent', { required: '개인정보 수집 및 이용에 동의해주세요.' })}
-              className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-            />
-            <label htmlFor="privacy_consent" className="ml-3 text-sm text-gray-700">
-              <span className="font-medium text-red-600">* [필수]</span> 개인정보 수집 및 이용에 동의합니다.
-              <div className="mt-1 text-xs text-gray-500">
-                참가신청, 행사 안내, 경품 배송을 위해 개인정보를 수집·이용합니다.
-              </div>
-            </label>
-          </div>
-          {errors.privacy_consent && (
-            <p className="text-red-600 text-sm" role="alert">
-              {errors.privacy_consent.message}
-            </p>
-          )}
 
-          <div className="flex items-start">
-            <input
-              type="checkbox"
-              id="marketing_consent"
-              {...register('marketing_consent')}
-              className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-            />
-            <label htmlFor="marketing_consent" className="ml-3 text-sm text-gray-700">
-              <span className="font-medium text-gray-600">[선택]</span> 마케팅 정보 수신에 동의합니다.
-              <div className="mt-1 text-xs text-gray-500">
-                향후 행사 안내 및 이벤트 정보를 받아보실 수 있습니다.
-              </div>
-            </label>
+        {/* 개인정보 처리방침 요약 */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-blue-800 mb-2">
+              개인정보 처리 주요 내용
+            </h4>
+            <div className="text-xs text-blue-700 space-y-1 mb-3">
+              <p><strong>수집목적:</strong> 축제 참가신청, 본인확인, 행사안내, 경품배송</p>
+              <p><strong>수집항목:</strong> 이름, 성별, 생년월일, 휴대폰, 주소 등</p>
+              <p><strong>보유기간:</strong> 목적 달성 후 지체없이 파기 (법령에 따라 일부 보관)</p>
+            </div>
+            <Link
+              href="/privacy-policy"
+              target="_blank"
+              className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+            >
+              전체 개인정보 처리방침 보기
+              <ExternalLink className="w-3 h-3 ml-1" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {/* 필수 동의 */}
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="privacy_consent"
+                {...register('privacy_consent', { required: '개인정보 수집 및 이용에 동의해주세요.' })}
+                className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+              />
+              <label htmlFor="privacy_consent" className="ml-3 text-sm text-gray-700 flex-1">
+                <span className="font-medium text-red-600">* [필수]</span> 개인정보 수집 및 이용에 동의합니다.
+                <div className="mt-2 text-xs text-gray-500 bg-gray-50 rounded p-2">
+                  <p><strong>수집·이용 목적:</strong> 축제 참가신청 접수, 본인확인, 행사 안내</p>
+                  <p><strong>수집 항목:</strong> 이름, 성별, 생년월일, 휴대폰번호, 주소</p>
+                  <p><strong>보유 기간:</strong> 참가신청 목적 달성 후 3년간 보관</p>
+                  <p className="text-red-600 mt-1">
+                    * 동의를 거부할 권리가 있으나, 거부 시 축제 참가신청이 제한됩니다.
+                  </p>
+                </div>
+              </label>
+            </div>
+            {errors.privacy_consent && (
+              <p className="text-red-600 text-sm mt-2 ml-7" role="alert">
+                {errors.privacy_consent.message}
+              </p>
+            )}
+          </div>
+
+          {/* 선택 동의 */}
+          <div className="border border-gray-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="marketing_consent"
+                {...register('marketing_consent')}
+                className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+              />
+              <label htmlFor="marketing_consent" className="ml-3 text-sm text-gray-700 flex-1">
+                <span className="font-medium text-gray-600">[선택]</span> 마케팅 정보 수신에 동의합니다.
+                <div className="mt-2 text-xs text-gray-500 bg-gray-50 rounded p-2">
+                  <p><strong>수집·이용 목적:</strong> 신규 서비스 및 이벤트 정보 제공</p>
+                  <p><strong>수집 항목:</strong> 이름, 휴대폰번호, 이메일</p>
+                  <p><strong>보유 기간:</strong> 동의 철회 시까지</p>
+                  <p className="text-gray-600 mt-1">
+                    * 동의하지 않아도 기본 서비스 이용에는 제한이 없습니다.
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* 카카오 로그인 관련 추가 안내 */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h4 className="text-sm font-semibold text-yellow-800 mb-2">
+            SNS 로그인 개인정보 처리 안내
+          </h4>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <p><strong>카카오 로그인 시:</strong> 카카오 계정 정보, 프로필, 이메일 등이 제공됩니다.</p>
+            <p><strong>네이버 로그인 시:</strong> 네이버 계정 정보, 프로필, 이메일 등이 제공됩니다.</p>
+            <p className="mt-2">
+              SNS 로그인으로 제공받은 정보는 회원가입 및 서비스 이용 목적으로만 사용되며,
+              각 플랫폼의 개인정보 처리방침도 함께 적용됩니다.
+            </p>
           </div>
         </div>
       </section>

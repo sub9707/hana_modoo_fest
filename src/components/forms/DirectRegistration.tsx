@@ -13,6 +13,7 @@ import { directRegistrationSchema, type DirectRegistrationData } from '@/lib/val
 import { AddressSearchResult, type DuplicationCheckResponse } from '@/types/registration'
 import KakaoAddressSearch from './KakaoAddressSearch'
 import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 interface DirectRegistrationFormProps {
     onBack: () => void
@@ -65,23 +66,23 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
     // 사용자명 중복 체크 함수
     const checkUsername = useCallback(async () => {
         const username = form.getValues('username')
-        
+
         if (!username || username.length < 4) {
-            setUsernameCheck({ 
-                isChecking: false, 
-                isChecked: false, 
-                available: false, 
-                message: '사용자명은 4글자 이상 입력해주세요' 
+            setUsernameCheck({
+                isChecking: false,
+                isChecked: false,
+                available: false,
+                message: '사용자명은 4글자 이상 입력해주세요'
             })
             return
         }
 
         if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-            setUsernameCheck({ 
-                isChecking: false, 
-                isChecked: false, 
-                available: false, 
-                message: '영문, 숫자, 언더바만 사용 가능합니다' 
+            setUsernameCheck({
+                isChecking: false,
+                isChecked: false,
+                available: false,
+                message: '영문, 숫자, 언더바만 사용 가능합니다'
             })
             return
         }
@@ -115,23 +116,23 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
     // 전화번호 중복 체크 함수
     const checkPhone = useCallback(async () => {
         const phone = form.getValues('phone')
-        
+
         if (!phone || phone.length !== 11) {
-            setPhoneCheck({ 
-                isChecking: false, 
-                isChecked: false, 
-                available: false, 
-                message: '휴대폰 번호 11자리를 입력해주세요' 
+            setPhoneCheck({
+                isChecking: false,
+                isChecked: false,
+                available: false,
+                message: '휴대폰 번호 11자리를 입력해주세요'
             })
             return
         }
 
         if (!phone.startsWith('01')) {
-            setPhoneCheck({ 
-                isChecking: false, 
-                isChecked: false, 
-                available: false, 
-                message: '올바른 휴대폰 번호를 입력해주세요' 
+            setPhoneCheck({
+                isChecking: false,
+                isChecked: false,
+                available: false,
+                message: '올바른 휴대폰 번호를 입력해주세요'
             })
             return
         }
@@ -568,7 +569,8 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                             <span className="text-sm text-gray-700">
-                                <span className="text-red-500">*</span> 개인정보처리방침에 동의합니다
+                                <span className="text-red-500">*</span> <Link className='text-blue-600' href={'/privacy-policy'} target="_blank"
+                                    rel="noopener noreferrer">개인정보처리방침</Link>에 동의합니다
                             </span>
                         </label>
                     </div>
