@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { 
+import {
   Shield, Users, Edit, Calendar, User as UserIcon, Phone, Building, Heart,
-  Settings, Key, Trash2, AlertTriangle, X, CheckCircle
+  Settings, Key, Trash2, AlertTriangle, X, CheckCircle, Globe
 } from 'lucide-react'
 import { User } from '@/types/auth'
 import UserEditModal from './UserEditModal'
@@ -25,12 +25,12 @@ interface EditUserData {
   role: 'admin' | 'editor' | 'user'
 }
 
-export default function UserModal({ 
-  user, 
-  isOpen, 
-  onClose, 
+export default function UserModal({
+  user,
+  isOpen,
+  onClose,
   onUserUpdate,
-  onUserDelete 
+  onUserDelete
 }: UserModalProps) {
   const [showEditModal, setShowEditModal] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -63,10 +63,22 @@ export default function UserModal({
     }
   }
 
+  const getSignupMethodDisplay = (method: string) => {
+    switch (method) {
+      case 'phone': return { text: '전화번호 가입', icon: Phone, color: 'bg-blue-100 text-blue-800' }
+      case 'naver': return { text: '네이버 로그인', icon: Globe, color: 'bg-green-100 text-green-800' }
+      case 'kakao': return { text: '카카오 로그인', icon: Globe, color: 'bg-yellow-100 text-yellow-800' }
+      default: return { text: '일반 가입', icon: UserIcon, color: 'bg-gray-100 text-gray-800' }
+    }
+  }
+
   const formatDateTime = (dateTimeString?: string) => {
     if (!dateTimeString) return '정보 없음'
     return new Date(dateTimeString).toLocaleString('ko-KR')
   }
+
+  // 소셜 로그인 사용자 여부 확인
+  const isSocialUser = user.signup_method === 'naver' || user.signup_method === 'kakao'
 
   // 비밀번호 초기화
   const handlePasswordReset = async () => {
@@ -239,7 +251,9 @@ export default function UserModal({
   }
 
   const roleDisplay = getRoleDisplay(user.role)
+  const signupMethodDisplay = getSignupMethodDisplay(user.signup_method || 'phone')
   const RoleIcon = roleDisplay.icon
+  const SignupIcon = signupMethodDisplay.icon
 
   return (
     <>
@@ -257,11 +271,10 @@ export default function UserModal({
 
           {/* 액션 결과 메시지 */}
           {actionResult && (
-            <div className={`mb-4 p-3 rounded-md flex items-center ${
-              actionResult.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
+            <div className={`mb-4 p-3 rounded-md flex items-center ${actionResult.type === 'success'
+                ? 'bg-green-50 text-green-800 border border-green-200'
                 : 'bg-red-50 text-red-800 border border-red-200'
-            }`}>
+              }`}>
               {actionResult.type === 'success' ? (
                 <CheckCircle className="w-4 h-4 mr-2" />
               ) : (
@@ -282,10 +295,16 @@ export default function UserModal({
                 <div className="flex-1">
                   <h4 className="text-xl font-medium text-gray-900">{user.name}</h4>
                   <p className="text-gray-600">@{user.username}</p>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-medium mt-2 ${roleDisplay.color}`}>
-                    <RoleIcon className="w-4 h-4 mr-1" />
-                    {roleDisplay.text}
-                  </span>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-sm font-medium ${roleDisplay.color}`}>
+                      <RoleIcon className="w-4 h-4 mr-1" />
+                      {roleDisplay.text}
+                    </span>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${signupMethodDisplay.color}`}>
+                      <SignupIcon className="w-3 h-3 mr-1" />
+                      {signupMethodDisplay.text}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -298,7 +317,7 @@ export default function UserModal({
                     {user.phone}
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">소속</label>
                   <div className="flex items-center text-gray-900">
@@ -306,7 +325,7 @@ export default function UserModal({
                     {user.company || '정보 없음'}
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">성별</label>
                   <div className="flex items-center text-gray-900">
@@ -314,7 +333,7 @@ export default function UserModal({
                     {getGenderDisplay(user.gender)}
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
                   <div className="flex items-center text-gray-900">
@@ -322,6 +341,17 @@ export default function UserModal({
                     {user.birth_date}
                   </div>
                 </div>
+
+                {/* 소셜 로그인 사용자의 경우 이메일 표시 */}
+                {isSocialUser && user.email && (
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                    <div className="flex items-center text-gray-900">
+                      <Globe className="w-4 h-4 mr-2 text-gray-400" />
+                      {user.email}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 계정 정보 */}
@@ -335,7 +365,7 @@ export default function UserModal({
                       {formatDateTime(user.created_at)}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">최근 로그인</label>
                     <div className="flex items-center text-gray-900">
@@ -343,7 +373,7 @@ export default function UserModal({
                       {formatDateTime(user.last_login_at)}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">최근 활동</label>
                     <div className="flex items-center text-gray-900">
@@ -351,7 +381,7 @@ export default function UserModal({
                       {formatDateTime(user.last_activity_at)}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">정보 수정일</label>
                     <div className="flex items-center text-gray-900">
@@ -366,7 +396,7 @@ export default function UserModal({
             {/* 오른쪽: 관리자 액션 */}
             <div className="space-y-4">
               <h5 className="font-medium text-gray-900 mb-3">관리자 액션</h5>
-              
+
               {/* 정보 수정 */}
               <button
                 onClick={() => setShowEditModal(true)}
@@ -385,17 +415,27 @@ export default function UserModal({
                     <button
                       onClick={() => handleQuickRoleChange('user')}
                       disabled={loading}
-                      className="flex items-center justify-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
+                      className="flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm"
                     >
                       <Users className="w-4 h-4 mr-2" />
                       일반회원으로
+                    </button>
+                  )}
+                  {user.role !== 'editor' && (
+                    <button
+                      onClick={() => handleQuickRoleChange('editor')}
+                      disabled={loading}
+                      className="flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      편집자로
                     </button>
                   )}
                   {user.role !== 'admin' && (
                     <button
                       onClick={() => handleQuickRoleChange('admin')}
                       disabled={loading}
-                      className="flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 text-sm"
+                      className="flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 text-sm"
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       관리자로
@@ -404,15 +444,29 @@ export default function UserModal({
                 </div>
               </div>
 
-              {/* 비밀번호 초기화 */}
-              <button
-                onClick={handlePasswordReset}
-                disabled={loading}
-                className="w-full flex items-center justify-center px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
-              >
-                <Key className="w-4 h-4 mr-2" />
-                비밀번호 초기화
-              </button>
+              {/* 비밀번호 초기화 - 소셜 로그인 사용자는 숨김 */}
+              {!isSocialUser && (
+                <button
+                  onClick={handlePasswordReset}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
+                >
+                  <Key className="w-4 h-4 mr-2" />
+                  비밀번호 초기화
+                </button>
+              )}
+
+              {/* 소셜 로그인 사용자에게는 안내 메시지 */}
+              {isSocialUser && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                  <div className="flex items-center">
+                    <Globe className="w-4 h-4 text-blue-600 mr-2" />
+                    <p className="text-sm text-blue-800">
+                      소셜 로그인 사용자는 비밀번호 관리가 불필요합니다.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* 사용자 삭제 */}
               <button
@@ -425,9 +479,10 @@ export default function UserModal({
               </button>
 
               <div className="text-xs text-gray-500 mt-4">
-                <p>※ 중요한 작업은 이중 확인을 거칩니다.</p>
-                <br/>
-                <p>※ 비밀번호 초기화 시 <strong>가입했던 전화번호</strong>로 초기화 됩니다. 반드시 요청이 있을 때만 초기화를 진행해주세요.</p>
+                <p>※ 초기화된 비밀번호는 가입자의 전화번호(- 제외)로 초기화됩니다.</p>
+                {isSocialUser && (
+                  <p className="text-blue-600 mt-2">※ 소셜 로그인 계정은 해당 플랫폼에서 관리됩니다.</p>
+                )}
               </div>
             </div>
           </div>
@@ -443,7 +498,6 @@ export default function UserModal({
           </div>
         </div>
       </div>
-
       {/* 사용자 정보 수정 모달 */}
       <UserEditModal
         user={user}

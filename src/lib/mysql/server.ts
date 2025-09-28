@@ -1,3 +1,4 @@
+// src/lib/mysql/server.ts
 import { Role } from '@/types/auth'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
@@ -5,9 +6,7 @@ import { query, queryOne } from '@/lib/mysql/connection'
 
 // 현재 로그인된 사용자 정보 가져오기
 export const getCurrentUser = cache(async () => {
-
   const cookieStore = await cookies()
-
   const sessionToken = cookieStore.get('session-token')?.value
 
   if (!sessionToken) {
@@ -16,7 +15,10 @@ export const getCurrentUser = cache(async () => {
 
   try {
     const user = await queryOne(
-      'SELECT id, name, company, username, gender, birth_date, phone, role, created_at, last_login_at, last_activity_at, updated_at, signup_method FROM users WHERE session_token = ?',
+      `SELECT id, name, company, username, gender, birth_date, phone, email, profile_image, 
+              role, signup_method, created_at, last_login_at, last_activity_at, updated_at, 
+              session_expires_at
+       FROM users WHERE session_token = ?`,
       [sessionToken]
     )
 
@@ -31,7 +33,6 @@ export const getCurrentUser = cache(async () => {
         'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
         [user.id]
       )
-
       return null
     }
 
@@ -40,15 +41,17 @@ export const getCurrentUser = cache(async () => {
       name: user.name,
       company: user.company,
       username: user.username,
+      email: user.email,
+      profile_image: user.profile_image,
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
       role: user.role,
+      signup_method: user.signup_method || 'phone', // 기본값 설정
       created_at: user.created_at,
       last_login_at: user.last_login_at,
       last_activity_at: user.last_activity_at,
-      updated_at: user.updated_at,
-      signup_method: user.signup_method 
+      updated_at: user.updated_at
     }
   } catch (error) {
     console.error('Error getting current user:', error)

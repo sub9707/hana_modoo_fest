@@ -15,7 +15,7 @@ export async function getUserFromSession(): Promise<User | null> {
       return null
     }
 
-    // 사용자 정보와 세션 검증
+    // 사용자 정보와 세션 검증 (signup_method 포함)
     const user = await queryOne(
       `SELECT u.id, u.name, u.username, u.company, u.gender, u.birth_date, 
               u.phone, u.email, u.profile_image, u.role, u.signup_method,
@@ -31,7 +31,23 @@ export async function getUserFromSession(): Promise<User | null> {
       return null
     }
 
-    return user as User
+    return {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      company: user.company || undefined,
+      gender: user.gender,
+      birth_date: user.birth_date,
+      phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
+      role: user.role,
+      signup_method: user.signup_method || 'phone', // 기본값 설정
+      last_login_at: user.last_login_at || undefined,
+      last_activity_at: user.last_activity_at || undefined,
+      created_at: user.created_at,
+      updated_at: user.updated_at
+    } as User
   } catch (error) {
     console.error('Get user from session error:', error)
     return null

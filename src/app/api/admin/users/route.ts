@@ -1,3 +1,4 @@
+// src/app/api/admin/users/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
 import { getAllUsers, createUser, CreateUserData } from '@/lib/services/users-service'
@@ -17,6 +18,16 @@ export async function GET(request: NextRequest) {
     }
 
     const users = await getAllUsers()
+    
+    // 디버깅을 위한 로그 (개발 환경에서만)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Admin Users API - 첫 번째 사용자 샘플:', {
+        name: users[0]?.name,
+        username: users[0]?.username,
+        signup_method: users[0]?.signup_method
+      })
+    }
+    
     return NextResponse.json(users)
   } catch (error) {
     console.error('Error fetching users:', error)

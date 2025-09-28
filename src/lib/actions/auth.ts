@@ -133,7 +133,7 @@ export async function logoutAction() {
     }
 }
 
-// 현재 사용자 정보 조회
+// 현재 사용자 정보 조회 (수정됨 - signup_method, email, profile_image 포함)
 export async function getCurrentUserAction() {
     try {
         const cookieStore = await cookies()
@@ -144,8 +144,9 @@ export async function getCurrentUserAction() {
         }
 
         const user = await queryOne(
-            `SELECT id, name, username, gender, birth_date, phone, role, 
-                    created_at, last_login_at, last_activity_at, session_expires_at
+            `SELECT id, name, username, company, gender, birth_date, phone, 
+                    email, profile_image, role, signup_method,
+                    created_at, last_login_at, last_activity_at, updated_at, session_expires_at
              FROM users 
              WHERE session_token = ?`,
             [sessionToken]
@@ -166,12 +167,20 @@ export async function getCurrentUserAction() {
             return { error: '세션이 만료되었습니다.' }
         }
 
-        // 민감한 정보 제거
+        // 민감한 정보 제거하고 완전한 사용자 정보 반환
         const { session_expires_at, ...safeUser } = user
 
         return {
             success: true,
-            user: safeUser
+            user: {
+                ...safeUser,
+                company: user.company || undefined,
+                email: user.email || undefined,
+                profile_image: user.profile_image || undefined,
+                signup_method: user.signup_method || 'phone', // 기본값 설정
+                last_login_at: user.last_login_at || undefined,
+                last_activity_at: user.last_activity_at || undefined
+            }
         }
 
     } catch (error) {

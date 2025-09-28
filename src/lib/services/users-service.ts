@@ -35,7 +35,7 @@ export interface UserStats {
 }
 
 /**
- * 모든 사용자 목록 조회
+ * 모든 사용자 목록 조회 (수정됨 - signup_method, email, profile_image 포함)
  */
 export async function getAllUsers(): Promise<User[]> {
   try {
@@ -48,7 +48,10 @@ export async function getAllUsers(): Promise<User[]> {
         gender, 
         birth_date, 
         phone, 
+        email,
+        profile_image,
         role, 
+        signup_method,
         last_login_at, 
         last_activity_at, 
         created_at, 
@@ -65,7 +68,10 @@ export async function getAllUsers(): Promise<User[]> {
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
       role: user.role,
+      signup_method: user.signup_method || 'phone',
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,
@@ -78,7 +84,7 @@ export async function getAllUsers(): Promise<User[]> {
 }
 
 /**
- * ID로 사용자 조회
+ * ID로 사용자 조회 (수정됨 - email, profile_image 포함)
  */
 export async function getUserById(userId: string): Promise<User | null> {
   try {
@@ -91,12 +97,14 @@ export async function getUserById(userId: string): Promise<User | null> {
         gender, 
         birth_date, 
         phone, 
+        email,
+        profile_image,
         role,
+        signup_method,
         last_login_at, 
         last_activity_at, 
         created_at, 
-        updated_at,
-        signup_method
+        updated_at
       FROM users 
       WHERE id = ?
     `, [userId])
@@ -111,12 +119,14 @@ export async function getUserById(userId: string): Promise<User | null> {
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
       role: user.role,
+      signup_method: user.signup_method || 'phone',
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,
-      updated_at: user.updated_at,
-      signup_method: user.signup_method
+      updated_at: user.updated_at
     }
   } catch (error) {
     console.error('Error fetching user by ID:', error)
@@ -158,12 +168,12 @@ export async function createUser(userData: CreateUserData): Promise<User> {
     const userId = crypto.randomUUID()
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
-    // 사용자 생성
+    // 사용자 생성 (signup_method 기본값 'phone' 설정)
     await query(`
       INSERT INTO users (
         id, name, username, company, gender, birth_date, phone, role,
-        password_hash, password_salt, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        password_hash, password_salt, signup_method, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       userId,
       userData.name,
@@ -175,6 +185,7 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       userData.role,
       passwordHash,
       salt,
+      'phone', // 기본 가입 방법
       now,
       now
     ])
@@ -363,7 +374,7 @@ export async function getUserStats(): Promise<UserStats> {
 }
 
 /**
- * 사용자 검색 (이름, 사용자명, 회사, 전화번호로 검색)
+ * 사용자 검색 (수정됨 - signup_method, email, profile_image 포함)
  */
 export async function searchUsers(searchTerm: string): Promise<User[]> {
   try {
@@ -376,7 +387,10 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
         gender, 
         birth_date, 
         phone, 
+        email,
+        profile_image,
         role, 
+        signup_method,
         last_login_at, 
         last_activity_at, 
         created_at, 
@@ -397,7 +411,10 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
       role: user.role,
+      signup_method: user.signup_method || 'phone',
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,
@@ -410,7 +427,7 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
 }
 
 /**
- * 역할별 사용자 조회
+ * 역할별 사용자 조회 (수정됨 - signup_method, email, profile_image 포함)
  */
 export async function getUsersByRole(role: Role): Promise<User[]> {
   try {
@@ -423,7 +440,10 @@ export async function getUsersByRole(role: Role): Promise<User[]> {
         gender, 
         birth_date, 
         phone, 
+        email,
+        profile_image,
         role, 
+        signup_method,
         last_login_at, 
         last_activity_at, 
         created_at, 
@@ -441,7 +461,10 @@ export async function getUsersByRole(role: Role): Promise<User[]> {
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
       role: user.role,
+      signup_method: user.signup_method || 'phone',
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,
@@ -454,7 +477,7 @@ export async function getUsersByRole(role: Role): Promise<User[]> {
 }
 
 /**
- * 특정 기간 내 가입한 사용자 조회
+ * 특정 기간 내 가입한 사용자 조회 (수정됨 - signup_method, email, profile_image 포함)
  */
 export async function getUsersByDateRange(startDate: Date, endDate: Date): Promise<User[]> {
   try {
@@ -470,7 +493,10 @@ export async function getUsersByDateRange(startDate: Date, endDate: Date): Promi
         gender, 
         birth_date, 
         phone, 
+        email,
+        profile_image,
         role, 
+        signup_method,
         last_login_at, 
         last_activity_at, 
         created_at, 
@@ -488,7 +514,10 @@ export async function getUsersByDateRange(startDate: Date, endDate: Date): Promi
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      email: user.email || undefined,
+      profile_image: user.profile_image || undefined,
       role: user.role,
+      signup_method: user.signup_method || 'phone',
       last_login_at: user.last_login_at || undefined,
       last_activity_at: user.last_activity_at || undefined,
       created_at: user.created_at,

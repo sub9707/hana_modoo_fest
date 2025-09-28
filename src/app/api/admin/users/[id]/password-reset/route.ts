@@ -36,18 +36,42 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }, { status: 400 })
     }
 
+    // 소셜 로그인 사용자는 비밀번호 초기화 불가
+    if (targetUser.signup_method === 'naver' || targetUser.signup_method === 'kakao') {
+      return NextResponse.json({ 
+        error: '소셜 로그인 사용자는 비밀번호 초기화가 불가능합니다.' 
+      }, { status: 400 })
+    }
+
     // 전화번호에서 '-' 제거한 값을 새 비밀번호로 설정
     const newPassword = targetUser.phone.replace(/-/g, '')
+    
+    // 비밀번호가 너무 짧은 경우 체크
+    if (newPassword.length < 8) {
+      return NextResponse.json({ 
+        error: '전화번호가 너무 짧아 비밀번호로 사용할 수 없습니다.' 
+      }, { status: 400 })
+    }
     
     await updateUserPassword(id, newPassword)
 
     return NextResponse.json({
       message: `${targetUser.name}님의 비밀번호가 전화번호로 초기화되었습니다.`,
-      newPassword: newPassword // 관리자에게만 표시용
+      newPassword: newPassword, // 관리자에게만 표시용
+      resetMethod: 'phone_number'
     })
 
   } catch (error) {
     console.error('Error resetting user password:', error)
+    
+    // DB 제약 조건 오류 처리
+    if (error instanceof Error && error.message.includes('Data too long')) {
+      return NextResponse.json(
+        { error: '비밀번호 해시 생성 중 오류가 발생했습니다. 데이터베이스 설정을 확인해주세요.' },
+        { status: 500 }
+      )
+    }
+    
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '비밀번호 초기화에 실패했습니다.' },
       { status: 500 }
