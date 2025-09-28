@@ -22,8 +22,10 @@ export default async function RegistrationSuccessPage({ searchParams }: PageProp
     redirect('/login?callbackUrl=/registration')
   }
 
+  const params = await searchParams
+
   // 등록 ID가 제공되지 않은 경우 사용자의 최신 등록 조회
-  let registrationId = searchParams.id
+  let registrationId = params.id
   
   if (!registrationId) {
     const latestRegistration = await queryOne(

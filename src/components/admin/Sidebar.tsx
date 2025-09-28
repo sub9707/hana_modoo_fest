@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { LogOut, User, Loader2 } from 'lucide-react'
+import { User, Loader2 } from 'lucide-react'
 import { menuItems } from '@/config/menuConfig'
 import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 export default function Sidebar() {
   const router = useRouter()
   const pathname = usePathname()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
-  const { user, isLoading, logout } = useAuth()
+  const { user, isLoading } = useAuth()
   
   // pathname에서 activeMenu 추출
   const getActiveMenuFromPath = () => {
@@ -52,12 +53,6 @@ export default function Sidebar() {
 
   const handleLogoClick = () => {
     router.push('/admin')
-  }
-
-  const handleLogout = async () => {
-    if (confirm('로그아웃 하시겠습니까?')) {
-      await logout()
-    }
   }
 
   // 역할 표시 함수
@@ -211,18 +206,12 @@ export default function Sidebar() {
 
         {/* 로그아웃 버튼 */}
         <div className="p-4">
-          <button
-            onClick={handleLogout}
-            disabled={isLoading || !user}
+          <Link
+          href={'/'}
             className="w-full flex items-center justify-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <LogOut className="w-4 h-4 mr-2" />
-            )}
-            {!user ? '로그인 필요' : '로그아웃'}
-          </button>
+            이벤트 페이지로
+          </Link>
         </div>
       </div>
     </aside>
