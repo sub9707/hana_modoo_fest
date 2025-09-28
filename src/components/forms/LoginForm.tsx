@@ -96,7 +96,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
   const [isPending, startTransition] = useTransition()
   const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, refreshUser } = useAuth()
 
   const {
     register,
@@ -126,26 +126,12 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
         if (result.error) {
           setError(result.error)
         } else if (result.success && result.user) {
-          try {
-            const response = await fetch('/api/auth/me', {
-              method: 'GET',
-              credentials: 'include',
-              cache: 'no-store',
-            })
-
-            if (response.ok) {
-              const { user: fullUserData } = await response.json()
-              if (fullUserData) {
-                login(fullUserData)
-              }
-            }
-          } catch (error) {
-            console.error('Failed to fetch full user data:', error)
-            login(result.user as User)
-          }
+          // 즉시 Context에 사용자 정보 설정
+          login(result.user as User)
 
           reset()
-          // 로그인 성공 시 지정된 페이지로 이동
+
+          // 즉시 페이지 이동
           router.push(redirectTo)
         }
       } catch (error) {

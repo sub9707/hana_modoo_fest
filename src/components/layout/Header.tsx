@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import LanguageSelect from '../ui/LanguageSelect'
 import LogoutButton from '../auth/LogoutButton'
@@ -37,11 +37,15 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
+  // 사용자 이름 표시 함수
+  const getUserDisplayName = () => {
+    if (!user) return ''
+    return user.name || user.username || '사용자'
+  }
 
   return (
     <>
@@ -99,13 +103,23 @@ export default function Header() {
                 <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
 
                 {/* 로그인 상태에 따른 분기 처리 */}
-                <div className='hidden lg:flex items-center'>
+                <div className='hidden lg:flex items-center gap-3'>
                   {isLoadingAuth ? (
                     // 로딩 중
                     <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
                   ) : user ? (
-                    // 로그인된 상태 - 로그아웃만 표시
-                    <LogoutButton type="link" />
+                    // 로그인된 상태 - 마이페이지와 로그아웃 표시
+                    <>
+                      <Link
+                        href="/my-page"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
+                      >
+                        <User className="h-4 w-4" />
+                        <span>{getUserDisplayName()}님</span>
+                      </Link>
+                      <div className="w-px h-4 bg-slate-300" />
+                      <LogoutButton type="link" variant="ghost" size="sm" />
+                    </>
                   ) : (
                     // 로그인되지 않은 상태 - 로그인/회원가입 링크 표시
                     <HeaderCTAButton href='login' title='로그인/회원가입' type='secondary' />
@@ -154,21 +168,37 @@ export default function Header() {
                 )
               })}
 
-              {/* 모바일 로그인/로그아웃 */}
-              <div className="pt-2 border-t border-gray-200">
-                <button className="block w-full text-left px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors">
+              {/* 모바일 하단 메뉴 */}
+              <div className="pt-2 border-t border-gray-200 space-y-1">
+                <Link
+                  href="/registration"
+                  className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   사전참가 신청하기
-                </button>
+                </Link>
 
                 {isLoadingAuth ? (
                   <div className="px-3 py-2">
                     <div className="w-24 h-5 bg-gray-200 animate-pulse rounded" />
                   </div>
                 ) : user ? (
-                  <div className="px-3 py-2">
-                   <LogoutButton type="link" />
-                  </div>
+                  // 로그인된 상태 - 마이페이지와 로그아웃
+                  <>
+                    <Link
+                      href="/my-page"
+                      className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      마이페이지
+                    </Link>
+                    <div className="px-3 py-2">
+                      <LogoutButton type="link" size="sm" />
+                    </div>
+                  </>
                 ) : (
+                  // 로그인되지 않은 상태
                   <Link
                     href='/login'
                     className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"

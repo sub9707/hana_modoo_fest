@@ -230,25 +230,25 @@ export default function SocialRegistration({
         if (result.user && result.autoLogin) {
           console.log('Auto-login successful, setting user in context')
 
-          // 즉시 AuthContext에 사용자 정보 설정 (UI 즉시 업데이트)
+          // AuthContext에 사용자 정보 설정
           login(result.user)
 
-          // 원래 가려던 페이지 또는 홈으로 SPA 방식 이동
+          // 성공 파라미터와 함께 페이지 이동
           const finalRedirect = originalRedirect && originalRedirect !== '/dashboard'
             ? originalRedirect
             : '/'
 
-          router.push(
-            `${finalRedirect}${finalRedirect.includes('?') ? '&' : '?'}signup_success=true`
-          )
+          const redirectUrl = new URL(finalRedirect, window.location.origin)
+          redirectUrl.searchParams.set('signup_success', 'true')
+
+          router.push(redirectUrl.pathname + redirectUrl.search)
         } else {
           console.log('Auto-login failed, redirecting to login')
-          router.push('/login?message=가입완료. 로그인해주세요')
+          router.push('/login?message=가입완료. 로그인해주세요.')
         }
-
-        return
       } else {
-        setError(result.error || '회원가입에 실패했습니다')
+        console.error('Registration failed:', result)
+        setError(result.error || '회원가입에 실패했습니다.')
       }
     } catch (error) {
       console.error('Social registration error:', error)
