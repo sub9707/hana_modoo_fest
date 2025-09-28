@@ -84,12 +84,13 @@ export function WinnersTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/winners?${params}`)
-      const data: WinnerResponse = await response.json()
+      const data = await response.json()
+      const dataArr = data.data as WinnerResponse
 
-      setWinners(data.items)
-      setTotalCount(data.total)
-      setTotalPages(data.totalPages)
-      setCurrentPage(data.page)
+      setWinners(dataArr.items)
+      setTotalCount(dataArr.total)
+      setTotalPages(dataArr.totalPages)
+      setCurrentPage(dataArr.page)
     } catch (error) {
       console.error('Failed to fetch winners:', error)
     } finally {
@@ -101,8 +102,9 @@ export function WinnersTab() {
   const fetchPrizeStats = async () => {
     try {
       const response = await fetch('/api/admin/online-festival/winners/stats')
-      const data: PrizeStats = await response.json()
-      setPrizeStats(data)
+      const data = await response.json()
+      const dataArr = data.data as PrizeStats
+      setPrizeStats(dataArr)
     } catch (error) {
       console.error('Failed to fetch prize stats:', error)
     }
@@ -125,12 +127,6 @@ export function WinnersTab() {
     setPrizeFilter(prize)
     setCurrentPage(1)
     fetchWinners(1, searchTerm, prize, claimFilter)
-  }
-
-  const handleClaimFilter = (claim: string) => {
-    setClaimFilter(claim)
-    setCurrentPage(1)
-    fetchWinners(1, searchTerm, prizeFilter, claim)
   }
 
   // 페이지 변경
@@ -207,9 +203,6 @@ export function WinnersTab() {
               </CardHeader>
               <CardContent>
                 <div className="text-xl font-bold text-gray-900">{prize.count}명</div>
-                <p className="text-xs text-gray-500">
-                  {prize.value ? `${prize.value.toLocaleString()}원` : '무료'}
-                </p>
               </CardContent>
             </Card>
           ))}

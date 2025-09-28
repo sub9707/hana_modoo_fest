@@ -33,6 +33,7 @@ interface MiddlewareUser {
 
 // 보호된 경로 설정
 const PROTECTED_PATHS = [
+  '/admin',
   '/profile', 
   '/settings',
   '/my-page',

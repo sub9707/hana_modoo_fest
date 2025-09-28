@@ -71,12 +71,13 @@ export function RegistrationTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/registrations?${params}`)
-      const data: RegistrationResponse = await response.json()
+      const data = await response.json()
+      const dataArr = data.data as RegistrationResponse
 
-      setRegistrations(data.items)
-      setTotalCount(data.total)
-      setTotalPages(data.totalPages)
-      setCurrentPage(data.page)
+      setRegistrations(dataArr.items)
+      setTotalCount(dataArr.total)
+      setTotalPages(dataArr.totalPages)
+      setCurrentPage(dataArr.page)
     } catch (error) {
       console.error('Failed to fetch registrations:', error)
     } finally {

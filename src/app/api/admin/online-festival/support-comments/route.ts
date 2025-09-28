@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
       ${whereClause}
     `
     const countResult = await query(countQuery, queryParams)
+
     const total = countResult[0]?.total || 0
 
     // 목록 조회

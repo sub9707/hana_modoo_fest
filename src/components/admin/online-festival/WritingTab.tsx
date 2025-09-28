@@ -74,15 +74,16 @@ export function WritingsTab() {
             })
 
             const response = await fetch(`/api/admin/online-festival/writings?${params}`)
-            const data: WritingResponse = await response.json()
+            const data = await response.json()
+            const dataArr = data.data as WritingResponse
 
-            setWritings(data.items)
-            setTotalCount(data.total)
-            setTotalPages(data.totalPages)
-            setCurrentPage(data.page)
+            setWritings(dataArr.items)
+            setTotalCount(dataArr.total)
+            setTotalPages(dataArr.totalPages)
+            setCurrentPage(dataArr.page)
 
             // 우수작품 수 계산
-            setFeaturedCount((data.items || []).filter(w => w.is_featured).length)
+            setFeaturedCount((dataArr.items || []).filter(w => w.is_featured).length)
         } catch (error) {
             console.error('Failed to fetch writings:', error)
         } finally {

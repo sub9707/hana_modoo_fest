@@ -7,15 +7,15 @@ import { Input } from '@/components/admin/online-festival/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/admin/online-festival/ui/card'
 import { Badge } from '@/components/admin/online-festival/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/admin/online-festival/ui/tabs'
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/admin/online-festival/ui/table'
-import { 
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -58,7 +58,7 @@ interface CommentResponse {
 
 export function SupportCommentsTab() {
   const [activeSubTab, setActiveSubTab] = useState('participants')
-  
+
   // 참여자 관련 상태
   const [participants, setParticipants] = useState<CommentParticipant[]>([])
   const [participantTotal, setParticipantTotal] = useState(0)
@@ -89,12 +89,13 @@ export function SupportCommentsTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/support-comments/participants?${params}`)
-      const data: ParticipantResponse = await response.json()
+      const data = await response.json()
+      const dataArr = data.data as ParticipantResponse;
 
-      setParticipants(data.items)
-      setParticipantTotal(data.total)
-      setParticipantTotalPages(data.totalPages)
-      setParticipantPage(data.page)
+      setParticipants(dataArr.items)
+      setParticipantTotal(dataArr.total)
+      setParticipantTotalPages(dataArr.totalPages)
+      setParticipantPage(dataArr.page)
     } catch (error) {
       console.error('Failed to fetch participants:', error)
     } finally {
@@ -113,12 +114,13 @@ export function SupportCommentsTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/support-comments?${params}`)
-      const data: CommentResponse = await response.json()
+      const data = await response.json()
+      const dataArr = data.data as CommentResponse;
 
-      setComments(data.items)
-      setCommentTotal(data.total)
-      setCommentTotalPages(data.totalPages)
-      setCommentPage(data.page)
+      setComments(dataArr.items)
+      setCommentTotal(dataArr.total)
+      setCommentTotalPages(dataArr.totalPages)
+      setCommentPage(dataArr.page)
     } catch (error) {
       console.error('Failed to fetch comments:', error)
     } finally {
@@ -129,11 +131,34 @@ export function SupportCommentsTab() {
   // 초기 데이터 로드
   useEffect(() => {
     if (activeSubTab === 'participants') {
-      fetchParticipants()
+      fetchParticipants(participantPage, participantSearch)
     } else {
-      fetchComments()
+      fetchComments(commentPage, commentSearch)
     }
   }, [activeSubTab])
+
+  // 통계용 초기 로드 (마운트 시 1회 실행)
+  useEffect(() => {
+    const initStats = async () => {
+      try {
+        // 참여자 count
+        const pRes = await fetch(`/api/admin/online-festival/support-comments/participants?page=1&limit=1`)
+        const pData = await pRes.json()
+        const pArr = pData.data as ParticipantResponse
+        setParticipantTotal(pArr.total)
+
+        // 댓글 count
+        const cRes = await fetch(`/api/admin/online-festival/support-comments?page=1&limit=1`)
+        const cData = await cRes.json()
+        const cArr = cData.data as CommentResponse
+        setCommentTotal(cArr.total)
+      } catch (error) {
+        console.error('Init stats failed:', error)
+      }
+    }
+
+    initStats()
+  }, [])
 
   // 댓글 삭제
   const handleDeleteComment = async (id: string) => {
@@ -259,7 +284,7 @@ export function SupportCommentsTab() {
                 className="w-64"
                 onKeyPress={(e) => e.key === 'Enter' && fetchParticipants(1, participantSearch)}
               />
-              <Button 
+              <Button
                 onClick={() => fetchParticipants(1, participantSearch)}
                 variant="outline"
                 className="w-35 h-10 flex items-center"
@@ -267,7 +292,7 @@ export function SupportCommentsTab() {
                 <Search className="h-4 w-4 mr-2" />
                 검색
               </Button>
-              <Button 
+              <Button
                 onClick={() => fetchParticipants(participantPage, participantSearch)}
                 variant="outline"
                 disabled={loading}
@@ -278,7 +303,7 @@ export function SupportCommentsTab() {
               </Button>
             </div>
 
-            <Button 
+            <Button
               onClick={handleExportParticipants}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
@@ -336,7 +361,7 @@ export function SupportCommentsTab() {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
+                  <PaginationPrevious
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
@@ -347,7 +372,7 @@ export function SupportCommentsTab() {
                     }}
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: Math.min(5, participantTotalPages) }, (_, i) => {
                   let pageNum
                   if (participantTotalPages <= 5) {
@@ -359,7 +384,7 @@ export function SupportCommentsTab() {
                   } else {
                     pageNum = participantPage - 2 + i
                   }
-                  
+
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink
@@ -376,7 +401,7 @@ export function SupportCommentsTab() {
                     </PaginationItem>
                   )
                 })}
-                
+
                 <PaginationItem>
                   <PaginationNext
                     href="#"
@@ -406,7 +431,7 @@ export function SupportCommentsTab() {
                 className="w-64"
                 onKeyPress={(e) => e.key === 'Enter' && fetchComments(1, commentSearch)}
               />
-              <Button 
+              <Button
                 onClick={() => fetchComments(1, commentSearch)}
                 variant="outline"
                 className="w-35 h-10 flex items-center"
@@ -414,7 +439,7 @@ export function SupportCommentsTab() {
                 <Search className="h-4 w-4 mr-2" />
                 검색
               </Button>
-              <Button 
+              <Button
                 onClick={() => fetchComments(commentPage, commentSearch)}
                 variant="outline"
                 disabled={loading}
@@ -425,7 +450,7 @@ export function SupportCommentsTab() {
               </Button>
             </div>
 
-            <Button 
+            <Button
               onClick={handleExportComments}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
@@ -496,7 +521,7 @@ export function SupportCommentsTab() {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
+                  <PaginationPrevious
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
@@ -507,7 +532,7 @@ export function SupportCommentsTab() {
                     }}
                   />
                 </PaginationItem>
-                
+
                 {Array.from({ length: Math.min(5, commentTotalPages) }, (_, i) => {
                   let pageNum
                   if (commentTotalPages <= 5) {
@@ -519,7 +544,7 @@ export function SupportCommentsTab() {
                   } else {
                     pageNum = commentPage - 2 + i
                   }
-                  
+
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink
@@ -536,7 +561,7 @@ export function SupportCommentsTab() {
                     </PaginationItem>
                   )
                 })}
-                
+
                 <PaginationItem>
                   <PaginationNext
                     href="#"

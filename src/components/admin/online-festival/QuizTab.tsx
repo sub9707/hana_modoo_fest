@@ -46,7 +46,6 @@ interface QuizParticipantResponse {
 export function QuizTab() {
   const [participants, setParticipants] = useState<QuizParticipant[]>([])
   const [totalCount, setTotalCount] = useState(0)
-  const [perfectScoreCount, setPerfectScoreCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
@@ -66,15 +65,14 @@ export function QuizTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/quiz-participants?${params}`)
-      const data: QuizParticipantResponse = await response.json()
+      const data = await response.json()
+      const dataArr = data.data as QuizParticipantResponse
 
-      setParticipants(data.items)
-      setTotalCount(data.total)
-      setTotalPages(data.totalPages)
-      setCurrentPage(data.page)
+      setParticipants(dataArr.items)
+      setTotalCount(dataArr.total)
+      setTotalPages(dataArr.totalPages)
+      setCurrentPage(dataArr.page)
 
-      // 만점자 수 계산
-      setPerfectScoreCount((data.items || []).filter(p => p.perfect_score).length)
     } catch (error) {
       console.error('Failed to fetch quiz participants:', error)
     } finally {
@@ -209,9 +207,7 @@ export function QuizTab() {
             <TableRow>
               <TableHead>참가자</TableHead>
               <TableHead>전화번호</TableHead>
-              <TableHead>점수</TableHead>
               <TableHead>완료시간</TableHead>
-              <TableHead>퀴즈버전</TableHead>
               <TableHead>참여일시</TableHead>
               <TableHead>액션</TableHead>
             </TableRow>
@@ -235,28 +231,11 @@ export function QuizTab() {
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       {participant.name}
-                      {participant.perfect_score && (
-                        <Trophy className="h-4 w-4 text-yellow-500" />
-                      )}
                     </div>
                   </TableCell>
                   <TableCell>{participant.phone}</TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={participant.perfect_score ? 'default' : 'secondary'}
-                      className={participant.perfect_score ? 'bg-yellow-500 hover:bg-yellow-600' : ''}
-                    >
-                      {participant.correct_answers}/{participant.total_questions}
-                      {participant.perfect_score && ' 만점'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
                     {formatCompletionTime(participant.completion_time)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {participant.quiz_version}
-                    </Badge>
                   </TableCell>
                   <TableCell>
                     {new Date(participant.participated_at).toLocaleString()}
