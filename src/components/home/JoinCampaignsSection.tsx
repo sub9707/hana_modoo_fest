@@ -7,7 +7,12 @@ interface CampaignStat {
   description?: string
 }
 
-// 숫자 포맷팅 함수
+interface CampaignStatsData {
+  preregistration_count: number
+  comment_count: number
+  writing_count: number
+}
+
 function formatNumber(num: number): string {
   if (num >= 10000) {
     return `${Math.floor(num / 1000)}K+`
@@ -17,8 +22,27 @@ function formatNumber(num: number): string {
   return num.toLocaleString()
 }
 
-// 서버 컴포넌트에서 데이터 fetch
-async function getCampaignStatsData() {
+// 안전한 숫자 변환 함수
+function safeToNumber(value: any): number {
+  if (typeof value === 'number') return Math.max(0, Math.floor(value))
+  if (typeof value === 'string') {
+    const parsed = parseInt(value, 10)
+    return isNaN(parsed) ? 0 : Math.max(0, parsed)
+  }
+  return 0
+}
+
+// 폴백 데이터
+const getFallbackStats = (): CampaignStatsData => ({
+  preregistration_count: 1247,
+  comment_count: 1786,
+  writing_count: 103
+})
+
+// 최적화된 데이터 조회 함수
+async function getCampaignStatsData(): Promise<CampaignStatsData> {
+  const startTime = Date.now()
+  
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
                    (process.env.NODE_ENV === 'production' 
@@ -26,39 +50,76 @@ async function getCampaignStatsData() {
                      : 'http://localhost:3000')
     
     const response = await fetch(`${baseUrl}/api/campaign/stats`, {
-      next: { 
-        revalidate: 300, // 5분 캐시
-        tags: ['campaign-stats'] 
-      },
+      cache: 'default',
       headers: {
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
-      }
+        'Accept': 'application/json',
+        'User-Agent': 'CampaignStats/1.0'
+      },
+      signal: AbortSignal.timeout(5000)
     })
     
+    const responseTime = Date.now() - startTime
+    
     if (!response.ok) {
-      console.warn('Campaign stats API failed:', response.status)
-      throw new Error('Failed to fetch campaign stats')
+      console.warn(`❌ API 응답 오류: ${response.status} ${response.statusText}`)
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
     
-    const data = await response.json()
-    console.log(data.data)
-    return data.data
-  } catch (error) {
-    console.error('Error fetching campaign stats:', error)
-    // 폴백 데이터 반환
-    return {
-      preregistration_count: 1247,
-      comment_count: 1786,
-      writing_count: 103
+    const result = await response.json()
+  
+    
+    // 기본 응답 구조 검증
+    if (!result.success || !result.data) {
+      console.warn('⚠️ 잘못된 API 응답 구조:', result)
+      throw new Error('Invalid API response structure')
     }
+    
+    const { data } = result
+    
+    // 안전한 타입 변환 및 검증
+    const safeData: CampaignStatsData = {
+      preregistration_count: safeToNumber(data.preregistration_count),
+      comment_count: safeToNumber(data.comment_count),
+      writing_count: safeToNumber(data.writing_count)
+    }
+    
+    // 변환된 데이터 검증
+    const isValidData = 
+      safeData.preregistration_count >= 0 &&
+      safeData.comment_count >= 0 &&
+      safeData.writing_count >= 0
+
+    if (!isValidData) {
+      console.warn('⚠️ 데이터 값이 유효하지 않음:', safeData)
+      throw new Error('Invalid data values after conversion')
+    }
+
+    return safeData
+    
+  } catch (error) {
+    const responseTime = Date.now() - startTime
+    
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        console.error(`⏰ API 타임아웃 (${responseTime}ms):`, error.message)
+      } else if (error.message.includes('fetch failed')) {
+        console.error(`🌐 네트워크 오류 (${responseTime}ms):`, error.message)
+      } else {
+        console.error(`❌ API 오류 (${responseTime}ms):`, error.message)
+      }
+    } else {
+      console.error(`❓ 알 수 없는 오류 (${responseTime}ms):`, error)
+    }
+    
+    // 폴백 데이터 반환
+    const fallbackData = getFallbackStats()
+    return fallbackData
   }
 }
 
 export default async function JoinCampaignsSection() {
-  // 서버에서 실시간 데이터 조회
   const statsData = await getCampaignStatsData()
   
-  // UI 표시 순서: 1. 사전접수 참여자, 2. 응원 댓글, 3. 가족주제 글짓기
   const campaignStats: CampaignStat[] = [
     {
       number: formatNumber(statsData.preregistration_count),
@@ -90,7 +151,6 @@ export default async function JoinCampaignsSection() {
 
           {/* 헤더 영역 */}
           <div className="flex items-center justify-between mb-12 max-w-6xl ml-0 sm:ml-20 translate-x-0 sm:translate-x-1/3 relative z-10">
-            {/* 텍스트 영역 */}
             <div className="text-left flex-1 relative">
               <h2 className="text-2xl sm:text-3xl lg:text-7xl font-black mb-6 text-center sm:text-left">
                 온라인 캠페인 참여하기

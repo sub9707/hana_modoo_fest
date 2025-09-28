@@ -65,12 +65,12 @@ export default function RouletteWheel({
 
   // 버튼 비활성화 조건
   const isButtonDisabled = () => {
-    return isLoading || 
-           requiresLogin || 
-           hasParticipatedToday || 
-           isSpinning || 
-           !canParticipate ||
-           serverLoad === 'high'
+    return isLoading ||
+      requiresLogin ||
+      hasParticipatedToday ||
+      isSpinning ||
+      (canParticipate !== null && canParticipate === false) || 
+      serverLoad === 'high'
   }
 
   // 룰렛 회전 애니메이션 스타일
@@ -95,11 +95,10 @@ export default function RouletteWheel({
       {/* 서버 상태 표시 */}
       <div className="mb-4 flex items-center space-x-2 text-sm">
         <div className="flex items-center space-x-1">
-          <div className={`w-2 h-2 rounded-full ${
-            serverLoad === 'low' ? 'bg-green-500' :
-            serverLoad === 'medium' ? 'bg-yellow-500' :
-            'bg-red-500'
-          } ${serverLoad === 'high' ? 'animate-pulse' : ''}`}></div>
+          <div className={`w-2 h-2 rounded-full ${serverLoad === 'low' ? 'bg-green-500' :
+              serverLoad === 'medium' ? 'bg-yellow-500' :
+                'bg-red-500'
+            } ${serverLoad === 'high' ? 'animate-pulse' : ''}`}></div>
           <span className="text-gray-600">서버 상태:</span>
           <span className={getLoadColor()}>{getLoadText()}</span>
         </div>
@@ -107,7 +106,7 @@ export default function RouletteWheel({
 
       {/* 룰렛 휠 */}
       <div className="relative mb-8">
-        
+
         {/* 룰렛 원판 */}
         <div className="relative">
           <div
@@ -118,22 +117,22 @@ export default function RouletteWheel({
             {prizes.length > 0 ? prizes.map((prize, index) => {
               const startAngle = index * sectionAngle
               const endAngle = (index + 1) * sectionAngle
-              
+
               // SVG 경로를 사용한 원형 섹션
               const centerX = 50
               const centerY = 50
               const radius = 45
-              
+
               const startAngleRad = (startAngle - 90) * (Math.PI / 180)
               const endAngleRad = (endAngle - 90) * (Math.PI / 180)
-              
+
               const x1 = centerX + radius * Math.cos(startAngleRad)
               const y1 = centerY + radius * Math.sin(startAngleRad)
               const x2 = centerX + radius * Math.cos(endAngleRad)
               const y2 = centerY + radius * Math.sin(endAngleRad)
-              
+
               const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0
-              
+
               const pathData = [
                 `M ${centerX} ${centerY}`,
                 `L ${x1} ${y1}`,
@@ -158,7 +157,7 @@ export default function RouletteWheel({
                       strokeWidth="0.5"
                     />
                   </svg>
-                  
+
                   {/* 텍스트 및 아이콘 */}
                   <div
                     className="absolute inset-0 pointer-events-none"
@@ -168,7 +167,7 @@ export default function RouletteWheel({
                     }}
                   >
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div 
+                      <div
                         className="flex flex-col items-center text-white font-bold translate-y-[-80px] md:translate-y-[-90px]"
                         style={{
                           transform: `rotate(${-(startAngle + sectionAngle / 2)}deg)`
@@ -180,21 +179,21 @@ export default function RouletteWheel({
                         <div className="text-xs md:text-sm text-center leading-tight drop-shadow-lg font-bold max-w-16">
                           {prize.name.length > 6 ? (
                             // 긴 이름은 두 줄로 분할
-                            prize.name.split(' ').length > 1 ? 
-                            prize.name.split(' ').map((word, i) => (
-                              <div key={i} className="whitespace-nowrap">
-                                {word}
-                              </div>
-                            )) :
-                            // 공백이 없으면 글자 수로 분할
-                            [
-                              prize.name.slice(0, Math.ceil(prize.name.length / 2)),
-                              prize.name.slice(Math.ceil(prize.name.length / 2))
-                            ].map((part, i) => (
-                              <div key={i} className="whitespace-nowrap">
-                                {part}
-                              </div>
-                            ))
+                            prize.name.split(' ').length > 1 ?
+                              prize.name.split(' ').map((word, i) => (
+                                <div key={i} className="whitespace-nowrap">
+                                  {word}
+                                </div>
+                              )) :
+                              // 공백이 없으면 글자 수로 분할
+                              [
+                                prize.name.slice(0, Math.ceil(prize.name.length / 2)),
+                                prize.name.slice(Math.ceil(prize.name.length / 2))
+                              ].map((part, i) => (
+                                <div key={i} className="whitespace-nowrap">
+                                  {part}
+                                </div>
+                              ))
                           ) : (
                             <div className="whitespace-nowrap">{prize.name}</div>
                           )}
@@ -210,7 +209,7 @@ export default function RouletteWheel({
                 <Loader2 className="w-12 h-12 text-festival-orange animate-spin" />
               </div>
             )}
-            
+
             {/* 중앙 원 */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-white to-gray-100 rounded-full border-4 border-gray-300 flex items-center justify-center shadow-lg z-10">
               <span className="text-2xl md:text-3xl">🎰</span>
@@ -220,7 +219,7 @@ export default function RouletteWheel({
 
         {/* 룰렛 그림자 효과 */}
         <div className="absolute inset-0 w-80 h-80 md:w-96 md:h-96 rounded-full bg-black/20 blur-xl transform translate-y-4 -z-10"></div>
-        
+
         {/* 스핀 중 글로우 효과 */}
         {isSpinning && (
           <div className="absolute inset-0 w-80 h-80 md:w-96 md:h-96 rounded-full bg-gradient-to-r from-festival-orange/30 via-festival-pink/30 to-festival-purple/30 blur-2xl animate-pulse -z-10"></div>
@@ -232,11 +231,10 @@ export default function RouletteWheel({
         <button
           onClick={onSpin}
           disabled={isButtonDisabled()}
-          className={`px-8 py-4 rounded-2xl font-bold text-white inline-flex items-center space-x-3 transform transition-all duration-300 text-lg ${
-            isButtonDisabled()
-              ? 'bg-gray-400 cursor-not-allowed scale-95' 
+          className={`px-8 py-4 rounded-2xl font-bold text-white inline-flex items-center space-x-3 transform transition-all duration-300 text-lg ${isButtonDisabled()
+              ? 'bg-gray-400 cursor-not-allowed scale-95'
               : 'bg-gradient-to-r from-festival-orange to-festival-pink hover:shadow-2xl hover:scale-105 active:scale-95'
-          } ${isSpinning ? 'animate-pulse' : ''}`}
+            } ${isSpinning ? 'animate-pulse' : ''}`}
         >
           {isSpinning ? (
             <>

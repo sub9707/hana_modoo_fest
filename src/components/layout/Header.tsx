@@ -28,7 +28,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const { user, isLoading: isLoadingAuth } = useAuth()
   const pathname = usePathname()
-  
+
   // ✅ GA4 트래킹 훅 사용
   const { trackButtonClick, trackEvent } = useGA4Tracking()
 
@@ -44,10 +44,10 @@ export default function Header() {
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
-    
+
     // ✅ 모바일 메뉴 토글 트래킹
     trackButtonClick(
-      isMobileMenuOpen ? 'mobile_menu_close' : 'mobile_menu_open', 
+      isMobileMenuOpen ? 'mobile_menu_close' : 'mobile_menu_open',
       'header'
     )
   }
@@ -55,7 +55,7 @@ export default function Header() {
   // ✅ 네비게이션 클릭 트래킹 함수
   const handleNavClick = (navName: string, href: string, isMobile: boolean = false) => {
     trackEvent('click', 'navigation', `${isMobile ? 'mobile_' : 'desktop_'}nav_${navName.replace(/\s+/g, '_').toLowerCase()}`)
-    
+
     // 모바일 메뉴는 닫기
     if (isMobile) {
       setIsMobileMenuOpen(false)
@@ -68,9 +68,17 @@ export default function Header() {
   }
 
   // 사용자 이름 표시 함수
-  const getUserDisplayName = () => {
+  const getUserDisplayName = (maxLength = 3) => {
     if (!user) return ''
-    return user.name || user.username || '사용자'
+
+    const name = user.name || user.username || '사용자'
+
+    // 지정된 길이보다 길면 생략
+    if (name.length > maxLength) {
+      return name.substring(0, maxLength - 1) + '...'
+    }
+
+    return name
   }
 
   return (

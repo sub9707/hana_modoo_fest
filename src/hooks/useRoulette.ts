@@ -23,7 +23,7 @@ export function useRouletteEvent(): UseRouletteEventReturn {
 
     const [state, setState] = useState<RouletteState>({
         isSpinning: false,
-        canParticipate: false,
+        canParticipate: true,
         hasParticipatedToday: false,
         currentRotation: 0,
         result: null,
@@ -78,6 +78,17 @@ export function useRouletteEvent(): UseRouletteEventReturn {
     // 참여 가능 여부 확인
     const checkParticipation = useCallback(async () => {
         try {
+            // 🚀 로그인하지 않은 경우 처리
+            if (!user) {
+                setState(prev => ({
+                    ...prev,
+                    canParticipate: false, // 로그인 안 한 경우만 false
+                    hasParticipatedToday: false,
+                    isLoading: false
+                }))
+                return
+            }
+
             const response = await fetch('/api/event/participation/check', {
                 cache: 'no-store',
                 headers: {
@@ -85,25 +96,56 @@ export function useRouletteEvent(): UseRouletteEventReturn {
                 }
             })
 
+            console.log('🔍 Participation API response:', response.status, response.ok)
+
+            if (!response.ok) {
+                console.warn('Participation API failed:', response.status)
+                // 🚀 API 실패 시 기본값으로 처리 (로그인된 사용자는 기본 참여 가능)
+                setState(prev => ({
+                    ...prev,
+                    canParticipate: true, // API 실패 시 참여 가능으로 설정
+                    hasParticipatedToday: false,
+                    isLoading: false
+                }))
+                return
+            }
+
             const data: ApiResponse = await response.json()
+            console.log('🔍 Participation API data:', data)
 
             if (data.success && data.data) {
                 setState(prev => ({
                     ...prev,
-                    canParticipate: data.data.can_participate,
-                    hasParticipatedToday: data.data.has_participated_today,
+                    canParticipate: data.data.can_participate ?? true, // 🚀 null 처리
+                    hasParticipatedToday: data.data.has_participated_today ?? false,
+                    isLoading: false
+                }))
+            } else {
+                console.warn('Participation API returned error:', data.error)
+                // 🚀 API 응답이 실패여도 기본값으로 처리
+                setState(prev => ({
+                    ...prev,
+                    canParticipate: true,
+                    hasParticipatedToday: false,
                     isLoading: false
                 }))
             }
         } catch (error) {
             console.error('Failed to check participation:', error)
+            // 🚀 에러 발생 시 참여 가능으로 설정 (더 관대한 처리)
             setState(prev => ({
                 ...prev,
+                canParticipate: true, // 에러 시에도 참여 가능
+                hasParticipatedToday: false,
                 isLoading: false,
-                error: '참여 가능 여부를 확인할 수 없습니다.'
+                error: null // 참여 확인 실패는 치명적 에러가 아님
             }))
         }
-    }, [])
+    }, [user])
+
+    useEffect(() => {
+        checkParticipation()
+    }, [checkParticipation, user])
 
     // 서버 부하 상태 모니터링 (간단한 응답 시간 기반)
     const checkServerLoad = useCallback(async () => {

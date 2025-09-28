@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'  // 🚀 추가
 import { LogOut, Loader2 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { logoutAction } from '@/lib/actions/auth'
@@ -12,6 +13,7 @@ interface LogoutButtonProps {
   className?: string
   showIcon?: boolean
   children?: React.ReactNode
+  redirectTo?: string  // 🚀 로그아웃 후 이동할 경로 옵션 추가
 }
 
 export default function LogoutButton({ 
@@ -20,10 +22,12 @@ export default function LogoutButton({
   size = 'default',
   className = '',
   showIcon = true,
-  children
+  children,
+  redirectTo = '/'  // 🚀 기본값은 홈으로
 }: LogoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { logout } = useAuth();
+  const router = useRouter()  // 🚀 라우터 추가
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -31,9 +35,17 @@ export default function LogoutButton({
     try {
       logout();
       await logoutAction()
+      
+      // 🚀 로그아웃 후 지정된 페이지로 리다이렉트
+      router.push(redirectTo)
+      router.refresh() // 페이지 새로고침으로 인증 상태 완전 업데이트
+      
     } catch (error) {
       console.error('Logout error:', error)
       setIsLoading(false)
+      
+      // 🚀 에러가 발생해도 홈으로 이동 (안전장치)
+      router.push(redirectTo)
     }
   }
 
@@ -85,7 +97,6 @@ export default function LogoutButton({
   )
 
   const textContent = children || (isLoading ? '로그아웃 중...' : '로그아웃')
-
 
   return (
     <button

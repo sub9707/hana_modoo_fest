@@ -1,5 +1,16 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Users, Calendar, MapPin, Gift } from 'lucide-react'
+import { ArrowRight, Users, Calendar, MapPin, Gift, Loader2 } from 'lucide-react'
+
+interface CampaignStats {
+  preregistration_count: number
+  total_participants: number
+  comment_count: number
+  writing_count: number
+  active_campaigns: number
+}
 
 const benefits = [
   {
@@ -9,13 +20,87 @@ const benefits = [
   }
 ]
 
-const stats = [
-  { number: '500', label: '사전접수 완료', color: 'text-festival-blue' },
-  { number: '2,000', label: '목표 인원', color: 'text-festival-green' },
-  { number: '25%', label: '달성률', color: 'text-festival-purple' }
-]
+const TARGET_PARTICIPANTS = 2000 // 목표 인원
 
 export default function PreRegistration() {
+  const [stats, setStats] = useState<CampaignStats | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // API에서 통계 데이터 가져오기
+  const fetchStats = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/campaign/stats', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('통계 데이터를 가져올 수 없습니다.')
+      }
+
+      const data = await response.json()
+      
+      if (data.success && data.data) {
+        setStats(data.data)
+        setError(null)
+      } else {
+        throw new Error(data.error || '데이터 형식이 올바르지 않습니다.')
+      }
+    } catch (err) {
+      console.error('Stats fetch error:', err)
+      setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.')
+      // 에러 시 기본값 설정
+      setStats({
+        preregistration_count: 0,
+        total_participants: 0,
+        comment_count: 0,
+        writing_count: 0,
+        active_campaigns: 0
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStats()
+    
+    // 30초마다 자동 새로고침
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // 달성률 계산
+  const achievementRate = stats ? Math.round((stats.total_participants / TARGET_PARTICIPANTS) * 100) : 0
+  const isAchieved = achievementRate >= 100
+
+  // 통계 배열 생성
+  const getStatsArray = () => {
+    if (!stats) return []
+
+    return [
+      { 
+        number: isLoading ? '...' : stats.total_participants.toLocaleString(), 
+        label: '참여 인원', 
+        color: 'text-festival-blue' 
+      },
+      { 
+        number: TARGET_PARTICIPANTS.toLocaleString(), 
+        label: '목표 인원', 
+        color: 'text-festival-green' 
+      },
+      { 
+        number: isLoading ? '...' : isAchieved ? '달성!' : `${achievementRate}%`, 
+        label: '달성률', 
+        color: isAchieved ? 'text-festival-pink' : 'text-festival-purple'
+      }
+    ]
+  }
+
   return (
     <div className="p-8 md:p-12">
       {/* 헤더 섹션 */}
@@ -32,19 +117,56 @@ export default function PreRegistration() {
         </p>
       </div>
 
+      {/* 에러 메시지 */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-center">
+          <p className="text-red-600 text-sm">{error}</p>
+          <button 
+            onClick={fetchStats}
+            className="mt-2 text-red-700 underline text-sm hover:text-red-800"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {/* 통계 섹션 */}
       <div className="grid grid-cols-3 gap-6 mb-12">
-        {stats.map((stat, index) => (
-          <div key={index} className="text-center p-0 sm:p-6 bg-white/50 rounded-2xl">
-            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-2`}>
+        {getStatsArray().map((stat, index) => (
+          <div key={index} className="text-center p-0 sm:p-6 bg-white/50 rounded-2xl relative">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              </div>
+            )}
+            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-2 ${isLoading ? 'opacity-30' : ''}`}>
               {stat.number}
             </div>
-            <div className="text-sm md:text-base text-gray-600">
+            <div className={`text-sm md:text-base text-gray-600 ${isLoading ? 'opacity-30' : ''}`}>
               {stat.label}
             </div>
+            {/* 달성 축하 효과 */}
+            {isAchieved && index === 2 && !isLoading && (
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-festival-pink rounded-full flex items-center justify-center animate-bounce">
+                <span className="text-white text-xs">🎉</span>
+              </div>
+            )}
           </div>
         ))}
       </div>
+
+      {/* 달성 축하 메시지 */}
+      {isAchieved && !isLoading && (
+        <div className="mb-8 p-6 bg-gradient-to-r from-festival-pink/10 to-festival-purple/10 border-2 border-festival-pink/20 rounded-2xl text-center">
+          <div className="text-2xl mb-2">🎉</div>
+          <h3 className="text-xl font-bold text-festival-pink mb-2">
+            목표 달성 축하합니다!
+          </h3>
+          <p className="text-gray-600">
+            많은 분들의 관심 덕분에 목표 인원을 달성했습니다. 더욱 풍성한 축제를 준비하겠습니다!
+          </p>
+        </div>
+      )}
 
       {/* 혜택 섹션 */}
       <div className="mb-12">
@@ -52,15 +174,15 @@ export default function PreRegistration() {
           사전접수 혜택
         </h3>
         <div className="flex justify-center">
-            <div className="flex items-start space-x-4 p-6 bg-white/50 rounded-2xl hover:bg-white/70 transition-colors duration-300">
-              <div className="flex-shrink-0 w-12 h-12 bg-festival-blue/10 rounded-full flex items-center justify-center text-festival-blue">
-                <Gift className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-2">사전접수 선물</h4>
-                <p className="text-gray-600 text-sm">사전 접수 후 현장 참여 시 선물제공</p>
-              </div>
+          <div className="flex items-start space-x-4 p-6 bg-white/50 rounded-2xl hover:bg-white/70 transition-colors duration-300">
+            <div className="flex-shrink-0 w-12 h-12 bg-festival-blue/10 rounded-full flex items-center justify-center text-festival-blue">
+              <Gift className="w-6 h-6" />
             </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">사전접수 선물</h4>
+              <p className="text-gray-600 text-sm">사전 접수 후 현장 참여 시 선물제공</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -99,6 +221,13 @@ export default function PreRegistration() {
         </Link>
         <p className="text-sm text-gray-500 mt-4">
           신청은 무료이며, 언제든지 취소 가능합니다
+        </p>
+      </div>
+
+      {/* 실시간 업데이트 안내 */}
+      <div className="mt-8 text-center">
+        <p className="text-xs text-gray-400">
+          참여 현황은 실시간으로 업데이트됩니다 • 마지막 업데이트: {stats ? new Date().toLocaleTimeString() : '로딩 중'}
         </p>
       </div>
 

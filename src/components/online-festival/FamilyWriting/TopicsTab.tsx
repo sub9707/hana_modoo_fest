@@ -7,6 +7,7 @@ interface TopicsTabProps {
 }
 
 export default function TopicsTab({ writingTopics, onTopicSelect }: TopicsTabProps) {
+  console.log('📝 사용 가능한 글쓰기 주제:', writingTopics)
   return (
     <div className="max-w-4xl mx-auto">
       <div className="grid gap-4 md:gap-6">
@@ -21,9 +22,6 @@ export default function TopicsTab({ writingTopics, onTopicSelect }: TopicsTabPro
               
               {/* 참여자 수와 마감일 - 모바일에서는 가로 배치 */}
               <div className="flex flex-row md:flex-col md:text-right space-x-4 md:space-x-0 md:space-y-2">
-                <div className="bg-pink-600/10 text-pink-600 px-3 py-1 rounded-full text-xs md:text-sm font-medium">
-                  {topic.participants}명 참여
-                </div>
                 <div className="text-xs md:text-sm text-gray-500 flex items-center">
                   <Calendar className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                   ~{topic.deadline}

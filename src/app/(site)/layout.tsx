@@ -91,7 +91,7 @@ export default function SiteLayout({
                         "organizer": {
                             "@type": "Organization",
                             "name": "서울특별시한부모가족지원센터",
-                            "url": "https://moduhana2025.seoul.kr"
+                            "url": "https://seoulhanbumo.or.kr/"
                         },
                         "offers": {
                             "@type": "Offer",

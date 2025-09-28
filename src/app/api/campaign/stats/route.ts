@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query, queryOne } from '@/lib/mysql/connection'
-import { getRedisClient } from '@/lib/redis/connection'
-import { unstable_cache } from 'next/cache'
+import { query } from '@/lib/mysql/connection'
 
-interface CampaignStats {
+interface CampaignStatsData {
     preregistration_count: number
     comment_count: number
     writing_count: number
@@ -11,194 +9,257 @@ interface CampaignStats {
     active_campaigns: number
 }
 
-// Redis 캐시 키
-const REDIS_KEYS = {
-    CAMPAIGN_STATS: 'campaign:stats:total',
-    PREREGISTRATION: 'campaign:preregistration:count',
-    COMMENTS: 'campaign:comments:count',
-    WRITINGS: 'campaign:writings:count'
-} as const
+// 메모리 캐시 설정
+interface CacheEntry {
+    data: CampaignStatsData
+    timestamp: number
+    ttl: number
+}
 
-// 캐시 TTL (5분)
-const CACHE_TTL = 300
+let statsCache: CacheEntry | null = null
+const CACHE_TTL = 30 * 1000 // 30초 캐시
 
-// 데이터베이스에서 실시간 통계 조회
-async function getCampaignStatsFromDB(): Promise<CampaignStats> {
+// 안전한 숫자 변환 함수
+function safeParseInt(value: any): number {
+    if (typeof value === 'number') return Math.max(0, Math.floor(value))
+    if (typeof value === 'string') {
+        const parsed = parseInt(value, 10)
+        return isNaN(parsed) ? 0 : Math.max(0, parsed)
+    }
+    return 0
+}
+
+// 캐시 유효성 검사
+function isCacheValid(cache: CacheEntry | null): boolean {
+    if (!cache) return false
+    const now = Date.now()
+    return (now - cache.timestamp) < cache.ttl
+}
+
+// 캐시에서 데이터 가져오기
+function getCachedData(): CampaignStatsData | null {
+    if (isCacheValid(statsCache)) {
+        const remainingTime = Math.round((statsCache!.ttl - (Date.now() - statsCache!.timestamp)) / 1000)
+        return statsCache!.data
+    }
+    return null
+}
+
+// 캐시에 데이터 저장
+function setCacheData(data: CampaignStatsData): void {
+    statsCache = {
+        data,
+        timestamp: Date.now(),
+        ttl: CACHE_TTL
+    }
+}
+
+// DB에서 실제 데이터 조회 (타입 변환 포함)
+async function getCampaignStatsFromDB(): Promise<CampaignStatsData> {
     try {
-        // 병렬로 모든 통계 조회 - UI 순서에 맞게 정렬
-        const [
-            preregistrationResult,
-            commentResult,
-            writingResult
-        ] = await Promise.all([
-            // 1. 사전 접수 참여자 수
-            query(`
-        SELECT COUNT(*) as count 
-        FROM registrations 
-        WHERE status = 'confirmed'
-      `),
+        
+        // 등록 통계 조회 (confirmed 상태만) - CAST로 명시적 숫자 변환
+        const [regResult] = await query(`
+            SELECT 
+                CAST(COUNT(*) AS UNSIGNED) as confirmed_count,
+                CAST(COALESCE(SUM(companions), 0) AS UNSIGNED) as total_companions
+            FROM registrations 
+            WHERE status = 'confirmed'
+        `)
 
-            // 2. 응원 댓글 수 - 실제 DB에서 조회
-            query(`
-          SELECT COUNT(*) as count 
-          FROM support_comments
-        `),
+        // 기타 캠페인 통계 - CAST로 명시적 숫자 변환
+        const [otherResult] = await query(`
+            SELECT 
+                CAST((SELECT COUNT(*) FROM support_comments) AS UNSIGNED) as comment_count,
+                CAST((SELECT COUNT(*) FROM writings WHERE topic IN ('가족에게 전하고 싶은 말', '가족과 함께해서 즐거웠던 순간')) AS UNSIGNED) as writing_count
+        `)
 
-            // 3. 가족주제 글짓기 수
-            query(`
-        SELECT COUNT(*) as count 
-        FROM writings 
-        WHERE topic IN ('가족에게 전하고 싶은 말', '가족과 함께해서 즐거웠던 순간')
-      `)
-        ])
+        const regData = regResult || {}
+        const otherData = otherResult || {}
 
-        return {
-            preregistration_count: preregistrationResult[0]?.count || 0,
-            comment_count: commentResult[0]?.count || 1786, // 응원 댓글 실시간 조회
-            writing_count: writingResult[0]?.count || 0,
-            total_participants: 0, // 사용하지 않음
+        // 안전한 숫자 변환
+        const confirmedRegistrations = safeParseInt(regData.confirmed_count)
+        const totalCompanions = safeParseInt(regData.total_companions)
+        const commentCount = safeParseInt(otherData.comment_count)
+        const writingCount = safeParseInt(otherData.writing_count)
+        const totalParticipants = confirmedRegistrations + totalCompanions
+
+        const result: CampaignStatsData = {
+            preregistration_count: confirmedRegistrations,
+            comment_count: commentCount,
+            writing_count: writingCount,
+            total_participants: totalParticipants,
             active_campaigns: 3
         }
+        
+        // 타입 검증
+        const isValidTypes = 
+            typeof result.preregistration_count === 'number' &&
+            typeof result.comment_count === 'number' &&
+            typeof result.writing_count === 'number' &&
+            typeof result.total_participants === 'number' &&
+            typeof result.active_campaigns === 'number'
+
+        if (!isValidTypes) {
+            console.error('❌ 타입 변환 실패:', result)
+            throw new Error('Type conversion failed')
+        }
+
+        return result
 
     } catch (error) {
-        console.error('Error fetching campaign stats from DB:', error)
-        // 오류 시 기본값 반환
+        console.error('❌ DB 통계 조회 오류:', error)
+        
+        // DB 오류 시 안전한 기본값 반환
         return {
-            preregistration_count: 1247,
-            comment_count: 1786,
-            writing_count: 103,
-            total_participants: 2500,
-            active_campaigns: 3
+            preregistration_count: 0,
+            comment_count: 0,
+            writing_count: 0,
+            total_participants: 0,
+            active_campaigns: 0
         }
     }
 }
 
-// Redis에서 캐시된 통계 조회
-async function getCachedStats(): Promise<CampaignStats | null> {
-    try {
-        const redis = await getRedisClient()
-        const cachedData = await redis.get(REDIS_KEYS.CAMPAIGN_STATS)
-
-        if (cachedData) {
-            return JSON.parse(cachedData)
-        }
-
-        return null
-    } catch (error) {
-        console.warn('Redis cache read failed:', error)
-        return null
-    }
-}
-
-// Redis에 통계 캐시 저장
-async function setCachedStats(stats: CampaignStats): Promise<void> {
-    try {
-        const redis = await getRedisClient()
-        await redis.setEx(
-            REDIS_KEYS.CAMPAIGN_STATS,
-            CACHE_TTL,
-            JSON.stringify(stats)
-        )
-    } catch (error) {
-        console.warn('Redis cache write failed:', error)
-    }
-}
-
-// 캐시를 활용한 통계 조회
-const getCampaignStats = unstable_cache(
-    async (): Promise<CampaignStats> => {
-        // 1. Redis 캐시 확인
-        const cachedStats = await getCachedStats()
-        if (cachedStats) {
-            return cachedStats
-        }
-
-        // 2. DB에서 조회
-        const freshStats = await getCampaignStatsFromDB()
-
-        // 3. Redis에 캐시 저장
-        await setCachedStats(freshStats)
-
-        return freshStats
-    },
-    ['campaign-stats'],
-    {
-        revalidate: 300, // 5분마다 재검증
-        tags: ['campaign', 'stats']
-    }
-)
+// 폴백 데이터 (DB 완전 실패 시)
+const getFallbackData = (): CampaignStatsData => ({
+    preregistration_count: 0,
+    comment_count: 0,
+    writing_count: 0,
+    total_participants: 0,
+    active_campaigns: 0
+})
 
 export async function GET(request: NextRequest) {
     try {
-        const stats = await getCampaignStats()
+        // 1. 먼저 캐시 확인
+        const cachedData = getCachedData()
+        if (cachedData) {
+            return NextResponse.json({
+                success: true,
+                data: cachedData,
+                timestamp: new Date().toISOString(),
+                source: 'memory-cache',
+                cache_hit: true
+            }, {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=20',
+                    'X-Data-Source': 'memory-cache'
+                }
+            })
+        }
 
-        return NextResponse.json({
-            success: true,
-            data: stats,
-            timestamp: new Date().toISOString()
-        }, {
-            headers: {
-                'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
-                'X-Data-Source': 'db-cache'
-            }
-        })
+        // 2. 캐시 미스 시 DB에서 조회
+        const data = await getCampaignStatsFromDB()
+        
+        // 3. 새 데이터를 캐시에 저장
+        setCacheData(data)
+        
+        // 4. 데이터 유효성 최종 검증
+        const isValidData = 
+            typeof data.preregistration_count === 'number' && data.preregistration_count >= 0 &&
+            typeof data.comment_count === 'number' && data.comment_count >= 0 &&
+            typeof data.writing_count === 'number' && data.writing_count >= 0
 
-    } catch (error) {
-        console.error('Campaign stats API error:', error)
-
-        // 오류 시 기본값 반환
-        const fallbackStats: CampaignStats = {
-            preregistration_count: 1247,
-            comment_count: 1786,
-            writing_count: 103,
-            total_participants: 2500,
-            active_campaigns: 3
+        if (!isValidData) {
+            console.warn('⚠️ 잘못된 통계 데이터, 폴백 사용')
+            const fallbackData = getFallbackData()
+            setCacheData(fallbackData)
+            
+            return NextResponse.json({
+                success: true,
+                data: fallbackData,
+                timestamp: new Date().toISOString(),
+                source: 'fallback',
+                cache_hit: false
+            }, {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=20',
+                    'X-Data-Source': 'fallback'
+                }
+            })
         }
 
         return NextResponse.json({
             success: true,
-            data: fallbackStats,
+            data,
             timestamp: new Date().toISOString(),
-            fallback: true
+            source: 'database-fresh',
+            cache_hit: false
+        }, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=20',
+                'X-Data-Source': 'database-fresh'
+            }
+        })
+
+    } catch (error) {
+        console.error('❌ 캠페인 통계 API 오류:', error)
+
+        const fallbackData = getFallbackData()
+        setCacheData(fallbackData)
+        
+        return NextResponse.json({
+            success: true,
+            data: fallbackData,
+            timestamp: new Date().toISOString(),
+            source: 'fallback',
+            error: 'Database temporarily unavailable',
+            cache_hit: false
         }, {
             status: 200,
             headers: {
-                'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'
+                'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=10',
+                'X-Data-Source': 'fallback-error'
             }
         })
     }
 }
 
-// POST: 통계 캐시 무효화 (관리자용)
+// 캐시 관리 엔드포인트
 export async function POST(request: NextRequest) {
     try {
         const { action } = await request.json()
 
         if (action === 'invalidate') {
-            // Redis 캐시 삭제
-            try {
-                const redis = await getRedisClient()
-                await redis.del(REDIS_KEYS.CAMPAIGN_STATS)
-            } catch (error) {
-                console.warn('Redis cache invalidation failed:', error)
+            statsCache = null
+
+            return NextResponse.json({
+                success: true,
+                message: '캐시가 무효화되었습니다. 다음 요청 시 새로운 데이터를 조회합니다.',
+                timestamp: new Date().toISOString()
+            })
+        }
+
+        if (action === 'status') {
+            const cacheStatus = statsCache ? {
+                exists: true,
+                age_seconds: Math.round((Date.now() - statsCache.timestamp) / 1000),
+                ttl_seconds: Math.round(statsCache.ttl / 1000),
+                remaining_seconds: Math.round((statsCache.ttl - (Date.now() - statsCache.timestamp)) / 1000),
+                is_valid: isCacheValid(statsCache),
+                data_preview: statsCache.data
+            } : {
+                exists: false
             }
 
             return NextResponse.json({
                 success: true,
-                message: 'Cache invalidated successfully'
+                cache_status: cacheStatus,
+                timestamp: new Date().toISOString()
             })
         }
 
         return NextResponse.json({
             success: false,
-            error: 'Invalid action'
+            error: '잘못된 액션입니다. 사용 가능한 액션: invalidate, status'
         }, { status: 400 })
 
     } catch (error) {
-        console.error('Cache invalidation error:', error)
+        console.error('❌ API 오류:', error)
         return NextResponse.json({
             success: false,
-            error: 'Internal server error'
+            error: '서버 내부 오류'
         }, { status: 500 })
     }
 }
