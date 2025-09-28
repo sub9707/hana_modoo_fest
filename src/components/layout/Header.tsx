@@ -161,7 +161,7 @@ export default function Header() {
                   )}
                 </div>
 
-                <LanguageSelect />
+                {/* <LanguageSelect /> */}
               </div>
 
               {/* 모바일 메뉴 버튼 */}
