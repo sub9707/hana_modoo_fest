@@ -12,7 +12,7 @@ export async function GET(
   { params }: Params
 ) {
   try {
-    const { id } = await params 
+    const { id } = (await params) as { id: string } 
     const news = await NewsService.getNewsById(id)
 
     if (!news) {

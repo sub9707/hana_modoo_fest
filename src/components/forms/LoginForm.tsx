@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
+import { loginSchema, type LoginData } from '@/lib/validations/auth'
 import { User } from '@/types/auth'
 import Image from 'next/image'
 import { loginAction } from '@/lib/actions/auth'
@@ -103,7 +103,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset
-  } = useForm<LoginFormData>({
+  } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: '',
@@ -112,7 +112,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
   })
 
   // 일반 로그인 폼 제출 처리 수정
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: LoginData) => {
     setError(null)
 
     startTransition(async () => {

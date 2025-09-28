@@ -1,4 +1,6 @@
 // app/admin/users/page.tsx
+export const dynamic = "force-dynamic"
+
 import React from 'react'
 import { redirect } from 'next/navigation'
 import { requireAuth, requireRole } from '@/lib/mysql/server'

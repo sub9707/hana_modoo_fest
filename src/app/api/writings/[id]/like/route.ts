@@ -5,7 +5,7 @@ import { getCurrentUser } from '@/lib/mysql/server'
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }  // ✅ params는 Promise
+  context:  { params: any } 
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function POST(
       )
     }
 
-    const { id: writingId } = await context.params   // ✅ await 추가
+    const { id: writingId } = (await context.params) as { id: string }
 
     // 글 존재 여부 확인
     const writing = await query(

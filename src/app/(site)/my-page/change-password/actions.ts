@@ -1,4 +1,4 @@
-// src/app/my-page/change-password/actions.ts
+// src/app/(site)/my-page/change-password/actions.ts
 'use server'
 
 import { cookies } from 'next/headers'
@@ -6,6 +6,7 @@ import { createHash, randomBytes } from 'crypto'
 import { queryOne, query } from '@/lib/mysql/connection'
 import { revalidateTag } from 'next/cache'
 import { changePasswordSchema, type ChangePasswordData } from '@/lib/validations/auth'
+import { validatePasswordServer } from '@/lib/utils/password'
 
 interface PasswordChangeResponse {
   success: boolean
@@ -13,7 +14,10 @@ interface PasswordChangeResponse {
   message?: string
 }
 
-// NextJS 15: Server Action 최적화
+/**
+ * NextJS 15: Server Action으로 비밀번호 변경
+ * 향상된 보안 검증 및 캐시 무효화 적용
+ */
 export async function changePassword(data: ChangePasswordData): Promise<PasswordChangeResponse> {
   try {
     // 입력값 검증
@@ -25,7 +29,16 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
       }
     }
 
-    // 세션 토큰 확인
+    // 새 비밀번호 강도 검증 (서버 사이드)
+    const passwordValidation = validatePasswordServer(data.newPassword)
+    if (!passwordValidation.isValid) {
+      return {
+        success: false,
+        error: passwordValidation.error
+      }
+    }
+
+    // NextJS 15: cookies() 함수 사용 (async 필요)
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session-token')?.value
 
@@ -38,7 +51,7 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
 
     // 사용자 정보 조회
     const user = await queryOne(
-      `SELECT id, password_hash, password_salt, session_expires_at 
+      `SELECT id, password_hash, password_salt, session_expires_at, username, phone
        FROM users 
        WHERE session_token = ?`,
       [sessionToken]
@@ -92,21 +105,26 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
     // 비밀번호 업데이트
     await query(
       `UPDATE users 
-       SET password_hash = ?, password_salt = ?, updated_at = ?
+       SET password_hash = ?, 
+           password_salt = ?, 
+           updated_at = ?,
+           last_activity_at = ?
        WHERE id = ?`,
       [
         finalNewPasswordHash,
         newSalt,
         new Date().toISOString().slice(0, 19).replace('T', ' '),
+        new Date().toISOString().slice(0, 19).replace('T', ' '),
         user.id
       ]
     )
 
-    // NextJS 15: 캐시 무효화
+    // NextJS 15: 향상된 캐시 무효화
     revalidateTag('user-info')
+    revalidateTag(`user-${user.id}`)
 
-    // 보안 로그 기록 (선택사항)
-    await logPasswordChange(user.id)
+    // 보안 로그 기록
+    await logPasswordChange(user.id, user.username, user.phone)
 
     return {
       success: true,
@@ -122,73 +140,128 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
   }
 }
 
-// 비밀번호 변경 로그 기록 (선택사항)
-async function logPasswordChange(userId: string): Promise<void> {
+/**
+ * 비밀번호 변경 로그 기록 (보안 감사용)
+ * NextJS 15: 향상된 로깅 시스템
+ */
+async function logPasswordChange(
+  userId: string, 
+  username: string, 
+  phone: string
+): Promise<void> {
   try {
-    // admin_actions 테이블이나 별도 로그 테이블에 기록
-    // 현재는 콘솔에만 기록
-    console.log(`Password changed for user: ${userId} at ${new Date().toISOString()}`)
+    // admin_actions 테이블이 있는지 확인
+    const tableExists = await checkTableExists('admin_actions')
     
-    // 실제 구현 시에는 아래와 같이 DB에 기록
-    /*
-    await query(
-      `INSERT INTO password_change_logs (user_id, changed_at, ip_address, user_agent)
-       VALUES (?, ?, ?, ?)`,
-      [userId, new Date().toISOString().slice(0, 19).replace('T', ' '), getClientIP(), getUserAgent()]
-    )
-    */
+    if (tableExists) {
+      // DB에 보안 로그 기록
+      await query(
+        `INSERT INTO admin_actions 
+         (admin_id, action_type, target_user_hash, reason, metadata, created_at)
+         VALUES (?, 'password_change', ?, ?, ?, NOW())`,
+        [
+          userId, // 사용자 자신이 변경한 경우
+          createHash('sha256').update(userId).digest('hex'),
+          `사용자 비밀번호 변경 (${username})`,
+          JSON.stringify({
+            action: 'password_change',
+            method: 'user_self_change',
+            username: username,
+            phone_masked: `${phone.substring(0, 3)}****${phone.substring(phone.length - 4)}`,
+            timestamp: new Date().toISOString(),
+            user_agent: process.env.USER_AGENT || 'server-action'
+          })
+        ]
+      )
+    }
+
+    // 콘솔 로그 (개발/디버깅용)
+    console.log(`🔐 Password changed for user: ${username} (${userId}) at ${new Date().toISOString()}`)
+    
   } catch (error) {
     console.error('Log password change error:', error)
     // 로그 기록 실패는 비밀번호 변경 성공에 영향을 주지 않음
   }
 }
 
-// 비밀번호 강도 점수 계산 (클라이언트에서 사용할 수 있는 유틸리티)
-export function calculatePasswordStrength(password: string): {
-  score: number
-  feedback: string[]
-  isStrong: boolean
-} {
-  let score = 0
-  const feedback: string[] = []
-
-  if (password.length >= 8) {
-    score += 1
-  } else {
-    feedback.push('8자 이상 사용하세요')
+/**
+ * 테이블 존재 여부 확인 유틸리티
+ */
+async function checkTableExists(tableName: string): Promise<boolean> {
+  try {
+    const result = await queryOne(
+      `SELECT COUNT(*) as count 
+       FROM information_schema.tables 
+       WHERE table_schema = DATABASE() AND table_name = ?`,
+      [tableName]
+    )
+    return result && result.count > 0
+  } catch (error) {
+    console.warn(`테이블 ${tableName} 존재 여부 확인 실패:`, error)
+    return false
   }
+}
 
-  if (/[a-z]/.test(password)) {
-    score += 1
-  } else {
-    feedback.push('소문자를 포함하세요')
+/**
+ * 현재 사용자 세션 정보 조회 (다른 컴포넌트에서 사용 가능)
+ */
+export async function getCurrentUser() {
+  try {
+    const cookieStore = await cookies()
+    const sessionToken = cookieStore.get('session-token')?.value
+
+    if (!sessionToken) {
+      return null
+    }
+
+    const user = await queryOne(
+      `SELECT id, name, username, role, email, phone, last_activity_at
+       FROM users 
+       WHERE session_token = ? AND session_expires_at > NOW()`,
+      [sessionToken]
+    )
+
+    return user
+  } catch (error) {
+    console.error('Get current user error:', error)
+    return null
   }
+}
 
-  if (/[A-Z]/.test(password)) {
-    score += 1
-  } else {
-    feedback.push('대문자를 포함하세요')
-  }
+/**
+ * 비밀번호 변경 이력 조회 (보안 감사용)
+ */
+export async function getPasswordChangeHistory(limit: number = 10) {
+  try {
+    const cookieStore = await cookies()
+    const sessionToken = cookieStore.get('session-token')?.value
 
-  if (/\d/.test(password)) {
-    score += 1
-  } else {
-    feedback.push('숫자를 포함하세요')
-  }
+    if (!sessionToken) {
+      return []
+    }
 
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    score += 1
-  } else {
-    feedback.push('특수문자를 포함하세요')
-  }
+    const user = await queryOne(
+      'SELECT id FROM users WHERE session_token = ?',
+      [sessionToken]
+    )
 
-  if (password.length >= 12) {
-    score += 1
-  }
+    if (!user) {
+      return []
+    }
 
-  return {
-    score,
-    feedback,
-    isStrong: score >= 4
+    // admin_actions 테이블에서 비밀번호 변경 이력 조회
+    const history = await query(
+      `SELECT created_at, reason, metadata
+       FROM admin_actions 
+       WHERE admin_id = ? AND action_type = 'password_change'
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [user.id, limit]
+    )
+
+    return history || []
+  } catch (error) {
+    console.error('Get password change history error:', error)
+    return []
   }
 }

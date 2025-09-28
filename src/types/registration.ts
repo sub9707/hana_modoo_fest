@@ -4,6 +4,28 @@ export type ParticipantType = 'citizen' | 'single-parent' | 'self-help' | 'volun
 // 신청 상태
 export type RegistrationStatus = 'pending' | 'confirmed' | 'cancelled'
 
+// 카카오 우편번호 API 응답 타입
+export interface KakaoAddress {
+  address: string           // 기본 주소
+  roadAddress: string       // 도로명 주소  
+  jibunAddress: string      // 지번 주소
+  zonecode: string          // 우편번호 (5자리)
+  zip_code: string          // 우편번호 별칭
+  addressType: 'R' | 'J'    // R: 도로명, J: 지번
+  userSelectedType: 'R' | 'J' // 사용자가 선택한 주소 타입
+  bname: string             // 법정동명
+  buildingName: string      // 건물명
+  apartment: 'Y' | 'N'      // 공동주택 여부
+  sido: string              // 시도
+  sigungu: string           // 시군구
+  roadname: string          // 도로명
+  buildingCode: string      // 건물관리번호
+  postcode: string          // 구 우편번호 (6자리)
+  postcode1: string         // 구 우편번호 앞 3자리
+  postcode2: string         // 구 우편번호 뒤 3자리
+  postcodeSeq: string       // 우편번호 일련번호
+}
+
 // 기본 Registration 인터페이스
 export interface Registration {
   id: string
@@ -100,4 +122,13 @@ export interface RegistrationExportData {
   개인정보수집동의: string
   상태: string
   신청일시: string
+}
+
+// 주소 검색 관련 타입
+export interface AddressSearchResult {
+  address: string
+  zip_code: string
+  roadAddress?: string
+  jibunAddress?: string
+  extraAddress?: string
 }

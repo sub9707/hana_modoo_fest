@@ -38,7 +38,8 @@ export const metadata: Metadata = {
     robots: {
         index: true,
         follow: true,
-    }
+    },
+    metadataBase: new URL('https://www.모두하나대축제.com')
 }
 
 export default function SiteLayout({

@@ -36,6 +36,7 @@ export default async function RegistrationPage() {
 
   const registration = existingRegistration ? {
     id: existingRegistration.id,
+    user_id: existingRegistration.user_id,
     registration_number: existingRegistration.registration_number,
     participant_type: existingRegistration.participant_type,
     companions: existingRegistration.companions,

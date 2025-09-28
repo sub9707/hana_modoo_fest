@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { User } from '@/types/auth'
-import type { RegistrationFormData, KakaoAddress } from '@/types/registration'
+import type { RegistrationFormData, AddressSearchResult } from '@/types/registration'
 import KakaoAddressSearch from './KakaoAddressSearch'
 
 interface RegistrationFormProps {
@@ -50,7 +50,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
   ]
 
   // 주소 선택 시 처리
-  const handleAddressSelect = (addressData: KakaoAddress) => {
+  const handleAddressSelect = (addressData: AddressSearchResult) => {
     setValue('address', addressData.address, { shouldValidate: true })
     setValue('zip_code', addressData.zip_code, { shouldValidate: true })
     // 상세주소 입력 필드로 포커스 이동
@@ -90,107 +90,106 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 font-paper">
-      {/* 1. 참가자 정보 (수정 불가) */}
+      {/* 1. 사용자 기본 정보 표시 */}
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">참가자 정보</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">신청자 정보</h3>
           <p className="text-sm text-gray-600">
-            로그인된 계정 정보로 자동 입력됩니다. (수정 불가)
+            로그인된 계정 정보로 자동 입력됩니다.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              성명 *
-            </label>
-            <input
-              type="text"
-              value={user.name}
-              disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              연락처 *
-            </label>
-            <input
-              type="tel"
-              value={user.phone}
-              disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">이름</label>
+              <input
+                type="text"
+                value={user.name}
+                disabled
+                className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">전화번호</label>
+              <input
+                type="text"
+                value={user.phone}
+                disabled
+                className="mt-1 w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-500"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. 참가 대상 선택 */}
+      {/* 2. 참가 유형 선택 */}
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">참가 대상 *</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">참가 유형 *</h3>
           <p className="text-sm text-gray-600">
-            해당하는 참가 대상을 선택해주세요.
+            해당하는 참가 유형을 선택해주세요.
           </p>
         </div>
         
-        <Controller
-          name="participant_type"
-          control={control}
-          rules={{ required: '참가 대상을 선택해주세요.' }}
-          render={({ field }) => (
-            <div className="space-y-3">
-              {participantTypes.map((type) => (
-                <label
-                  key={type.id}
-                  className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    field.value === type.id
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="radio"
-                      {...field}
-                      value={type.id}
-                      checked={field.value === type.id}
-                      className="mt-1 text-orange-600 focus:ring-orange-500"
-                    />
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-800">{type.name}</div>
-                      <div className="text-sm text-gray-600">{type.description}</div>
-                    </div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {participantTypes.map((type) => (
+            <label
+              key={type.id}
+              className={`
+                relative flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all
+                ${watch('participant_type') === type.id 
+                  ? 'border-orange-500 bg-orange-50' 
+                  : 'border-gray-200 hover:border-orange-300 hover:bg-orange-25'
+                }
+              `}
+            >
+              <input
+                type="radio"
+                value={type.id}
+                {...register('participant_type', { required: '참가 유형을 선택해주세요.' })}
+                className="sr-only"
+              />
+              <div className="flex-1">
+                <div className="font-semibold text-gray-900">{type.name}</div>
+                <div className="text-sm text-gray-600 mt-1">{type.description}</div>
+              </div>
+              {watch('participant_type') === type.id && (
+                <div className="absolute top-4 right-4 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              )}
+            </label>
+          ))}
+        </div>
         {errors.participant_type && (
-          <p className="text-red-600 text-sm mt-1" role="alert">
+          <p className="text-red-600 text-sm" role="alert">
             {errors.participant_type.message}
           </p>
         )}
       </section>
 
-      {/* 3. 동반 참가자 */}
+      {/* 3. 동반자 정보 */}
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">
-          <h3 className="text-xl font-bold text-gray-800 mb-2">동반 참가자</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">동반자 정보</h3>
+          <p className="text-sm text-gray-600">
+            함께 참석할 동반자 정보를 입력해주세요. (본인 제외)
+          </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="companions" className="block text-sm font-medium text-gray-700 mb-2">
-              동반 인원 (본인 제외)
+              동반자 수 (본인 제외) *
             </label>
             <select
               id="companions"
               {...register('companions', {
                 valueAsNumber: true,
-                min: { value: 0, message: '동반 인원은 0명 이상이어야 합니다.' },
+                min: { value: 0, message: '동반자 수는 0명 이상이어야 합니다.' },
                 max: { value: 10, message: '동반 인원은 10명을 초과할 수 없습니다.' }
               })}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
@@ -305,77 +304,76 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
         </div>
       </section>
 
-      {/* 6. 개인정보 동의 */}
+      {/* 6. 개인정보 및 마케팅 동의 */}
       <section className="space-y-6">
         <div className="border-b border-gray-200 pb-4">
           <h3 className="text-xl font-bold text-gray-800 mb-2">개인정보 처리 동의</h3>
         </div>
         
         <div className="space-y-4">
-          {/* 필수 동의 */}
-          <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-            <label className="flex items-start space-x-3">
-              <input
-                type="checkbox"
-                {...register('privacy_consent', {
-                  required: '개인정보 수집·이용에 동의해주세요.'
-                })}
-                className="mt-1 text-orange-600 focus:ring-orange-500"
-              />
-              <div className="flex-1">
-                <div className="font-semibold text-gray-800 mb-1">
-                  개인정보 수집·이용 동의 (필수) *
-                </div>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>• 수집항목: 성명, 연락처, 참가 정보, 주소</p>
-                  <p>• 이용목적: 축제 참가 관리, 경품 발송, 안내사항 전달, 안전관리</p>
-                  <p>• 보유기간: 축제 종료 후 1년 (법정 보관기간 준수)</p>
-                  <p>• 동의거부권: 동의를 거부할 수 있으나, 축제 참가신청이 제한됩니다.</p>
-                </div>
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="privacy_consent"
+              {...register('privacy_consent', { required: '개인정보 수집 및 이용에 동의해주세요.' })}
+              className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+            />
+            <label htmlFor="privacy_consent" className="ml-3 text-sm text-gray-700">
+              <span className="font-medium text-red-600">* [필수]</span> 개인정보 수집 및 이용에 동의합니다.
+              <div className="mt-1 text-xs text-gray-500">
+                참가신청, 행사 안내, 경품 배송을 위해 개인정보를 수집·이용합니다.
               </div>
             </label>
-            {errors.privacy_consent && (
-              <p className="text-red-600 text-sm mt-2" role="alert">
-                {errors.privacy_consent.message}
-              </p>
-            )}
           </div>
+          {errors.privacy_consent && (
+            <p className="text-red-600 text-sm" role="alert">
+              {errors.privacy_consent.message}
+            </p>
+          )}
 
+          <div className="flex items-start">
+            <input
+              type="checkbox"
+              id="marketing_consent"
+              {...register('marketing_consent')}
+              className="mt-1 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+            />
+            <label htmlFor="marketing_consent" className="ml-3 text-sm text-gray-700">
+              <span className="font-medium text-gray-600">[선택]</span> 마케팅 정보 수신에 동의합니다.
+              <div className="mt-1 text-xs text-gray-500">
+                향후 행사 안내 및 이벤트 정보를 받아보실 수 있습니다.
+              </div>
+            </label>
+          </div>
         </div>
       </section>
 
       {/* 제출 버튼 */}
-      <div className="pt-6 border-t border-gray-200">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-          >
-            뒤로 가기
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting || !privacyConsent}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-400 to-pink-500 text-white font-medium rounded-lg hover:from-orange-500 hover:to-pink-600 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                신청 처리 중...
-              </span>
-            ) : (
-              '사전참가 신청하기'
-            )}
-          </button>
-        </div>
-        
-        <p className="text-sm text-gray-500 mt-4 text-center">
-          신청 완료 후 휴대폰으로 확인 안내를 보내드립니다.
-        </p>
+      <div className="pt-6">
+        <button
+          type="submit"
+          disabled={isSubmitting || !privacyConsent}
+          className={`
+            w-full flex justify-center py-4 px-6 border border-transparent 
+            text-lg font-bold rounded-xl text-white transition-all duration-200
+            ${isSubmitting || !privacyConsent
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:shadow-lg transform hover:scale-[1.02]'
+            }
+          `}
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              신청 처리 중...
+            </span>
+          ) : (
+            '사전참가 신청하기'
+          )}
+        </button>
       </div>
     </form>
   )

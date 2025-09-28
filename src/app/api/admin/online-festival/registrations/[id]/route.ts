@@ -5,7 +5,7 @@ import { query } from '@/lib/mysql/connection'
 // DELETE: 사전접수 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+   { params }: { params: any }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function DELETE(
       )
     }
 
-    const { id } = params
+    const { id } = (await params) as { id: string }
 
     // 사전접수 존재 확인
     const existingRegistration = await query(

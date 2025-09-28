@@ -8,7 +8,7 @@ interface RouteParams {
 
 // GET: 특정 사용자 정보 조회
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params
+  const { id } = (await params) as { id: string }
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PUT: 사용자 정보 업데이트
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params
+  const { id } = (await params) as { id: string }
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 // DELETE: 사용자 삭제
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params
+  const { id } = (await params) as { id: string }
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()

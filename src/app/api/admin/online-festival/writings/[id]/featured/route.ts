@@ -5,7 +5,7 @@ import { query } from '@/lib/mysql/connection'
 // PATCH: 우수작품 토글
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+   { params }: { params: any }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function PATCH(
       )
     }
 
-    const { id } = params
+    const { id } = (await params) as { id: string }
     const { is_featured } = await request.json()
 
     // 글 존재 확인

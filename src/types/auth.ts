@@ -1,5 +1,8 @@
-// types/auth.ts
-// 기본 사용자 타입 정의
+// src/types/auth.ts
+
+/**
+ * 사용자 기본 정보 타입
+ */
 export interface User {
   id: string
   name: string
@@ -8,9 +11,12 @@ export interface User {
   gender: 'male' | 'female' | 'none'
   birth_date: string
   phone: string
+  address?: string
+  address_detail?: string
+  zip_code?: string
+  role: 'admin' | 'editor' | 'user'
   email?: string
   profile_image?: string
-  role: 'admin' | 'editor' | 'user'
   signup_method: 'phone' | 'naver' | 'kakao'
   last_login_at?: string
   last_activity_at?: string
@@ -18,15 +24,65 @@ export interface User {
   updated_at: string
 }
 
-// 데이터베이스 사용자 타입 (내부 필드 포함)
-export interface DatabaseUser extends User {
-  password_hash: string
-  password_salt: string
-  session_token?: string
-  session_expires_at?: string
+/**
+ * 세션 정보 타입
+ */
+export interface UserSession {
+  id: string
+  name: string
+  username: string
+  role: 'admin' | 'editor' | 'user'
+  email?: string
+  phone: string
+  session_token: string
+  session_expires_at: string
 }
 
-// SNS 계정 정보 타입
+/**
+ * 로그인 응답 타입
+ */
+export interface LoginResponse {
+  success: boolean
+  user?: {
+    id: string
+    name: string
+    username: string
+    role: string
+  }
+  error?: string
+}
+
+/**
+ * 비밀번호 변경 요청 타입
+ */
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
+/**
+ * 비밀번호 변경 응답 타입
+ */
+export interface ChangePasswordResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+/**
+ * 비밀번호 강도 결과 타입 (유틸리티에서 재사용)
+ */
+export interface PasswordStrengthResult {
+  score: number
+  feedback: string[]
+  isStrong: boolean
+  strength: 'very-weak' | 'weak' | 'fair' | 'good' | 'strong'
+}
+
+/**
+ * 소셜 계정 정보 타입
+ */
 export interface SocialAccount {
   id: string
   user_id: string
@@ -42,40 +98,10 @@ export interface SocialAccount {
   updated_at: string
 }
 
-// 전화번호 인증 타입
-export interface PhoneVerification {
-  id: string
-  phone: string
-  code: string
-  ip_address: string
-  user_agent?: string
-  attempt_count: number
-  verified: boolean
-  expires_at: string
-  created_at: string
-  updated_at: string
-}
-
-// 인증 제한 타입
-export interface VerificationLimit {
-  id: string
-  identifier: string
-  type: 'ip' | 'phone'
-  attempt_count: number
-  last_attempt_at: string
-  blocked_until?: string
-  created_at: string
-  updated_at: string
-}
-
-// 로그인 폼 타입
-export interface LoginFormData {
-  username: string
-  password: string
-}
-
-// 전화번호 회원가입 폼 타입
-export interface PhoneRegistrationFormData {
+/**
+ * 회원가입 요청 타입
+ */
+export interface SignupRequest {
   name: string
   username: string
   password: string
@@ -84,95 +110,46 @@ export interface PhoneRegistrationFormData {
   gender: 'male' | 'female' | 'none'
   birthDate: string
   company?: string
+  address?: string
+  addressDetail?: string
+  zipCode?: string
+  privacyConsent: boolean
+  marketingConsent?: boolean
 }
 
-// SNS 회원가입 폼 타입
-export interface SocialRegistrationFormData {
-  name: string
-  username: string
-  password: string
-  confirmPassword: string
+/**
+ * 비밀번호 재설정 요청 타입
+ */
+export interface ResetPasswordRequest {
   phone: string
-  gender: 'male' | 'female' | 'none'
-  birthDate: string
+  newPassword: string
+  confirmPassword: string
+  verificationCode: string
+}
+
+/**
+ * 프로필 업데이트 요청 타입
+ */
+export interface UpdateProfileRequest {
+  name: string
   company?: string
+  address?: string
+  addressDetail?: string
+  zipCode?: string
 }
 
-// 로그인 응답 타입
-export interface LoginResponse {
-  success?: boolean
-  error?: string
-  user?: Pick<User, 'id' | 'name' | 'username' | 'role'>
+/**
+ * 인증 에러 타입
+ */
+export interface AuthError {
+  message: string
+  code?: string
+  path?: string[]
 }
 
-// 회원가입 응답 타입
-export interface RegistrationResponse {
-  success?: boolean
-  error?: string
-  userId?: string
-}
-
-// 인증번호 발송 응답 타입
-export interface SendVerificationResponse {
-  success?: boolean
-  error?: string
-  message?: string
-  expiresIn?: number
-  remainingSeconds?: number
-  existingUser?: boolean
-  signupMethod?: string
-}
-
-// 인증번호 확인 응답 타입
-export interface VerifyCodeResponse {
-  success?: boolean
-  error?: string
-  message?: string
-  phone?: string
-  remainingAttempts?: number
-  blocked?: boolean
-  blockDurationMinutes?: number
-  blockedUntil?: string
-  remainingMinutes?: number
-}
-
-// OAuth 사용자 데이터 타입
-export interface OAuthUserData {
-  id: string
-  email?: string
-  name?: string
-  profileImage?: string
-}
-
-// OAuth 제공자 설정 타입
-export interface OAuthProviderConfig {
-  clientId: string
-  clientSecret: string
-  authUrl: string
-  tokenUrl: string
-  userUrl: string
-  scope: string
-}
-
-// 세션 정보 타입
-export interface SessionInfo {
-  user: User
-  expiresAt: string
-}
-
-// 권한 레벨 타입
-export type Role = 'admin' | 'editor' | 'user'
-
-// 가입 방법 타입
-export type SignupMethod = 'phone' | 'naver' | 'kakao'
-
-// OAuth 제공자 타입
-export type OAuthProvider = 'naver' | 'kakao'
-
-// 권한 계층 타입
-export type RoleHierarchy = Record<Role, number>
-
-// API 응답 기본 타입
+/**
+ * API 응답 기본 타입
+ */
 export interface ApiResponse<T = any> {
   success: boolean
   data?: T
@@ -180,88 +157,30 @@ export interface ApiResponse<T = any> {
   message?: string
 }
 
-// 페이지네이션 타입
-export interface Pagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-}
+/**
+ * 세션 상태 타입
+ */
+export type SessionStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
-// 필터 옵션 타입
-export interface UserFilterOptions {
-  role?: Role
-  signupMethod?: SignupMethod
-  search?: string
-  dateFrom?: string
-  dateTo?: string
-}
+/**
+ * 권한 레벨 타입
+ */
+export type Role = 'admin' | 'editor' | 'user'
 
-// 사용자 목록 응답 타입
-export interface UsersListResponse extends ApiResponse {
-  data?: {
-    users: User[]
-    pagination: Pagination
-  }
-}
-
-// 프로필 업데이트 타입
-export interface ProfileUpdateData {
-  name?: string
-  company?: string
-  phone?: string
-  gender?: 'male' | 'female' | 'none'
-  birth_date?: string
-}
-
-// 비밀번호 변경 타입
-export interface PasswordChangeData {
-  currentPassword: string
-  newPassword: string
-  confirmNewPassword: string
-}
-
-// 계정 연결/해제 타입
-export interface AccountLinkData {
-  provider: OAuthProvider
-  action: 'link' | 'unlink'
-}
-
-// 관리자 사용자 관리 타입
-export interface AdminUserUpdateData {
-  name?: string
-  username?: string
-  role?: Role
-  company?: string
-  phone?: string
-  email?: string
-  gender?: 'male' | 'female' | 'none'
-  birth_date?: string
-}
-
-// 통계 데이터 타입
-export interface UserStats {
-  totalUsers: number
-  newUsersToday: number
-  newUsersThisMonth: number
-  usersBySignupMethod: Record<SignupMethod, number>
-  usersByRole: Record<Role, number>
-  activeUsersToday: number
-  activeUsersThisWeek: number
-}
-
-// 활동 로그 타입
-export interface ActivityLog {
+/**
+ * 로그인 이력 타입
+ */
+export interface LoginHistory {
   id: string
   user_id: string
-  action: string
-  details?: string
   ip_address: string
   user_agent?: string
   created_at: string
 }
 
-// 보안 이벤트 타입
+/**
+ * 보안 이벤트 타입
+ */
 export interface SecurityEvent {
   id: string
   user_id?: string
@@ -273,7 +192,9 @@ export interface SecurityEvent {
   created_at: string
 }
 
-// 설정 타입
+/**
+ * 앱 설정 타입
+ */
 export interface AppSettings {
   allowPhoneRegistration: boolean
   allowNaverLogin: boolean
@@ -285,3 +206,155 @@ export interface AppSettings {
   smsRateLimitPerDay: number
 }
 
+/**
+ * 관리자 액션 로그 타입
+ */
+export interface AdminAction {
+  id: string
+  admin_id: string
+  action_type: 'user_blacklist' | 'user_unblock' | 'force_deletion' | 'pattern_review' | 'password_change'
+  target_user_hash?: string
+  target_phone_hash?: string
+  reason?: string
+  metadata?: any
+  created_at: string
+}
+
+/**
+ * 계정 삭제 정보 타입
+ */
+export interface AccountDeletion {
+  id: string
+  user_id_hash: string
+  phone_hash: string
+  email_hash?: string
+  ip_address: string
+  signup_method: 'phone' | 'naver' | 'kakao'
+  deletion_reason?: 'privacy_concern' | 'service_dissatisfaction' | 'no_longer_needed' | 'duplicate_account' | 'other'
+  deletion_reason_detail?: string
+  account_age_days: number
+  last_activity_days_ago?: number
+  total_logins: number
+  had_social_accounts: boolean
+  deleted_at: string
+  deleted_by_admin: boolean
+  admin_id?: string
+}
+
+/**
+ * 사용자 블랙리스트 타입
+ */
+export interface UserBlacklist {
+  id: string
+  phone_hash: string
+  email_hash?: string
+  ip_address?: string
+  blacklist_reason: 'excessive_signup_deletion' | 'fraud_suspicion' | 'abuse' | 'admin_decision' | 'automated_behavior'
+  evidence_data?: any
+  blocked_until?: string
+  created_by?: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * 인증 제한 타입
+ */
+export interface VerificationLimit {
+  id: string
+  identifier: string
+  type: 'ip' | 'phone'
+  attempt_count: number
+  last_attempt_at: string
+  blocked_until?: string
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * NextJS 15: Server Action 결과 타입
+ */
+export interface ServerActionResult<T = any> {
+  success: boolean
+  data?: T
+  error?: string
+  message?: string
+}
+
+/**
+ * 비밀번호 변경 이력 조회 결과
+ */
+export interface PasswordChangeHistory {
+  created_at: string
+  reason: string
+  metadata?: {
+    action: string
+    method: string
+    username?: string
+    phone_masked?: string
+    timestamp: string
+    user_agent?: string
+  }
+}
+
+/**
+ * 사용자 통계 타입
+ */
+export interface UserStats {
+  total_users: number
+  admin_count: number
+  editor_count: number
+  user_count: number
+  male_count: number
+  female_count: number
+  unknown_gender_count: number
+  new_users_last_30days: number
+  new_users_last_7days: number
+  active_users_last_30days: number
+  active_users_last_7days: number
+}
+
+/**
+ * 폼 검증 상태 타입
+ */
+export interface FormValidationState {
+  isValid: boolean
+  errors: Record<string, string>
+  touched: Record<string, boolean>
+}
+
+/**
+ * 비밀번호 정책 설정
+ */
+export interface PasswordPolicy {
+  minLength: number
+  maxLength: number
+  requireUppercase: boolean
+  requireLowercase: boolean
+  requireNumbers: boolean
+  requireSpecialChars: boolean
+  preventRepetition: boolean
+  preventCommonPasswords: boolean
+  maxAge: number // days
+}
+
+/**
+ * NextJS 15: 클라이언트 컴포넌트 props 타입
+ */
+export interface AuthProviderProps {
+  children: React.ReactNode
+  initialUser?: User | null
+}
+
+/**
+ * 컨텍스트 상태 타입
+ */
+export interface AuthContextState {
+  user: User | null
+  isLoading: boolean
+  isAuthenticated: boolean
+  login: (credentials: { username: string; password: string }) => Promise<LoginResponse>
+  logout: () => Promise<void>
+  updateUser: (userData: Partial<User>) => void
+  refreshUser: () => Promise<void>
+}

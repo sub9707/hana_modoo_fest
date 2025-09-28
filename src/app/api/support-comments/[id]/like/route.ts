@@ -31,7 +31,7 @@ async function invalidateCommentCaches(redis: any, commentId: string) {
 // 좋아요 토글 API - 성능 대폭 개선
 export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context:  { params: any }
 ) {
   const startTime = Date.now()
 
@@ -43,7 +43,7 @@ export async function PATCH(
       return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
     }
 
-    const { id: commentId } = await context.params
+    const { id: commentId } = (await context.params) as { id: string }
     console.log(`[${Date.now() - startTime}ms] 파라미터 파싱 완료`)
 
     // Redis 연결 확인

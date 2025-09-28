@@ -5,7 +5,7 @@ import { query } from '@/lib/mysql/connection'
 // PATCH: 당첨자 수령 상태 토글
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+   { params }: { params: any }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function PATCH(
       )
     }
 
-    const { id } = params
+    const { id } = (await params) as { id: string }
     const { is_claimed, notes } = await request.json()
 
     // 당첨자 존재 확인

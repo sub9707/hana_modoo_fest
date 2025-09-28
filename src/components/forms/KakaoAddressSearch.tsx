@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { KakaoAddress } from '@/types/registration'
+import { AddressSearchResult } from '@/types/registration'
 
 interface KakaoAddressSearchProps {
-  onAddressSelect: (address: KakaoAddress) => void
+  onAddressSelect: (address: AddressSearchResult) => void
   placeholder?: string
   value?: string
   className?: string
@@ -79,8 +79,10 @@ export default function KakaoAddressSearch({
         // 선택된 주소 정보를 부모 컴포넌트로 전달
         onAddressSelect({
           address: fullAddress,
-          address_detail: '',
-          zip_code: data.zonecode
+          zip_code: data.zonecode,
+          roadAddress: data.roadAddress,
+          jibunAddress: data.jibunAddress,
+          extraAddress: extraAddr
         })
       },
       theme: {

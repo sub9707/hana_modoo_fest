@@ -10,7 +10,7 @@ interface RouteParams {
 
 // PATCH: 사용자 역할 변경
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-   const { id } = await params
+   const { id } = (await params) as { id: string }
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()
@@ -72,7 +72,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 // GET: 역할 변경 가능 여부 확인
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params
+  const { id } = (await params) as { id: string }
   try {
     // 권한 확인
     const currentUser = await getCurrentUser()

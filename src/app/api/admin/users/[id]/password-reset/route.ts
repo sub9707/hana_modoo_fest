@@ -9,7 +9,7 @@ interface RouteParams {
 
 // POST: 관리자가 사용자 비밀번호 초기화
 export async function POST(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params
+  const { id } = (await params) as { id: string }
   
   try {
     // 권한 확인

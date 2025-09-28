@@ -6,7 +6,7 @@ import type { ApiResponse } from '@/types/event'
 // 상품 수량 업데이트 (관리자만)
 export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: any }
 ) {
   try {
     const user = await getCurrentUser()
