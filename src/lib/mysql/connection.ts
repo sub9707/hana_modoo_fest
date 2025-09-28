@@ -202,7 +202,10 @@ export async function healthCheck(): Promise<boolean> {
 
 // 연결 풀 정리 함수
 export async function closePool(): Promise<void> {
+  if (!pool) return
   try {
+    // pool이 이미 종료된 상태인지 체크
+    if ((pool as any)._closed) return
     await pool.end()
     console.log('🔌 Database connection pool closed')
   } catch (error) {
@@ -211,7 +214,7 @@ export async function closePool(): Promise<void> {
 }
 
 // 프로세스 종료 시 정리
-if (typeof process !== 'undefined') {
+if (process.env.NODE_ENV === 'production' && typeof process !== 'undefined') {
   process.on('SIGTERM', closePool)
   process.on('SIGINT', closePool)
 }

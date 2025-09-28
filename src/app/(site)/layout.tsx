@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     openGraph: {
         type: 'website',
         locale: 'ko_KR',
-        url: 'https://moduhana2025.seoul.kr',
+        url: 'https://www.모두하나대축제.com',
         title: '모두하나대축제 2025 | 서울시 대표 가족축제',
         description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
         siteName: '모두하나대축제',
