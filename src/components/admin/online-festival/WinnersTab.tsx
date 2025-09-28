@@ -195,39 +195,6 @@ export function WinnersTab() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">수령 완료</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {prizeStats?.claimed_count?.toLocaleString() || 0}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              전체의 {prizeStats?.total_winners ? Math.round(((prizeStats.claimed_count || 0) / prizeStats.total_winners) * 100) : 0}%
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">수령 대기</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {prizeStats?.unclaimed_count?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">총 상품 가치</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              {prizeStats?.total_value ? `${prizeStats.total_value.toLocaleString()}원` : '0원'}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* 상품별 통계 카드 */}
@@ -270,16 +237,6 @@ export function WinnersTab() {
                   {prize.prize_name}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-          <Select value={claimFilter} onValueChange={handleClaimFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="수령 상태" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="true">수령 완료</SelectItem>
-              <SelectItem value="false">수령 대기</SelectItem>
             </SelectContent>
           </Select>
           <Button 

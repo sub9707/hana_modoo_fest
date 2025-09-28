@@ -162,43 +162,6 @@ export function QuizTab() {
             <div className="text-2xl font-bold text-blue-600">{(totalCount || 0).toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">만점자 수</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{(perfectScoreCount || 0).toLocaleString()}</div>
-            <p className="text-xs text-gray-500 mt-1">
-              전체의 {totalCount > 0 ? Math.round(((perfectScoreCount || 0) / totalCount) * 100) : 0}%
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">평균 완료 시간</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {(participants || []).length > 0
-                ? formatCompletionTime(Math.round((participants || []).reduce((sum, p) => sum + (p.completion_time || 0), 0) / (participants || []).length))
-                : '0분 0초'
-              }
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">최고 기록</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-             {(participants || []).length > 0
-                ? formatCompletionTime(Math.min(...(participants || []).filter(p => p.perfect_score).map(p => p.completion_time || 999999)))
-                : '0분 0초'
-              }
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* 검색 및 액션 바 */}

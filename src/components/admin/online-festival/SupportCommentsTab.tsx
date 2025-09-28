@@ -409,7 +409,7 @@ export function SupportCommentsTab() {
               <Button 
                 onClick={() => fetchComments(1, commentSearch)}
                 variant="outline"
-                className="bg-gray-800 text-white hover:bg-gray-700"
+                className="w-35 h-10 flex items-center"
               >
                 <Search className="h-4 w-4 mr-2" />
                 검색
@@ -418,6 +418,7 @@ export function SupportCommentsTab() {
                 onClick={() => fetchComments(commentPage, commentSearch)}
                 variant="outline"
                 disabled={loading}
+                className="w-50 h-10 flex items-center"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 새로고침
