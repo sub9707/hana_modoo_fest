@@ -26,21 +26,11 @@ declare global {
   var __mysql_pool: mysql.Pool | undefined
 }
 
-let pool: mysql.Pool
+// 글로벌 풀 재사용
+const pool: mysql.Pool = global.__mysql_pool || mysql.createPool(config)
 
-if (process.env.NODE_ENV === 'production') {
-  pool = mysql.createPool(config)
-} else {
-  if (!global.__mysql_pool) {
-    console.log('🔌 MySQL 연결 풀 생성:', {
-      host: config.host,
-      port: config.port,
-      database: config.database,
-      connectionLimit: config.connectionLimit
-    })
-    global.__mysql_pool = mysql.createPool(config)
-  }
-  pool = global.__mysql_pool
+if (process.env.NODE_ENV !== 'production') {
+  global.__mysql_pool = pool
 }
 
 export function getPool(): mysql.Pool {
@@ -214,7 +204,7 @@ export async function closePool(): Promise<void> {
 }
 
 // 프로세스 종료 시 정리
-if (process.env.NODE_ENV === 'production' && typeof process !== 'undefined') {
+if (process.env.NODE_ENV === 'development' && typeof process !== 'undefined') {
   process.on('SIGTERM', closePool)
   process.on('SIGINT', closePool)
 }
