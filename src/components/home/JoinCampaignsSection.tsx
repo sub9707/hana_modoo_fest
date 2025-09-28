@@ -22,7 +22,7 @@ async function getCampaignStatsData() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
                    (process.env.NODE_ENV === 'production' 
-                     ? 'https://moduhana2025.seoul.kr' 
+                     ? 'https://www.모두하나대축제.com' 
                      : 'http://localhost:3000')
     
     const response = await fetch(`${baseUrl}/api/campaign/stats`, {
@@ -41,6 +41,7 @@ async function getCampaignStatsData() {
     }
     
     const data = await response.json()
+    console.log(data.data)
     return data.data
   } catch (error) {
     console.error('Error fetching campaign stats:', error)
