@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Loader2 } from 'lucide-react'
 import { menuItems } from '@/config/menuConfig'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -10,7 +10,7 @@ export default function Sidebar() {
   const router = useRouter()
   const pathname = usePathname()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
-  const {user} = useAuth();
+  const { user, isLoading, logout } = useAuth()
   
   // pathname에서 activeMenu 추출
   const getActiveMenuFromPath = () => {
@@ -54,9 +54,23 @@ export default function Sidebar() {
     router.push('/admin')
   }
 
-  const handleLogout = () => {
-    if (confirm('이벤트 페이지로 이동합니다.')) {
-      router.push('/')
+  const handleLogout = async () => {
+    if (confirm('로그아웃 하시겠습니까?')) {
+      await logout()
+    }
+  }
+
+  // 역할 표시 함수
+  const getRoleDisplay = (role?: string) => {
+    switch (role) {
+      case 'admin':
+        return '관리자'
+      case 'editor':
+        return '편집자'
+      case 'user':
+        return '사용자'
+      default:
+        return '역할 미지정'
     }
   }
 
@@ -137,24 +151,61 @@ export default function Sidebar() {
         {/* 관리자 프로필 카드 */}
         <div className="p-4">
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <div className="flex items-center space-x-3 gap-1">
-    
-              {/* 프로필 아이콘 */}
-              <User className="w-8 h-8 text-gray-400 flex-shrink-0" />
-              {/* 프로필 정보 */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
-                  {user!.name}
-                </p>
-                <p className="text-xs text-blue-600 font-medium">
-                  {user!.role ? user!.role === 'admin' ? '관리자' : '운영자' : '역할 미지정'}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {user?.company ? user!.company: '소속 미기재'}
-                </p>
+            {isLoading ? (
+              /* 로딩 상태 */
+              <div className="flex items-center space-x-3">
+                <Loader2 className="w-8 h-8 text-gray-400 animate-spin flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                </div>
               </div>
-              
-            </div>
+            ) : user ? (
+              /* 사용자 정보 표시 */
+              <div className="flex items-center space-x-3">
+                {/* 프로필 아이콘 또는 이미지 */}
+                {user.profile_image ? (
+                  <img 
+                    src={user.profile_image} 
+                    alt="Profile" 
+                    className="w-8 h-8 rounded-full flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
+                    {user.name ? user.name[0].toUpperCase() : user.username[0].toUpperCase()}
+                  </div>
+                )}
+                
+                {/* 프로필 정보 */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {user.name || user.username || '이름 없음'}
+                  </p>
+                  <p className="text-xs text-blue-600 font-medium">
+                    {getRoleDisplay(user.role)}
+                  </p>
+                  {user.company && (
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.company}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* 사용자 정보 없음 */
+              <div className="flex items-center space-x-3">
+                <User className="w-8 h-8 text-gray-400 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">
+                    인증 필요
+                  </p>
+                  <p className="text-xs text-red-600 font-medium">
+                    로그인해주세요
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -162,10 +213,15 @@ export default function Sidebar() {
         <div className="p-4">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm font-medium"
+            disabled={isLoading || !user}
+            className="w-full flex items-center justify-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            나가기
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <LogOut className="w-4 h-4 mr-2" />
+            )}
+            {!user ? '로그인 필요' : '로그아웃'}
           </button>
         </div>
       </div>

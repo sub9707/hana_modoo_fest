@@ -5,9 +5,11 @@ import { Download, UserCheck, RefreshCw, UserPlus } from 'lucide-react'
 import SearchAndFilters from './SearchAndFilters'
 import ChartSection from './ChartSection'
 import UserTable from './UserTable'
-import UserModal from './UserModal'
 import { User } from '@/types/auth'
 import { UserStats } from '@/lib/services/users-service'
+
+// 강화된 UserModal import
+const UserModal = React.lazy(() => import('./UserModal'))
 
 type SortField = 'name' | 'username' | 'company' | 'role' | 'created_at' | 'last_login_at'
 type SortOrder = 'asc' | 'desc'
@@ -32,7 +34,7 @@ export default function UsersManagementClient({
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
   const [loading, setLoading] = useState(false)
 
-  // 통계 재계산 함수 (간단한 버전)
+  // 통계 재계산 함수
   const calculateSimpleStats = (userList: User[]) => {
     const now = new Date()
     return {
@@ -58,12 +60,20 @@ export default function UsersManagementClient({
       const updatedUsers = await response.json()
       setUsers(updatedUsers)
       
-      // 간단한 통계만 계산 (전체 통계는 서버에서만)
       const simpleStats = calculateSimpleStats(updatedUsers)
       setStats(prevStats => ({
         ...prevStats,
         ...simpleStats
       }))
+
+      // 현재 선택된 사용자가 있다면 업데이트
+      if (selectedUser) {
+        const updatedSelectedUser = updatedUsers.find((u: User) => u.id === selectedUser.id)
+        if (updatedSelectedUser) {
+          setSelectedUser(updatedSelectedUser)
+        }
+      }
+
     } catch (error) {
       console.error('Error refreshing users:', error)
       alert(error instanceof Error ? error.message : '사용자 목록 새로고침에 실패했습니다.')
@@ -72,97 +82,43 @@ export default function UsersManagementClient({
     }
   }
 
-  // 사용자 역할 변경
-  const handleRoleChange = async (userId: string, newRole: 'admin' | 'editor' | 'user') => {
-    if (!confirm('사용자의 역할을 변경하시겠습니까?')) {
-      return
-    }
-
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/admin/users/${userId}/role`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role: newRole }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || '역할 변경에 실패했습니다.')
-      }
-
-      // 로컬 상태 업데이트
-      const updatedUsers = users.map(user => 
-        user.id === userId ? { ...user, role: newRole, updated_at: result.user.updated_at } : user
+  // 사용자 업데이트 핸들러 (모달에서 호출)
+  const handleUserUpdate = (updatedUser: User) => {
+    setUsers(prevUsers => 
+      prevUsers.map(user => 
+        user.id === updatedUser.id ? updatedUser : user
       )
-      setUsers(updatedUsers)
-      
-      // 통계 업데이트
-      const simpleStats = calculateSimpleStats(updatedUsers)
-      setStats(prevStats => ({
-        ...prevStats,
-        ...simpleStats
-      }))
-      
-      // 선택된 사용자 정보도 업데이트
-      if (selectedUser && selectedUser.id === userId) {
-        setSelectedUser({ ...selectedUser, role: newRole, updated_at: result.user.updated_at })
-      }
+    )
+    
+    // 통계 업데이트
+    const updatedUsers = users.map(user => 
+      user.id === updatedUser.id ? updatedUser : user
+    )
+    const simpleStats = calculateSimpleStats(updatedUsers)
+    setStats(prevStats => ({
+      ...prevStats,
+      ...simpleStats
+    }))
 
-      alert(result.message || '역할이 성공적으로 변경되었습니다.')
-    } catch (error) {
-      console.error('Error changing user role:', error)
-      alert(error instanceof Error ? error.message : '역할 변경에 실패했습니다.')
-    } finally {
-      setLoading(false)
-    }
+    // 선택된 사용자 정보 업데이트
+    setSelectedUser(updatedUser)
   }
 
-  // 사용자 삭제
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`${userName}님의 계정을 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
-      return
-    }
+  // 사용자 삭제 핸들러 (모달에서 호출)
+  const handleUserDelete = (deletedUserId: string) => {
+    const updatedUsers = users.filter(user => user.id !== deletedUserId)
+    setUsers(updatedUsers)
+    
+    // 통계 업데이트
+    const simpleStats = calculateSimpleStats(updatedUsers)
+    setStats(prevStats => ({
+      ...prevStats,
+      ...simpleStats
+    }))
 
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE',
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || '사용자 삭제에 실패했습니다.')
-      }
-
-      // 로컬 상태에서 사용자 제거
-      const updatedUsers = users.filter(user => user.id !== userId)
-      setUsers(updatedUsers)
-      
-      // 통계 업데이트
-      const simpleStats = calculateSimpleStats(updatedUsers)
-      setStats(prevStats => ({
-        ...prevStats,
-        ...simpleStats
-      }))
-      
-      // 모달이 열려있다면 닫기
-      if (selectedUser && selectedUser.id === userId) {
-        setShowModal(false)
-        setSelectedUser(null)
-      }
-
-      alert(result.message || '사용자가 성공적으로 삭제되었습니다.')
-    } catch (error) {
-      console.error('Error deleting user:', error)
-      alert(error instanceof Error ? error.message : '사용자 삭제에 실패했습니다.')
-    } finally {
-      setLoading(false)
-    }
+    // 모달 닫기
+    setShowModal(false)
+    setSelectedUser(null)
   }
 
   // 날짜 필터링 함수
@@ -194,7 +150,7 @@ export default function UsersManagementClient({
     }
   }
 
-  // 필터링된 및 정렬된 사용자 목록 (메모이제이션)
+  // 필터링 및 정렬된 사용자 목록
   const filteredAndSortedUsers = useMemo(() => {
     // 필터링
     const filtered = users.filter(user => {
@@ -257,7 +213,6 @@ export default function UsersManagementClient({
   const handleExportExcel = async () => {
     setLoading(true)
     try {
-      // 실제로는 서버에서 엑셀 파일을 생성하는 API를 호출
       const response = await fetch('/api/admin/users/export', {
         method: 'POST',
         headers: {
@@ -273,7 +228,6 @@ export default function UsersManagementClient({
         throw new Error('엑셀 내보내기에 실패했습니다.')
       }
 
-      // 파일 다운로드
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -300,7 +254,7 @@ export default function UsersManagementClient({
   }
 
   return (
-    <>
+    <div className="space-y-6">
       {/* 액션 버튼 */}
       <div className="flex justify-end space-x-3">
         <button 
@@ -343,15 +297,29 @@ export default function UsersManagementClient({
         sortOrder={sortOrder}
       />
 
-      {/* 회원 상세 보기 모달 */}
-      <UserModal
-        user={selectedUser}
-        isOpen={showModal}
-        onClose={() => {
-          setShowModal(false)
-          setSelectedUser(null)
-        }}
-      />
-    </>
+      {/* 강화된 회원 상세 보기 모달 */}
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <UserModal
+          user={selectedUser}
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false)
+            setSelectedUser(null)
+          }}
+          onUserUpdate={handleUserUpdate}
+          onUserDelete={handleUserDelete}
+        />
+      </React.Suspense>
+
+      {/* 로딩 오버레이 */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40">
+          <div className="bg-white p-4 rounded-lg flex items-center">
+            <RefreshCw className="w-5 h-5 animate-spin mr-2" />
+            처리 중...
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

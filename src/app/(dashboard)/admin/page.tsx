@@ -28,26 +28,17 @@ export default function AdminPage() {
             모두하나대축제를 효율적으로 관리할 수 있는 통합 관리 시스템입니다. <br/>
           </p>
 
-          <div className="flex justify-center items-center space-x-6 text-sm text-gray-500">
-            <div className="flex items-center">
-              <Shield className="w-4 h-4 mr-2" />
-              보안 인증
-            </div>
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-2" />
-              실시간 모니터링
-            </div>
-            <div className="flex items-center">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              데이터 분석
-            </div>
+          <div className="flex flex-col justify-center items-center space-x-6 text-sm text-gray-500 gap-2">
+            문제 발생 시 아래로 연락주세요.
+            <span className="mx-2">(주)하우두유두 | +82 2-322-9775</span>
+            <span className="mx-2">개발인원 | 010-9404-3714</span>
           </div>
         </div>
 
         {/* 푸터 */}
         <div className="text-center mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            © 2024 모두하나대축제. 관리자 전용 시스템입니다.
+            © 2025모두하나대축제. 관리자 전용 시스템입니다.
           </p>
         </div>
       </div>
