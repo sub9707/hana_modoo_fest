@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import SocialRegistration from '@/components/forms/SocialRegistration'
 import { AlertCircle, CheckCircle, Smartphone, UserPlus } from 'lucide-react'
 import { DirectRegistrationForm } from '@/components/forms/DirectRegistration'
-import { PhoneRegistration } from '@/components/forms/PhoneRegistration'
 
 type RegistrationStep = 'method' | 'phone' | 'direct' | 'social' | 'complete'
 
@@ -222,13 +221,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       {registrationStep === 'method' && renderMethodSelection()}
-      
-      {registrationStep === 'phone' && (
-        <PhoneRegistration
-          onBack={handleBackToMethod}
-          onComplete={handleRegistrationComplete}
-        />
-      )}
       
       {registrationStep === 'direct' && (
         <DirectRegistrationForm onBack={handleBackToMethod} />

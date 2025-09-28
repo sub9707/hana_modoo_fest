@@ -12,6 +12,7 @@ import {
 import { directRegistrationSchema, type DirectRegistrationData } from '@/lib/validations/registration'
 import { AddressSearchResult, type DuplicationCheckResponse } from '@/types/registration'
 import KakaoAddressSearch from './KakaoAddressSearch'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface DirectRegistrationFormProps {
     onBack: () => void
@@ -19,6 +20,7 @@ interface DirectRegistrationFormProps {
 
 export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) {
     const router = useRouter()
+    const { login } = useAuth()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -60,10 +62,27 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
         mode: 'onChange'
     })
 
-    // NextJS 15: 디바운스된 중복 체크
-    const checkUsername = useCallback(async (username: string) => {
+    // 사용자명 중복 체크 함수
+    const checkUsername = useCallback(async () => {
+        const username = form.getValues('username')
+        
         if (!username || username.length < 4) {
-            setUsernameCheck({ isChecking: false, isChecked: false, available: false, message: '' })
+            setUsernameCheck({ 
+                isChecking: false, 
+                isChecked: false, 
+                available: false, 
+                message: '사용자명은 4글자 이상 입력해주세요' 
+            })
+            return
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setUsernameCheck({ 
+                isChecking: false, 
+                isChecked: false, 
+                available: false, 
+                message: '영문, 숫자, 언더바만 사용 가능합니다' 
+            })
             return
         }
 
@@ -91,11 +110,29 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                 message: '중복 확인 중 오류가 발생했습니다'
             })
         }
-    }, [])
+    }, [form])
 
-    const checkPhone = useCallback(async (phone: string) => {
+    // 전화번호 중복 체크 함수
+    const checkPhone = useCallback(async () => {
+        const phone = form.getValues('phone')
+        
         if (!phone || phone.length !== 11) {
-            setPhoneCheck({ isChecking: false, isChecked: false, available: false, message: '' })
+            setPhoneCheck({ 
+                isChecking: false, 
+                isChecked: false, 
+                available: false, 
+                message: '휴대폰 번호 11자리를 입력해주세요' 
+            })
+            return
+        }
+
+        if (!phone.startsWith('01')) {
+            setPhoneCheck({ 
+                isChecking: false, 
+                isChecked: false, 
+                available: false, 
+                message: '올바른 휴대폰 번호를 입력해주세요' 
+            })
             return
         }
 
@@ -123,7 +160,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                 message: '중복 확인 중 오류가 발생했습니다'
             })
         }
-    }, [])
+    }, [form])
 
     // 전화번호 포맷팅
     const formatPhone = (value: string) => {
@@ -159,7 +196,19 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             const result = await response.json()
 
             if (result.success) {
-                router.push('/?registered=true')
+                console.log('DirectRegistration: Registration successful', result)
+
+                // AuthContext에 사용자 정보 설정
+                if (result.user) {
+                    console.log('DirectRegistration: Setting user in context', result.user)
+                    login(result.user)
+                }
+
+                // 성공 메시지와 함께 메인 페이지로 이동
+                const redirectUrl = new URL('/', window.location.origin)
+                redirectUrl.searchParams.set('signup_success', 'true')
+
+                router.push(redirectUrl.pathname + redirectUrl.search)
             } else {
                 setSubmitError(result.error || '회원가입에 실패했습니다')
             }
@@ -237,27 +286,39 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             사용자명 <span className="text-red-500">*</span>
                         </label>
-                        <div className="relative">
-                            <input
-                                {...form.register('username', {
-                                    onChange: (e) => {
-                                        const value = e.target.value
-                                        if (value !== usernameCheck.message) {
+                        <div className="flex gap-2">
+                            <div className="flex-1 relative">
+                                <input
+                                    {...form.register('username', {
+                                        onChange: () => {
+                                            // 입력이 변경되면 중복 체크 상태 초기화
                                             setUsernameCheck({ isChecking: false, isChecked: false, available: false, message: '' })
                                         }
-                                        // 디바운스
-                                        setTimeout(() => checkUsername(value), 500)
-                                    }
-                                })}
-                                type="text"
-                                placeholder="user123"
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                {usernameCheck.isChecking && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
-                                {usernameCheck.isChecked && usernameCheck.available && <Check className="h-4 w-4 text-green-500" />}
-                                {usernameCheck.isChecked && !usernameCheck.available && <X className="h-4 w-4 text-red-500" />}
+                                    })}
+                                    type="text"
+                                    placeholder="user123"
+                                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                    {usernameCheck.isChecked && usernameCheck.available && <Check className="h-4 w-4 text-green-500" />}
+                                    {usernameCheck.isChecked && !usernameCheck.available && <X className="h-4 w-4 text-red-500" />}
+                                </div>
                             </div>
+                            <button
+                                type="button"
+                                onClick={checkUsername}
+                                disabled={usernameCheck.isChecking || !form.getValues('username')}
+                                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                            >
+                                {usernameCheck.isChecking ? (
+                                    <>
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                        확인중
+                                    </>
+                                ) : (
+                                    '중복확인'
+                                )}
+                            </button>
                         </div>
                         {form.formState.errors.username && (
                             <p className="mt-1 text-sm text-red-600">{form.formState.errors.username.message}</p>
@@ -333,30 +394,42 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                             휴대폰 번호 <span className="text-red-500">*</span>
                             <span className="text-xs text-blue-600 ml-2">(경품 수령용 - 정확히 입력해주세요)</span>
                         </label>
-                        <div className="relative">
-                            <input
-                                {...form.register('phone', {
-                                    onChange: (e) => {
-                                        const value = e.target.value.replace(/[^\d]/g, '')
-                                        e.target.value = formatPhone(value)
-                                        form.setValue('phone', value)
-
-                                        if (value !== phoneCheck.message) {
+                        <div className="flex gap-2">
+                            <div className="flex-1 relative">
+                                <input
+                                    {...form.register('phone', {
+                                        onChange: (e) => {
+                                            const value = e.target.value.replace(/[^\d]/g, '')
+                                            e.target.value = formatPhone(value)
+                                            form.setValue('phone', value)
+                                            // 입력이 변경되면 중복 체크 상태 초기화
                                             setPhoneCheck({ isChecking: false, isChecked: false, available: false, message: '' })
                                         }
-                                        // 디바운스
-                                        setTimeout(() => checkPhone(value), 500)
-                                    }
-                                })}
-                                type="tel"
-                                placeholder="010-0000-0000"
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                {phoneCheck.isChecking && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
-                                {phoneCheck.isChecked && phoneCheck.available && <Check className="h-4 w-4 text-green-500" />}
-                                {phoneCheck.isChecked && !phoneCheck.available && <X className="h-4 w-4 text-red-500" />}
+                                    })}
+                                    type="tel"
+                                    placeholder="010-0000-0000"
+                                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                    {phoneCheck.isChecked && phoneCheck.available && <Check className="h-4 w-4 text-green-500" />}
+                                    {phoneCheck.isChecked && !phoneCheck.available && <X className="h-4 w-4 text-red-500" />}
+                                </div>
                             </div>
+                            <button
+                                type="button"
+                                onClick={checkPhone}
+                                disabled={phoneCheck.isChecking || !form.getValues('phone')}
+                                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                            >
+                                {phoneCheck.isChecking ? (
+                                    <>
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                        확인중
+                                    </>
+                                ) : (
+                                    '중복확인'
+                                )}
+                            </button>
                         </div>
                         {form.formState.errors.phone && (
                             <p className="mt-1 text-sm text-red-600">{form.formState.errors.phone.message}</p>
