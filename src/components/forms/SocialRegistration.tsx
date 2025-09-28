@@ -234,7 +234,7 @@ export default function SocialRegistration({
           login(result.user)
 
           // 성공 파라미터와 함께 페이지 이동
-          const finalRedirect = originalRedirect && originalRedirect !== '/dashboard'
+          const finalRedirect = originalRedirect && originalRedirect !== '/my-page'
             ? originalRedirect
             : '/'
 

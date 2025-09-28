@@ -45,7 +45,7 @@ export default async function UsersPage() {
       if (error.message === 'Authentication required') {
         redirect('/login')
       } else if (error.message === 'Insufficient permissions') {
-        redirect('/dashboard')
+        redirect('/')
       }
     }
     

@@ -33,7 +33,6 @@ interface MiddlewareUser {
 
 // 보호된 경로 설정
 const PROTECTED_PATHS = [
-  '/dashboard',
   '/profile', 
   '/settings',
   '/my-page',
@@ -308,7 +307,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // 로그인 페이지 접근 처리
   if (pathname === '/login') {
     if (user) {
-      const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/dashboard'
+      const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/'
       return NextResponse.redirect(new URL(callbackUrl, request.url))
     }
     return response
@@ -317,7 +316,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // 회원가입 페이지 접근 처리
   if (pathname === '/register') {
     if (user) {
-      const dashboardUrl = createRedirectUrl(request, '/dashboard', {
+      const dashboardUrl = createRedirectUrl(request, '/', {
         message: '이미 로그인된 상태입니다.'
       })
       return NextResponse.redirect(dashboardUrl)

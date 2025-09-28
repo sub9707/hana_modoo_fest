@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { LogOut, User } from 'lucide-react'
 import { menuItems } from '@/config/menuConfig'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Sidebar() {
   const router = useRouter()
   const pathname = usePathname()
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null)
+  const {user} = useAuth();
   
   // pathname에서 activeMenu 추출
   const getActiveMenuFromPath = () => {
@@ -56,14 +58,6 @@ export default function Sidebar() {
     if (confirm('이벤트 페이지로 이동합니다.')) {
       router.push('/')
     }
-  }
-
-  // 현재 관리자 정보 (실제로는 컨텍스트나 API에서 가져옴)
-  const adminInfo = {
-    name: '홍길동',
-    role: '최고 관리자',
-    department: '시스템 관리부',
-    avatar: '홍'
   }
 
   return (
@@ -150,13 +144,13 @@ export default function Sidebar() {
               {/* 프로필 정보 */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
-                  {adminInfo.name}
+                  {user!.name}
                 </p>
                 <p className="text-xs text-blue-600 font-medium">
-                  {adminInfo.role}
+                  {user!.role ? user!.role === 'admin' ? '관리자' : '운영자' : '역할 미지정'}
                 </p>
                 <p className="text-xs text-gray-500 truncate">
-                  {adminInfo.department}
+                  {user?.company ? user!.company: '소속 미기재'}
                 </p>
               </div>
               

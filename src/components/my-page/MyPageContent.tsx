@@ -63,7 +63,7 @@ export function MyPageContent({ user }: MyPageContentProps) {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-6 space-y-8 font-paper">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">마이페이지</h1>
@@ -169,6 +169,10 @@ export function MyPageContent({ user }: MyPageContentProps) {
             </div>
           </div>
         </div>
+        <div className='border border-gray-100 mt-5'/>
+          <div className='mt-6 text-sm text-gray-500 text-center'>
+            본 페이지는 회원 정보 열람용입니다. <br/>정보 수정을 위해서는 02-861-3020으로 연락바랍니다.
+          </div>
       </section>
     </div>
   )
