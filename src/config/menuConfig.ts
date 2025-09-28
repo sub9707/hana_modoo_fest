@@ -19,13 +19,7 @@ export const menuItems: MenuItem[] = [
     id: 'online-festival',
     title: '온라인 축제',
     icon: Users,
-    submenu: [
-      { id: 'registration', title: '사전접수', path: '/admin/registration' },
-      { id: 'quiz', title: '퀴즈이벤트', path: '/admin/quiz' },
-      { id: 'comments', title: '응원댓글', path: '/admin/comments' },
-      { id: 'writing', title: '가족주제 글짓기', path: '/admin/writing' },
-      { id: 'random-event', title: '랜덤이벤트', path: '/admin/random-event' }
-    ]
+    path: '/admin/online-festival'
   },
   {
     id: 'news',
