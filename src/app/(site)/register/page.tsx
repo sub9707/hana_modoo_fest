@@ -104,11 +104,11 @@ export default function RegisterPage() {
         {/* 정보 입력 방식 (NEW) */}
         <button
           onClick={() => handleMethodSelect('direct')}
-          className="w-full p-6 border-2 border-blue-500 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group"
+          className="w-full p-6 border-2 border-orange-500 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors group"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-500 rounded-full">
+              <div className="p-3 bg-orange-500 rounded-full">
                 <UserPlus className="h-6 w-6 text-white" />
               </div>
               <div className="text-left">
@@ -120,7 +120,7 @@ export default function RegisterPage() {
         </button>
 
         {/* SNS 가입 방식 */}
-        <button
+        {/* <button
           onClick={() => handleMethodSelect('social')}
           className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-colors group"
         >
@@ -133,7 +133,7 @@ export default function RegisterPage() {
               <p className="text-sm text-gray-600">네이버, 카카오 계정으로 간편 가입</p>
             </div>
           </div>
-        </button>
+        </button> */}
       </div>
 
       <div className="mt-8 text-center">
@@ -170,7 +170,7 @@ export default function RegisterPage() {
         <div className="space-y-3">
           <button
             onClick={() => router.push('/')}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full px-6 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors"
           >
             메인으로 이동
           </button>

@@ -183,7 +183,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
         </div>
 
         {/* SNS 로그인 섹션 */}
-        <div className="mt-8 space-y-3">
+        {/* <div className="mt-8 space-y-3">
           <SocialLoginButton
             provider="naver"
             onClick={() => handleSocialLogin('naver')}
@@ -194,10 +194,10 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
             onClick={() => handleSocialLogin('kakao')}
             isLoading={socialLoading === 'kakao'}
           />
-        </div>
+        </div> */}
 
         {/* 구분선 */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
@@ -206,7 +206,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
               <span className="px-2 bg-white text-gray-500">또는</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
@@ -291,7 +291,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
                 ${isLoading || socialLoading !== null
                   ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-gray-800 hover:bg-gray-700'
                 }
               `}
             >

@@ -34,8 +34,8 @@ export default function CampaignOverview() {
 
         {/* 참여 버튼들 */}
         <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20">
-          <HeroCTAButton href="/" text="사전참가 신청하기" />
-          <HeroCTAButton href="/" text="캠페인 신청하기" />
+          <HeroCTAButton href="/registration" text="사전참가 신청하기" />
+          <HeroCTAButton href="/online-festival" text="캠페인 참여하기" />
         </div>
 
         {/* 통계 섹션 */}

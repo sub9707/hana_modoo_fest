@@ -240,16 +240,16 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             </div>
 
             {/* 경품 관련 안내 */}
-            <div className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+            <div className="mb-8 p-4 bg-gradient-to-r from-orange-50 to-pink-50 border border-orange-200 rounded-lg">
                 <div className="flex items-start space-x-3">
-                    <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-blue-900 mb-1">
+                        <h3 className="text-sm font-semibold text-orange-900 mb-1">
                             중요 안내사항
                         </h3>
-                        <ul className="text-sm text-blue-800 space-y-1">
+                        <ul className="text-sm text-orange-800 space-y-1">
                             <li>• 휴대폰 번호는 경품 지급을 위한 연락처입니다</li>
-                            <li>• 정확한 번호를 입력해주세요 (잘못된 번호 시 경품 수령 불가)</li>
+                            <li>• 정확한 정보를 입력해주세요 (잘못된 번호일 시 경품 수령 불가)</li>
                             <li>• 동일 번호로 중복 가입 시 참여가 제한됩니다</li>
                             <li>• 부정한 방법으로 중복 참여 시 모든 혜택이 박탈됩니다</li>
                         </ul>
@@ -309,7 +309,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 type="button"
                                 onClick={checkUsername}
                                 disabled={usernameCheck.isChecking || !form.getValues('username')}
-                                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                                className="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
                             >
                                 {usernameCheck.isChecking ? (
                                     <>
@@ -420,7 +420,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 type="button"
                                 onClick={checkPhone}
                                 disabled={phoneCheck.isChecking || !form.getValues('phone')}
-                                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                                className="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
                             >
                                 {phoneCheck.isChecking ? (
                                     <>
