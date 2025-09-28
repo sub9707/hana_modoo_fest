@@ -23,8 +23,6 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'latest'
     const offset = (page - 1) * limit
 
-    console.log(`[${Date.now() - startTime}ms] 댓글 목록 조회 시작`)
-
     // Redis에서 캐시된 댓글 목록 확인
     const redisHealthy = await isRedisHealthy()
     let redis: any = null
@@ -38,7 +36,6 @@ export async function GET(request: NextRequest) {
         
         if (cachedComments) {
           comments = JSON.parse(cachedComments)
-          console.log(`[${Date.now() - startTime}ms] Redis 캐시 히트`)
         }
       } catch (error) {
         console.warn('Redis cache read failed:', error)
@@ -47,7 +44,6 @@ export async function GET(request: NextRequest) {
 
     if (comments.length === 0) {
       // 캐시 미스 - DB에서 조회
-      console.log(`[${Date.now() - startTime}ms] DB 조회 시작`)
       
       let orderBy = 'sc.created_at DESC'
       if (sortBy === 'popular') {
@@ -67,8 +63,7 @@ export async function GET(request: NextRequest) {
         ORDER BY ${orderBy}
         LIMIT ? OFFSET ?
       `, [limit, offset])
-      
-      console.log(`[${Date.now() - startTime}ms] DB 조회 완료`)
+    
 
       // Redis에 캐시 저장 (5분)
       if (redis && comments.length > 0) {
@@ -94,7 +89,6 @@ export async function GET(request: NextRequest) {
             comment.isLiked = likedSet.has(comment.id)
           })
           
-          console.log(`[${Date.now() - startTime}ms] Redis 좋아요 정보 조회 완료`)
         } catch (error) {
           console.warn('Redis user likes read failed, falling back to DB:', error)
           // DB fallback
@@ -108,8 +102,6 @@ export async function GET(request: NextRequest) {
         comment.isLiked = false
       })
     }
-
-    console.log(`[${Date.now() - startTime}ms] 댓글 목록 조회 완료`)
 
     return NextResponse.json({
       comments,
@@ -204,8 +196,6 @@ export async function POST(request: NextRequest) {
       VALUES (?, ?, ?)
     `, [commentId, user.id, message.trim()])
 
-    console.log(`[${Date.now() - startTime}ms] 댓글 DB 저장 완료`)
-
     // Redis 실시간 업데이트
     if (redis) {
       const multi = redis.multi()
@@ -237,8 +227,7 @@ export async function POST(request: NextRequest) {
       
       // 댓글 캐시 무효화
       await invalidateCommentCaches(redis, commentId)
-      
-      console.log(`[${Date.now() - startTime}ms] Redis 업데이트 완료`)
+    
     }
 
     // 생성된 댓글 정보 반환
@@ -251,8 +240,6 @@ export async function POST(request: NextRequest) {
       user_id: user.id,
       isLiked: false
     }
-
-    console.log(`[${Date.now() - startTime}ms] 댓글 생성 완료`)
 
     return NextResponse.json({
       success: true,

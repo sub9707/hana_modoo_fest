@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Download, Search, Filter, Calendar } from 'lucide-react'
 import { Registration, RegistrationStatus } from '@/types/admin'
 import { sampleRegistrations } from '@/data/sampleData'
+import { exportToExcel } from '@/lib/utils'
 
 export default function RegistrationManagement() {
   const [registrations] = useState<Registration[]>(sampleRegistrations)
@@ -43,18 +44,16 @@ export default function RegistrationManagement() {
 
   // 엑셀 다운로드 핸들러
   const handleExportExcel = () => {
-    console.log('사전접수자 목록 엑셀 추출 시작...')
-    // 실제로는 API 호출하여 엑셀 파일 생성 후 다운로드
-    // const data = filteredRegistrations.map(reg => ({
-    //   이름: reg.name,
-    //   이메일: reg.email,
-    //   연락처: reg.phone,
-    //   동반인원: reg.companions,
-    //   총참가인원: reg.companions + 1,
-    //   관심프로그램: reg.programs.join(', '),
-    //   접수일: reg.registeredAt
-    // }))
-    // exportToExcel(data, '사전접수자_목록.xlsx')
+
+    const data = filteredRegistrations.map(reg => ({
+      이름: reg.name,
+      연락처: reg.phone,
+      동반인원: reg.companions,
+      총참가인원: reg.companions + 1,
+      관심프로그램: reg.programs.join(', '),
+      접수일: reg.registeredAt
+    }))
+    exportToExcel(data, '사전접수자_목록.xlsx')
   }
 
   return (

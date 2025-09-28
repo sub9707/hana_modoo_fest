@@ -36,7 +36,6 @@ export async function PATCH(
   const startTime = Date.now()
 
   try {
-    console.log(`[${Date.now() - startTime}ms] API 시작`)
 
     const user = await getCurrentUser()
     if (!user) {
@@ -44,7 +43,6 @@ export async function PATCH(
     }
 
     const { id: commentId } = (await context.params) as { id: string }
-    console.log(`[${Date.now() - startTime}ms] 파라미터 파싱 완료`)
 
     // Redis 연결 확인
     const redisHealthy = await isRedisHealthy()
@@ -75,7 +73,6 @@ export async function PATCH(
 
     if (redis) {
       // Redis 기반 빠른 처리
-      console.log(`[${Date.now() - startTime}ms] Redis 처리 시작`)
 
       const multi = redis.multi()
       const userLikesKey = REDIS_KEYS.USER_LIKES(user.id)
@@ -84,7 +81,6 @@ export async function PATCH(
 
       // 현재 좋아요 상태 확인
       const isCurrentlyLiked = await redis.sIsMember(userLikesKey, commentId)
-      console.log(`[${Date.now() - startTime}ms] Redis 좋아요 상태 확인 완료`)
 
       let newLikes: number
       let isLiked: boolean
@@ -110,7 +106,6 @@ export async function PATCH(
       multi.expire(commentLikedUsersKey, 30 * 24 * 3600) // 30일
 
       await multi.exec()
-      console.log(`[${Date.now() - startTime}ms] Redis 트랜잭션 완료`)
 
       // 업데이트된 좋아요 수 조회
       newLikes = await redis.get(commentLikesKey).then((val: string) => parseInt(val || '0'))
@@ -120,7 +115,6 @@ export async function PATCH(
       // 백그라운드에서 DB 동기화 (응답 후 비동기 처리)
       Promise.resolve().then(async () => {
         try {
-          console.log(`Background DB sync started for comment ${commentId}`)
 
           await transaction(async (connection) => {
             // 댓글 존재 확인과 좋아요 상태를 한 번에 조회
@@ -165,7 +159,6 @@ export async function PATCH(
             }
           })
 
-          console.log(`Background DB sync completed for comment ${commentId}`)
         } catch (error) {
           console.error('Background DB sync error:', error)
           // Redis 상태를 DB와 재동기화하는 로직 추가 가능
@@ -177,7 +170,6 @@ export async function PATCH(
 
     } else {
       // Redis 실패 시 기존 DB 방식 (최적화된 버전)
-      console.log(`[${Date.now() - startTime}ms] DB 처리 시작`)
 
       result = await transaction(async (connection) => {
         // 댓글 존재 확인과 좋아요 상태를 한 번에 조회 (쿼리 수 감소)
@@ -228,10 +220,8 @@ export async function PATCH(
         }
       })
 
-      console.log(`[${Date.now() - startTime}ms] DB 트랜잭션 완료`)
     }
 
-    console.log(`[${Date.now() - startTime}ms] API 전체 완료`)
 
     return NextResponse.json({
       success: true,

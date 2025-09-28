@@ -56,10 +56,6 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
           setTimeout(() => setShowProcessingTime(false), 3000)
         }
         
-        // Redis 캐시 사용 여부 로그
-        if (data.fromCache) {
-          console.log('💾 Redis 캐시에서 처리됨')
-        }
       } else {
         // 에러 시 원래 상태로 복원
         onLikeToggle(comment.id, !!comment.isLiked, comment.likes)

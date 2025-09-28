@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       ])
       
       if (totalComments && totalLikes) {
-        console.log(`[${Date.now() - startTime}ms] Redis 통계 조회 완료`)
         return NextResponse.json({
           totalComments: parseInt(totalComments),
           totalLikes: parseInt(totalLikes),
@@ -32,8 +31,6 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // 캐시 미스 시 DB에서 조회
-    console.log(`[${Date.now() - startTime}ms] DB 통계 조회 시작`)
     
     const stats = await query(`
       SELECT 
@@ -42,7 +39,6 @@ export async function GET(request: NextRequest) {
       FROM support_comments
     `)
     
-    console.log(`[${Date.now() - startTime}ms] DB 통계 조회 완료`)
 
     // Redis에 통계 캐시 (1시간)
     if (redis) {

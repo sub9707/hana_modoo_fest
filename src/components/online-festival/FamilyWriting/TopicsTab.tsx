@@ -7,7 +7,6 @@ interface TopicsTabProps {
 }
 
 export default function TopicsTab({ writingTopics, onTopicSelect }: TopicsTabProps) {
-  console.log('📝 사용 가능한 글쓰기 주제:', writingTopics)
   return (
     <div className="max-w-4xl mx-auto">
       <div className="grid gap-4 md:gap-6">

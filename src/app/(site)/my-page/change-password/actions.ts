@@ -174,9 +174,6 @@ async function logPasswordChange(
         ]
       )
     }
-
-    // 콘솔 로그 (개발/디버깅용)
-    console.log(`🔐 Password changed for user: ${username} (${userId}) at ${new Date().toISOString()}`)
     
   } catch (error) {
     console.error('Log password change error:', error)

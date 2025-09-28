@@ -96,8 +96,6 @@ export function useRouletteEvent(): UseRouletteEventReturn {
                 }
             })
 
-            console.log('🔍 Participation API response:', response.status, response.ok)
-
             if (!response.ok) {
                 console.warn('Participation API failed:', response.status)
                 // 🚀 API 실패 시 기본값으로 처리 (로그인된 사용자는 기본 참여 가능)
@@ -111,7 +109,6 @@ export function useRouletteEvent(): UseRouletteEventReturn {
             }
 
             const data: ApiResponse = await response.json()
-            console.log('🔍 Participation API data:', data)
 
             if (data.success && data.data) {
                 setState(prev => ({

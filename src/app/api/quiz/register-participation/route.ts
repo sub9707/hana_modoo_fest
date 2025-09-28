@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
   try {
     const data: ParticipationRequest = await request.json()
 
-    console.log('Received participation data:', data)
-
     // 입력값 검증
     if (!data.userId || !data.perfectScore) {
       return NextResponse.json(
@@ -69,8 +67,6 @@ export async function POST(request: NextRequest) {
     const clientIP = getClientIP(request)
     const userAgent = getUserAgent(request)
 
-    console.log('Inserting participation record...')
-
     // 참여 기록 저장 (insertId 대신 affectedRows 확인)
     const result = await query(
       `INSERT INTO quiz_event_participants 
@@ -87,8 +83,6 @@ export async function POST(request: NextRequest) {
         userAgent
       ]
     )
-
-    console.log('Insert result:', result)
 
     // MySQL에서는 insertId가 없을 수도 있으므로 affectedRows로 확인
     if (!result.affectedRows || result.affectedRows === 0) {

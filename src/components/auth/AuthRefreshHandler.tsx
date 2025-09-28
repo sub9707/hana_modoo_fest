@@ -20,8 +20,6 @@ export function AuthRefreshHandler() {
       newUrl.searchParams.delete('signup_success')
       router.replace(newUrl.pathname + newUrl.search)
       
-      // 인증 상태 새로고침
-      console.log('AuthRefreshHandler: Refreshing user state')
       setTimeout(() => {
         refreshUser()
       }, 100)

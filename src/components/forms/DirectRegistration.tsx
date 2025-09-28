@@ -197,11 +197,9 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             const result = await response.json()
 
             if (result.success) {
-                console.log('DirectRegistration: Registration successful', result)
 
                 // AuthContext에 사용자 정보 설정
                 if (result.user) {
-                    console.log('DirectRegistration: Setting user in context', result.user)
                     login(result.user)
                 }
 

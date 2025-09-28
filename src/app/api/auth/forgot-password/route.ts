@@ -95,16 +95,6 @@ export async function POST(request: NextRequest) {
     
     // 6. SMS 발송 (테스트 모드 - 실제 SMS 발송하지 않음)
     let smsResult: { success: boolean; requestId?: string; error?: string }
-
-    // 🧪 테스트 모드: 실제 SMS 발송 없이 시뮬레이션
-    console.log('='.repeat(50))
-    console.log('📱 [비밀번호 찾기 SMS 시뮬레이션]')
-    console.log(`📞 전화번호: ${phone}`)
-    console.log(`👤 사용자: ${user.name}`)
-    console.log(`🔢 인증번호: ${verificationCode}`)
-    console.log(`⏰ 만료시간: 5분`)
-    console.log(`📱 SMS 내용: [모두하나대축제 2025] 비밀번호 찾기 인증번호는 ${verificationCode}입니다. 5분 내에 입력해주세요.`)
-    console.log('='.repeat(50))
     
     smsResult = {
       success: true,

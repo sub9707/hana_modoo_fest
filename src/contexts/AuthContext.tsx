@@ -87,7 +87,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // 로그인
   const login = useCallback((userData: User) => {
-    console.log('AuthContext login called with:', userData)
     setUser(userData)
   }, [])
 

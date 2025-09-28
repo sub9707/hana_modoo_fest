@@ -12,11 +12,6 @@ export function GA4Script() {
     return null;
   }
 
-  // 개발환경에서 트래킹 비활성화 (선택사항)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('개발환경에서 GA4 트래킹 활성화됨. GA4_TRACKING_ID:', GA4_TRACKING_ID);
-  }
-
   return (
     <>
       {/* Google Analytics 4 스크립트 */}

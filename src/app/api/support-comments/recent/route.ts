@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
       
       if (cachedComments.length > 0) {
         const recentComments = cachedComments.map(comment => JSON.parse(comment))
-        console.log(`[${Date.now() - startTime}ms] Redis 최근 댓글 조회 완료`)
         return NextResponse.json({ 
           comments: recentComments,
           fromCache: true,
@@ -31,9 +30,6 @@ export async function GET(request: NextRequest) {
         })
       }
     }
-    
-    // 캐시 미스 시 DB에서 조회
-    console.log(`[${Date.now() - startTime}ms] DB 최근 댓글 조회 시작`)
     
     const recentComments = await query(`
       SELECT 
@@ -47,8 +43,7 @@ export async function GET(request: NextRequest) {
       ORDER BY sc.created_at DESC
       LIMIT ?
     `, [limit])
-    
-    console.log(`[${Date.now() - startTime}ms] DB 최근 댓글 조회 완료`)
+  
     
     // Redis에 캐시 저장
     if (redis && recentComments.length > 0) {

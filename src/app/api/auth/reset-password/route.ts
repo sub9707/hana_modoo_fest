@@ -88,7 +88,6 @@ export async function POST(request: NextRequest) {
         )
       }
     } else {
-      console.log('🔧 [테스트 모드] 비밀번호 재설정 토큰 검증 건너뛰기')
       
       // 테스트 모드에서도 최소한의 검증 (인증 기록이 있는지만 확인)
       const hasVerification = await queryOne(
@@ -138,15 +137,6 @@ export async function POST(request: NextRequest) {
 
     // 7. 보안 로그 기록 (선택사항)
     await logPasswordReset(user.id, user.name, phone, clientIp)
-
-    console.log('='.repeat(50))
-    console.log('✅ [비밀번호 재설정 완료]')
-    console.log(`📞 전화번호: ${phone}`)
-    console.log(`👤 사용자: ${user.name} (ID: ${user.id})`)
-    console.log(`🔑 새 비밀번호 해시: ${newPasswordHash.substring(0, 16)}...`)
-    console.log(`🧂 새 솔트: ${newSalt.substring(0, 16)}...`)
-    console.log(`🖥️ IP: ${clientIp}`)
-    console.log('='.repeat(50))
 
     return NextResponse.json({
       success: true,
@@ -209,7 +199,6 @@ async function logPasswordReset(
     // admin_actions 테이블이 있는지 확인
     const tableExists = await checkTableExists('admin_actions')
     if (!tableExists) {
-      console.log('📝 admin_actions 테이블이 없습니다. 비밀번호 재설정 로그 기록을 건너뜁니다.')
       return
     }
 
@@ -233,7 +222,6 @@ async function logPasswordReset(
       ]
     )
 
-    console.log(`📝 비밀번호 재설정 로그가 기록되었습니다: ${userName} (${phone})`)
   } catch (error) {
     console.warn('비밀번호 재설정 로그 기록 실패:', error)
     // 로그 기록 실패는 치명적이지 않으므로 무시

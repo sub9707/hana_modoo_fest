@@ -214,7 +214,6 @@ export default function SocialRegistration({
         autoGenerate: true
       }
 
-      console.log('Final registration data:', finalData)
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',
