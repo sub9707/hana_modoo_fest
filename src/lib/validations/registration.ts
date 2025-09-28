@@ -221,3 +221,79 @@ export function getFieldError(error: z.ZodError, fieldName: string): string | un
   )
   return fieldError?.message
 }
+
+export const directRegistrationSchema = z.object({
+  name: z.string()
+    .min(2, '이름은 2자 이상이어야 합니다')
+    .max(50, '이름은 50자를 초과할 수 없습니다')
+    .regex(/^[가-힣a-zA-Z\s]+$/, '이름은 한글, 영문만 입력 가능합니다'),
+  
+  username: z.string()
+    .min(4, '사용자명은 4자 이상이어야 합니다')
+    .max(30, '사용자명은 30자를 초과할 수 없습니다')
+    .regex(/^[a-zA-Z0-9_]+$/, '사용자명은 영문, 숫자, 언더스코어(_)만 사용 가능합니다')
+    .refine(val => !/^\d+$/.test(val), '사용자명은 숫자로만 구성될 수 없습니다'),
+  
+  password: z.string()
+    .min(8, '비밀번호는 8자 이상이어야 합니다')
+    .max(128, '비밀번호는 128자를 초과할 수 없습니다')
+    .regex(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z\d!@#$%^&*(),.?":{}|<>]+$/, 
+           '비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다'),
+  
+  confirmPassword: z.string(),
+  
+  phone: z.string()
+    .regex(/^010\d{8}$/, '올바른 휴대폰 번호를 입력해주세요 (010-0000-0000)')
+    .length(11, '휴대폰 번호는 11자리여야 합니다'),
+  
+  gender: z.enum(['male', 'female', 'none'], {
+    message: '성별을 선택해주세요'
+  }),
+  
+  birthDate: z.string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '올바른 생년월일을 입력해주세요 (YYYY-MM-DD)')
+    .refine(val => {
+      const date = new Date(val)
+      const now = new Date()
+      const age = now.getFullYear() - date.getFullYear()
+      return age >= 14 && age <= 100
+    }, '만 14세 이상 100세 이하만 가입 가능합니다'),
+  
+  company: z.string().max(100, '회사명은 100자를 초과할 수 없습니다').optional(),
+  
+  address: z.string().max(200, '주소는 200자를 초과할 수 없습니다').optional(),
+  
+  addressDetail: z.string().max(100, '상세주소는 100자를 초과할 수 없습니다').optional(),
+  
+  zipCode: z.string()
+    .regex(/^\d{5}$/, '우편번호는 5자리 숫자여야 합니다')
+    .optional()
+    .or(z.literal('')),
+  
+  agreedToTerms: z.boolean()
+    .refine(val => val === true, '이용약관에 동의해주세요'),
+  
+  agreedToPrivacy: z.boolean()
+    .refine(val => val === true, '개인정보처리방침에 동의해주세요'),
+  
+  agreedToMarketing: z.boolean().optional()
+  
+}).refine(data => data.password === data.confirmPassword, {
+  message: '비밀번호가 일치하지 않습니다',
+  path: ['confirmPassword']
+})
+
+export type DirectRegistrationData = z.infer<typeof directRegistrationSchema>
+
+export const usernameCheckSchema = z.object({
+  username: z.string()
+    .min(4, '사용자명은 4자 이상이어야 합니다')
+    .max(30, '사용자명은 30자를 초과할 수 없습니다')
+    .regex(/^[a-zA-Z0-9_]+$/, '사용자명은 영문, 숫자, 언더스코어(_)만 사용 가능합니다')
+})
+
+export const phoneCheckSchema = z.object({
+  phone: z.string()
+    .regex(/^010\d{8}$/, '올바른 휴대폰 번호를 입력해주세요')
+    .length(11, '휴대폰 번호는 11자리여야 합니다')
+})

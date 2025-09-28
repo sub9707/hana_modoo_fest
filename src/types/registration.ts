@@ -132,3 +132,61 @@ export interface AddressSearchResult {
   jibunAddress?: string
   extraAddress?: string
 }
+
+export interface DirectRegistrationData {
+  name: string
+  username: string
+  password: string
+  confirmPassword: string
+  phone: string
+  gender: 'male' | 'female' | 'none'
+  birthDate: string
+  company?: string
+  address?: string
+  addressDetail?: string
+  zipCode?: string
+  agreedToTerms: boolean
+  agreedToPrivacy: boolean
+  agreedToMarketing?: boolean
+}
+
+export interface DuplicationCheckResponse {
+  available: boolean
+  message: string
+}
+
+export interface RegistrationResponse {
+  success: boolean
+  message: string
+  error?: string
+  user?: {
+    id: string
+    name: string
+    username: string
+  }
+}
+
+export interface FormFieldState {
+  value: string
+  error?: string
+  isChecking?: boolean
+  isChecked?: boolean
+  isValid?: boolean
+}
+
+export interface RegistrationFormState {
+  name: FormFieldState
+  username: FormFieldState
+  password: FormFieldState
+  confirmPassword: FormFieldState
+  phone: FormFieldState
+  gender: FormFieldState
+  birthDate: FormFieldState
+  company: FormFieldState
+  address: FormFieldState
+  addressDetail: FormFieldState
+  zipCode: FormFieldState
+  agreedToTerms: FormFieldState
+  agreedToPrivacy: FormFieldState
+  agreedToMarketing: FormFieldState
+}
