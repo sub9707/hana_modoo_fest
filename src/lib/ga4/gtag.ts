@@ -32,7 +32,6 @@ export const gtag_pageview = (url: string, title?: string): void => {
       send_page_view: true,
     });
     
-    console.log('GA4 페이지뷰 전송:', { url, title });
   } catch (error) {
     console.error('GA4 페이지뷰 전송 오류:', error);
   }
@@ -54,7 +53,6 @@ export const gtag_event = (
       value: value,
     });
     
-    console.log('GA4 이벤트 전송:', { action, category, label, value });
   } catch (error) {
     console.error('GA4 이벤트 전송 오류:', error);
   }

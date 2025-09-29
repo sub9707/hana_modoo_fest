@@ -61,24 +61,22 @@ export async function loginAction(formData: FormData) {
 
         // 세션 토큰 생성 및 저장
         const sessionToken = generateSessionToken()
-        const expiresAt = new Date()
-        expiresAt.setDate(expiresAt.getDate() + 7)
-
         await query(
             `UPDATE users SET 
              session_token = ?, 
-             session_expires_at = ?, 
-             last_login_at = ?
+             session_expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY), 
+             last_login_at = NOW()
              WHERE id = ?`,
             [
                 sessionToken,
-                expiresAt.toISOString().slice(0, 19).replace('T', ' '),
-                new Date().toISOString().slice(0, 19).replace('T', ' '),
                 user.id
             ]
         )
 
         // 세션 쿠키 저장
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 7)
+
         const cookieStore = await cookies()
         cookieStore.set('session-token', sessionToken, {
             httpOnly: true,
@@ -129,6 +127,7 @@ export async function logoutAction() {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             expires: new Date(0),
+            maxAge: 0,
             path: '/'
         })
 

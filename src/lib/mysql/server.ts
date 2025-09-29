@@ -1,13 +1,10 @@
 // src/lib/mysql/server.ts
 import { Role } from '@/types/auth'
 import { cookies } from 'next/headers'
-import { cache } from 'react'
 import { query, queryOne } from '@/lib/mysql/connection'
 
 // 현재 로그인된 사용자 정보 가져오기
-export const getCurrentUser = cache(async () => {
-  console.log('[getCurrentUser] 호출됨')
-
+export async function getCurrentUser() {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session-token')?.value
 
@@ -33,7 +30,6 @@ export const getCurrentUser = cache(async () => {
     // 세션 만료 확인
     if (user.session_expires_at && new Date(user.session_expires_at) < new Date()) {
       console.log('[getCurrentUser] 세션 만료됨')
-      // 만료된 세션 정리
       await query(
         'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
         [user.id]
@@ -67,10 +63,10 @@ export const getCurrentUser = cache(async () => {
     console.error('[getCurrentUser] 에러:', error)
     return null
   }
-})
+}
 
 // 사용자 권한 확인
-export const checkUserRole = cache(async (requiredRole: Role): Promise<boolean> => {
+export async function checkUserRole(requiredRole: Role): Promise<boolean> {
   const user = await getCurrentUser()
 
   if (!user) return false
@@ -82,13 +78,13 @@ export const checkUserRole = cache(async (requiredRole: Role): Promise<boolean> 
   }
 
   return roleHierarchy[user.role as Role] >= roleHierarchy[requiredRole]
-})
+}
 
-// NextJS 15: 사용자 세션 검증 (캐시됨)
-export const validateSession = cache(async () => {
+// NextJS 15: 사용자 세션 검증
+export async function validateSession(): Promise<boolean> {
   const user = await getCurrentUser()
   return !!user
-})
+}
 
 // NextJS 15: 사용자 권한별 리다이렉트
 export async function requireAuth() {

@@ -146,10 +146,10 @@ async function updateUserActivity(userId: string): Promise<void> {
       globalPool = getPool()
     }
 
-    const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    // MySQL의 NOW() 함수 사용
     await globalPool.execute(
-      'UPDATE users SET last_activity_at = ? WHERE id = ?',
-      [now, userId]
+      'UPDATE users SET last_activity_at = NOW() WHERE id = ?',
+      [userId]
     )
   } catch (error) {
     console.error('Error updating user activity:', error)
