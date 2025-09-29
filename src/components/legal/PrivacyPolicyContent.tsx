@@ -279,9 +279,10 @@ export default function PrivacyPolicyContent() {
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">개인정보보호책임자</h3>
                             <div className="space-y-2 text-gray-700">
-                                <p><strong>성명:</strong> 홍길동</p>
-                                <p><strong>연락처:</strong> 02-1234-5678</p>
-                                <p><strong>이메일:</strong> hanbumo1@seoul.go.kr</p>
+                                <p><strong>성명:</strong> 신성익</p>
+                                <p><strong>소속:</strong> (주)하우두유두</p>
+                                <p><strong>연락처:</strong> 02-322-9775</p>
+                                <p><strong>이메일:</strong> how9775@naver.com</p>
                             </div>
                         </div>
                     </div>
