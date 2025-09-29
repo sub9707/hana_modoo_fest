@@ -6,10 +6,13 @@ import { query, queryOne } from '@/lib/mysql/connection'
 
 // 현재 로그인된 사용자 정보 가져오기
 export const getCurrentUser = cache(async () => {
+  console.log('[getCurrentUser] 호출됨')
+
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session-token')?.value
 
   if (!sessionToken) {
+    console.log('[getCurrentUser] 세션 토큰 없음')
     return null
   }
 
@@ -17,17 +20,19 @@ export const getCurrentUser = cache(async () => {
     const user = await queryOne(
       `SELECT id, name, company, username, gender, birth_date, phone, email, profile_image, 
               role, signup_method, created_at, last_login_at, last_activity_at, updated_at, 
-              session_expires_at
+              session_expires_at, address, address_detail, zip_code
        FROM users WHERE session_token = ?`,
       [sessionToken]
     )
 
     if (!user) {
+      console.log('[getCurrentUser] 세션 토큰으로 사용자 찾을 수 없음:', sessionToken.substring(0, 8))
       return null
     }
 
     // 세션 만료 확인
     if (user.session_expires_at && new Date(user.session_expires_at) < new Date()) {
+      console.log('[getCurrentUser] 세션 만료됨')
       // 만료된 세션 정리
       await query(
         'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
@@ -35,6 +40,8 @@ export const getCurrentUser = cache(async () => {
       )
       return null
     }
+
+    console.log('[getCurrentUser] 사용자 인증 성공:', user.name)
 
     return {
       id: user.id,
@@ -46,15 +53,18 @@ export const getCurrentUser = cache(async () => {
       gender: user.gender,
       birth_date: user.birth_date,
       phone: user.phone,
+      address: user.address,
+      address_detail: user.address_detail,
+      zip_code: user.zip_code,
       role: user.role,
-      signup_method: user.signup_method || 'phone', // 기본값 설정
+      signup_method: user.signup_method || 'phone',
       created_at: user.created_at,
       last_login_at: user.last_login_at,
       last_activity_at: user.last_activity_at,
       updated_at: user.updated_at
     }
   } catch (error) {
-    console.error('Error getting current user:', error)
+    console.error('[getCurrentUser] 에러:', error)
     return null
   }
 })

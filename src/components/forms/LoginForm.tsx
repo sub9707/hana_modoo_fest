@@ -1,4 +1,3 @@
-// src/components/forms/LoginForm.tsx
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -6,88 +5,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
 import { loginSchema, type LoginData } from '@/lib/validations/auth'
-import { User } from '@/types/auth'
 import Image from 'next/image'
 import { loginAction } from '@/lib/actions/auth'
+import Link from 'next/link'
 
 interface LoginFormProps {
   redirectTo?: string
-}
-
-// SNS 로그인 버튼 컴포넌트
-interface SocialLoginButtonProps {
-  provider: 'naver' | 'kakao'
-  onClick: () => void
-  isLoading: boolean
-}
-
-function SocialLoginButton({ provider, onClick, isLoading }: SocialLoginButtonProps) {
-  if (provider === "naver") {
-    return (
-
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={isLoading}
-        className={`
-    relative w-full bg-green-500 text-white rounded-lg py-3 font-medium flex items-center justify-center
-    ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600 transition-colors"}
-  `}
-      >
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <>
-            {/* 왼쪽 끝 로고 */}
-            <div className="absolute left-4 flex items-center">
-              <Image
-                src="/images/common/naver-logo.png"
-                alt="네이버 로고"
-                width={20}
-                height={20}
-                className="object-contain"
-              />
-            </div>
-
-            {/* 가운데 텍스트 */}
-            <span className="text-xl">네이버로 시작하기</span>
-          </>
-        )}
-      </button>
-    )
-  }
-
-  if (provider === "kakao") {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={isLoading}
-        className={`
-          w-full rounded-lg overflow-hidden 
-          ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-90"}
-        `}
-      >
-        {isLoading ? (
-          <div className="flex justify-center py-3">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </div>
-        ) : (
-          <Image
-            src="/images/common/kakao_login_large_wide.png"
-            alt="카카오 로그인 버튼"
-            width={320}
-            height={48}
-            className="w-full h-auto"
-          />
-        )}
-      </button>
-    )
-  }
-
-  return null
 }
 
 export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
@@ -96,7 +20,6 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
   const [isPending, startTransition] = useTransition()
   const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const router = useRouter()
-  const { login, refreshUser } = useAuth()
 
   const {
     register,
@@ -111,7 +34,6 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
     }
   })
 
-  // 일반 로그인 폼 제출 처리 수정
   const onSubmit = async (data: LoginData) => {
     setError(null)
 
@@ -125,14 +47,12 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
 
         if (result.error) {
           setError(result.error)
-        } else if (result.success && result.user) {
-          // 즉시 Context에 사용자 정보 설정
-          login(result.user as User)
-
+        } else if (result.success) {
           reset()
-
-          // 즉시 페이지 이동
-          router.push(redirectTo)
+          
+          router.refresh()
+          await new Promise(resolve => setTimeout(resolve, 150))
+          window.location.href = redirectTo
         }
       } catch (error) {
         console.error('Login error:', error)
@@ -146,15 +66,12 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
     setError(null)
 
     try {
-      // OAuth URL로 리다이렉트 (callbackUrl을 redirect 파라미터로 전달)
       const params = new URLSearchParams({
         provider: provider,
         redirect: redirectTo
       })
 
       const oauthUrl = `/api/auth/oauth?${params.toString()}`
-
-      // OAuth는 외부 서비스로 이동해야 하므로 window.location.href 사용 필요
       window.location.href = oauthUrl
     } catch (error) {
       console.error('Social login error:', error)
@@ -181,32 +98,6 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
             </p>
           )}
         </div>
-
-        {/* SNS 로그인 섹션 */}
-        {/* <div className="mt-8 space-y-3">
-          <SocialLoginButton
-            provider="naver"
-            onClick={() => handleSocialLogin('naver')}
-            isLoading={socialLoading === 'naver'}
-          />
-          <SocialLoginButton
-            provider="kakao"
-            onClick={() => handleSocialLogin('kakao')}
-            isLoading={socialLoading === 'kakao'}
-          />
-        </div> */}
-
-        {/* 구분선 */}
-        {/* <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">또는</span>
-            </div>
-          </div>
-        </div> */}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
@@ -275,10 +166,10 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
                   <Eye className="h-5 w-5" />
                 )}
               </button>
-              {errors.password && (
-                <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>
-              )}
             </div>
+            {errors.password && (
+              <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>
+            )}
           </div>
 
           <div>
@@ -304,23 +195,23 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
           </div>
 
           <div className="text-center">
-            <a
+            <Link
               href="/forgot-password"
               className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
             >
               비밀번호를 잊으셨나요?
-            </a>
+            </Link>
           </div>
 
           <div className="text-center border-t border-gray-200 pt-6">
             <p className="text-sm text-gray-600">
               아직 계정이 없으신가요?{' '}
-              <a
+              <Link
                 href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
               >
                 회원가입
-              </a>
+              </Link>
             </p>
           </div>
         </form>

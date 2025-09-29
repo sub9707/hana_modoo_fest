@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { RowDataPacket } from 'mysql2/promise'
 
-// 사용자 역할 타입 정의
 export type Role = 'admin' | 'editor' | 'user'
 export type SignupMethod = 'phone' | 'naver' | 'kakao'
 
-// 데이터베이스 사용자 타입 정의 (SNS 정보 포함)
 interface DatabaseUser extends RowDataPacket {
   id: string
   name: string
@@ -18,7 +16,6 @@ interface DatabaseUser extends RowDataPacket {
   last_activity_at: string | null
 }
 
-// 미들웨어에서 사용할 사용자 타입
 interface MiddlewareUser {
   id: string
   name: string
@@ -31,7 +28,6 @@ interface MiddlewareUser {
   last_activity_at: Date | null
 }
 
-// 보호된 경로 설정
 const PROTECTED_PATHS = [
   '/admin',
   '/profile',
@@ -44,14 +40,12 @@ const PROTECTED_PATHS = [
 const ADMIN_PATHS = ['/admin'] as const
 const EDITOR_PATHS = ['/editor', '/manage'] as const
 
-// 역할 계층 구조
 const ROLE_HIERARCHY: Record<Role, number> = {
   'user': 1,
   'editor': 2,
   'admin': 3
 } as const
 
-// 정적 파일 경로 패턴
 const STATIC_FILE_PATTERNS = [
   '/_next',
   '/api',
@@ -61,16 +55,13 @@ const STATIC_FILE_PATTERNS = [
   '/sitemap.xml'
 ] as const
 
-// 🚀 글로벌 MySQL 풀 (기존 connection.ts와 동일한 풀 사용)
 let globalPool: any = null
 
-// 🚀 최적화된 DB 쿼리 함수 (연결 풀 사용)
 async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
   sql: string,
   params: unknown[] = []
 ): Promise<T | null> {
   try {
-    // 기존 connection.ts의 풀 재사용
     if (!globalPool) {
       const { getPool } = await import('@/lib/mysql/connection')
       globalPool = getPool()
@@ -88,11 +79,10 @@ async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
       sql: sql.substring(0, 50) + '...',
       error: error instanceof Error ? error.message : 'Unknown error'
     })
-    return null // 🚀 DB 오류 시 null 반환하여 서비스 계속 제공
+    return null
   }
 }
 
-// 사용자 데이터 변환 함수 (SNS 정보 포함)
 function transformDatabaseUser(dbUser: DatabaseUser): MiddlewareUser {
   return {
     id: dbUser.id,
@@ -107,39 +97,32 @@ function transformDatabaseUser(dbUser: DatabaseUser): MiddlewareUser {
   }
 }
 
-// 정적 파일 체크 함수
 function isStaticFile(pathname: string): boolean {
   return STATIC_FILE_PATTERNS.some(pattern => pathname.startsWith(pattern)) ||
     pathname.includes('.') && !pathname.endsWith('/')
 }
 
-// 보호된 경로 체크 함수
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PATHS.some(path => pathname.startsWith(path))
 }
 
-// 관리자 경로 체크 함수
 function isAdminPath(pathname: string): boolean {
   return ADMIN_PATHS.some(path => pathname.startsWith(path))
 }
 
-// 편집자 경로 체크 함수
 function isEditorPath(pathname: string): boolean {
   return EDITOR_PATHS.some(path => pathname.startsWith(path))
 }
 
-// 권한 체크 함수
 function hasRole(userRole: Role, requiredRole: Role): boolean {
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole]
 }
 
-// 세션 만료 체크 함수
 function isSessionExpired(expiresAt: Date | null): boolean {
   if (!expiresAt) return true
   return new Date() > expiresAt
 }
 
-// 🚀 최적화된 세션 정리 함수 (풀 사용)
 async function clearExpiredSession(userId: string): Promise<void> {
   try {
     if (!globalPool) {
@@ -156,7 +139,6 @@ async function clearExpiredSession(userId: string): Promise<void> {
   }
 }
 
-// 🚀 최적화된 사용자 활동 업데이트 (30분 간격, 풀 사용)
 async function updateUserActivity(userId: string): Promise<void> {
   try {
     if (!globalPool) {
@@ -174,12 +156,10 @@ async function updateUserActivity(userId: string): Promise<void> {
   }
 }
 
-// 🚀 최적화된 사용자 인증 함수 (SNS 계정 정보 포함)
 async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | null> {
   if (!sessionToken) return null
 
   try {
-    // SNS 계정 정보와 함께 사용자 정보 조회
     const dbUser = await queryDatabase<DatabaseUser>(
       `SELECT 
          u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
@@ -189,29 +169,26 @@ async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | 
       [sessionToken]
     )
 
-    // DB에 해당 토큰이 없음 → 무효화된 세션처리
     if (!dbUser) {
-      console.warn('등록되지않은 토큰입니다.:', sessionToken.substring(0, 8))
+      console.warn('[Middleware] 등록되지 않은 토큰 (다른 기기 로그인으로 무효화됨):', sessionToken.substring(0, 8))
       return null
     }
 
     const user = transformDatabaseUser(dbUser)
 
-    // 세션 만료 확인
     if (isSessionExpired(user.session_expires_at)) {
-      console.warn('만료된 토큰입니다:')
+      console.warn('[Middleware] 만료된 토큰')
       await clearExpiredSession(dbUser.id)
       return null
     }
 
     return user
   } catch (error) {
-    console.error('인증에러 발생:', error)
+    console.error('[Middleware] 인증 에러:', error)
     return null
   }
 }
 
-// 리다이렉트 URL 생성 함수
 function createRedirectUrl(request: NextRequest, path: string, params?: Record<string, string>): URL {
   const url = new URL(path, request.url)
 
@@ -224,7 +201,6 @@ function createRedirectUrl(request: NextRequest, path: string, params?: Record<s
   return url
 }
 
-// 쿠키 설정 옵션
 function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production') {
   return {
     httpOnly: true,
@@ -234,17 +210,108 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
   }
 }
 
-// 메인 미들웨어 함수
+// ✅ 개선된 무한 리다이렉트 감지 (쿠키 기반)
+function checkRedirectLoop(request: NextRequest): { isLoop: boolean; count: number } {
+  const loopCookie = request.cookies.get('_redirect_loop')?.value
+
+  if (!loopCookie) {
+    return { isLoop: false, count: 0 }
+  }
+
+  try {
+    const data = JSON.parse(loopCookie)
+    const now = Date.now()
+
+    // 5초 이내에 3번 이상 리다이렉트되면 루프로 판단
+    if (now - data.timestamp < 5000 && data.count >= 3) {
+      console.error('[Middleware] 무한 리다이렉트 감지:', data.count, '회')
+      return { isLoop: true, count: data.count }
+    }
+
+    // 5초가 지났으면 카운트 리셋
+    if (now - data.timestamp >= 5000) {
+      return { isLoop: false, count: 0 }
+    }
+
+    return { isLoop: false, count: data.count }
+  } catch {
+    return { isLoop: false, count: 0 }
+  }
+}
+
+// ✅ 리다이렉트 카운트 증가
+function incrementRedirectCount(response: NextResponse, currentCount: number): void {
+  const data = {
+    count: currentCount + 1,
+    timestamp: Date.now()
+  }
+
+  response.cookies.set('_redirect_loop', JSON.stringify(data), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 10 // 10초 후 자동 삭제
+  })
+}
+
+// ✅ 리다이렉트 카운트 초기화
+function clearRedirectCount(response: NextResponse): void {
+  response.cookies.set('_redirect_loop', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    expires: new Date(0)
+  })
+}
+
+// ✅ 메인 미들웨어 함수
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
-  // 🚀 정적 파일들은 미들웨어를 거치지 않음
+  // 정적 파일들은 미들웨어를 거치지 않음
   if (isStaticFile(pathname)) {
     return NextResponse.next()
   }
 
+  // ✅ 무한 리다이렉트 루프 감지 (쿠키 기반)
+  const { isLoop, count } = checkRedirectLoop(request)
+
+  if (isLoop) {
+    console.error('[Middleware] 무한 리다이렉트 루프 중단 - 강제 로그아웃')
+    const response = NextResponse.redirect(new URL('/login?message=' +
+      encodeURIComponent('세션 오류가 발생했습니다. 다시 로그인해주세요.'), request.url))
+
+    // 모든 인증 관련 쿠키 삭제
+    response.cookies.set('session-token', '', {
+      ...getCookieOptions(),
+      expires: new Date(0),
+      maxAge: 0
+    })
+    clearRedirectCount(response)
+
+    return response
+  }
+
   const response = NextResponse.next()
   const sessionToken = request.cookies.get('session-token')?.value
+
+  // 로그인 페이지 접근 처리
+  if (pathname === '/login') {
+    // ✅ 로그인 페이지에서는 리다이렉트 카운트 초기화
+    clearRedirectCount(response)
+
+    // 세션 만료 파라미터가 있으면 쿠키 강제 삭제
+    if (request.nextUrl.searchParams.get('session_expired') === 'true') {
+      response.cookies.set('session-token', '', {
+        ...getCookieOptions(),
+        expires: new Date(0),
+        maxAge: 0
+      })
+    }
+    return response
+  }
 
   // 사용자 인증
   let user: MiddlewareUser | null = null
@@ -252,48 +319,86 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (sessionToken) {
     user = await authenticateUser(sessionToken)
 
-    // 만료된 세션인 경우 쿠키 삭제
+    // ✅ 세션 무효화 감지 (다른 기기 로그인 등)
     if (!user && sessionToken) {
-      console.warn('유효하지않은 세션입니다. - 쿠키를 삭제합니다:', sessionToken.substring(0, 8))
+      console.warn('[Middleware] 세션 무효화 감지 - 쿠키 삭제 및 강제 로그아웃')
+
+      // 보호된 경로에서 무효화된 세션 발견 시
+      if (isProtectedPath(pathname)) {
+        const loginUrl = createRedirectUrl(request, '/login', {
+          callbackUrl: pathname,
+          message: '다른 기기에서 로그인하여 현재 세션이 종료되었습니다. 다시 로그인해주세요.',
+          session_expired: 'true'
+        })
+
+        const redirectResponse = NextResponse.redirect(loginUrl)
+
+        // 쿠키 확실하게 삭제
+        redirectResponse.cookies.set('session-token', '', {
+          ...getCookieOptions(),
+          expires: new Date(0),
+          maxAge: 0
+        })
+
+        // ✅ 리다이렉트 카운트 증가
+        incrementRedirectCount(redirectResponse, count)
+
+        return redirectResponse
+      }
+
+      // 일반 페이지에서는 쿠키만 삭제
       response.cookies.set('session-token', '', {
         ...getCookieOptions(),
-        expires: new Date(0)
+        expires: new Date(0),
+        maxAge: 0
       })
     }
   }
 
-  // 로그인 페이지 접근 처리
-  if (pathname === '/login') {
-    if (user) {
-      const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/'
-      return NextResponse.redirect(new URL(callbackUrl, request.url))
-    }
-    return response
-  }
 
 
-  // 로그인이 필요한 경로 체크
+  // ✅ 보호된 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
-      // 무한 리다이렉트 방지: referer 체크
-      const referer = request.headers.get('referer')
-      if (referer && referer.includes('/login')) {
-        return response
-      }
+      console.log('[Middleware] 인증 필요 - 로그인 페이지로 리다이렉트:', pathname)
+
+      const hadToken = !!sessionToken
 
       const loginUrl = createRedirectUrl(request, '/login', {
         callbackUrl: pathname,
-        message: '로그인이 필요한 서비스입니다.'
+        message: hadToken
+          ? '세션이 만료되었습니다. 다시 로그인해주세요.'
+          : '로그인이 필요한 서비스입니다.',
+        ...(hadToken && { session_expired: 'true' })
       })
-      return NextResponse.redirect(loginUrl)
+
+      const redirectResponse = NextResponse.redirect(loginUrl)
+
+      // 쿠키 삭제
+      if (hadToken) {
+        redirectResponse.cookies.set('session-token', '', {
+          ...getCookieOptions(),
+          expires: new Date(0),
+          maxAge: 0
+        })
+      }
+
+      // ✅ 리다이렉트 카운트 증가
+      incrementRedirectCount(redirectResponse, count)
+
+      return redirectResponse
     }
+
+    // ✅ 인증 성공 시 리다이렉트 카운트 초기화
+    clearRedirectCount(response)
   }
 
-  // 🚀 권한 기반 접근 제어
+  // 권한 기반 접근 제어
   if (user) {
     // 관리자 전용 경로
     if (isAdminPath(pathname)) {
       if (!hasRole(user.role, 'admin')) {
+        console.warn('[Middleware] 관리자 권한 부족:', user.username)
         const errorUrl = createRedirectUrl(request, '/unauthorized', {
           message: '관리자 권한이 필요합니다.'
         })
@@ -304,6 +409,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     // 편집자 이상 전용 경로  
     if (isEditorPath(pathname)) {
       if (!hasRole(user.role, 'editor')) {
+        console.warn('[Middleware] 편집자 권한 부족:', user.username)
         const errorUrl = createRedirectUrl(request, '/unauthorized', {
           message: '편집자 이상의 권한이 필요합니다.'
         })
@@ -312,12 +418,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
 
     // 사용자 활동 시간 업데이트 (30분마다)
-
     const lastActivity = user.last_activity_at
     if (!lastActivity || (new Date().getTime() - lastActivity.getTime()) > 30 * 60 * 1000) {
-      // 비동기로 실행
       updateUserActivity(user.id).catch(err =>
-        console.error('Failed to update user activity:', err)
+        console.error('[Middleware] 활동 시간 업데이트 실패:', err)
       )
     }
   }
@@ -325,22 +429,12 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   return response
 }
 
-// NextJS 15 최적화된 매처 설정
 export const config = {
   matcher: [
-    /*
-     * 다음 경로들을 제외한 모든 요청에 대해 실행:
-     * - api routes (API 경로들)
-     * - _next/static (정적 파일)
-     * - _next/image (이미지 최적화 파일)
-     * - favicon.ico 및 기타 정적 assets
-     * - 확장자가 있는 파일들
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
   ],
   runtime: 'nodejs',
-  // NextJS 15에서 추가된 설정
   unstable_allowDynamic: [
-    '/lib/**', // lib 폴더의 동적 import 허용
+    '/lib/**',
   ]
 }
