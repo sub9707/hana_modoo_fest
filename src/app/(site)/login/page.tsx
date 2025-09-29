@@ -28,14 +28,8 @@ export default async function LoginPage({ searchParams }: PageProps) {
   
   // ✅ 서버에서 사용자 확인
   const user = await getCurrentUser()
-  
-  // ✅ 세션 만료 파라미터가 있으면 쿠키 강제 삭제
   const params = await searchParams
-  if (params.session_expired === 'true') {
-    console.log('[LoginPage] 세션 만료 - 쿠키 삭제')
-    const cookieStore = await cookies()
-    cookieStore.delete('session-token')
-  }
+
   
   // ✅ 이미 로그인된 사용자는 리다이렉트
   if (user) {

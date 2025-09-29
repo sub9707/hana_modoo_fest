@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getCurrentUserAction } from '@/lib/actions/auth'
+import { query } from '@/lib/mysql/connection';
 
 // 캐시를 위한 간단한 메모리 저장소
 const userCache = new Map<string, { user: any; timestamp: number }>()
-const CACHE_DURATION = 3 * 60 * 1000
+const CACHE_DURATION = 3 * 1000
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,6 +22,28 @@ export async function GET(request: NextRequest) {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
           }
         }
+      )
+    }
+
+    const tokenExists = await query(
+      'SELECT 1 FROM users WHERE session_token = ? AND session_expires_at > NOW()',
+      [sessionToken]
+    )
+
+    if (!tokenExists || tokenExists.length === 0) {
+      userCache.delete(sessionToken) // 캐시 무효화
+
+      cookieStore.set('session-token', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        expires: new Date(0),
+        path: '/'
+      })
+
+      return NextResponse.json(
+        { error: '세션이 무효화되었습니다.' },
+        { status: 401, headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }
       )
     }
 
@@ -77,7 +100,7 @@ export async function GET(request: NextRequest) {
     })
 
     // 캐시 크기 제한 (메모리 누수 방지)
-    if (userCache.size > 1000) {
+    if (userCache.size > 100) { 
       const oldestKey = userCache.keys().next().value
       if (typeof oldestKey === 'string') {
         userCache.delete(oldestKey)
@@ -113,7 +136,7 @@ if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now()
     for (const [key, value] of userCache.entries()) {
-      if (now - value.timestamp > CACHE_DURATION * 2) {
+      if (now - value.timestamp > CACHE_DURATION * 2) { 
         userCache.delete(key)
       }
     }
