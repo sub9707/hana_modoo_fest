@@ -31,6 +31,11 @@ export interface PrizeWithProbability extends Prize {
   probability: number
 }
 
+export interface PrizeWithProbabilityAdmin extends Prize {
+  probability: number
+  probability_active: boolean
+}
+
 export interface EventParticipation {
   id: string
   user_id: string

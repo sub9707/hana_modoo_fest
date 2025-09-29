@@ -1,7 +1,8 @@
+// src/components/admin/online-festival/WinnersTab.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Download, Search, RefreshCw, Gift, Trophy, CheckCircle } from 'lucide-react'
+import { Download, Search, RefreshCw, Gift, Trophy, CheckCircle, Settings } from 'lucide-react'
 import { Button } from '@/components/admin/online-festival/ui/button'
 import { Input } from '@/components/admin/online-festival/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/admin/online-festival/ui/card'
@@ -23,6 +24,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/admin/online-festival/ui/pagination'
+import { PrizeProbabilityManager } from './PrizeProbabilityManager'
 
 interface Winner {
   id: string
@@ -98,61 +100,38 @@ export function WinnersTab() {
     }
   }
 
-  // 통계 데이터 조회
+  // 통계 조회
   const fetchPrizeStats = async () => {
     try {
       const response = await fetch('/api/admin/online-festival/winners/stats')
       const data = await response.json()
-      const dataArr = data.data as PrizeStats
-      setPrizeStats(dataArr)
+      if (data.success) {
+        setPrizeStats(data.data)
+      }
     } catch (error) {
       console.error('Failed to fetch prize stats:', error)
     }
   }
 
-  // 초기 데이터 로드
-  useEffect(() => {
-    fetchWinners()
-    fetchPrizeStats()
-  }, [])
-
-  // 검색 처리
-  const handleSearch = () => {
-    setCurrentPage(1)
-    fetchWinners(1, searchTerm, prizeFilter, claimFilter)
-  }
-
-  // 필터 변경
-  const handlePrizeFilter = (prize: string) => {
-    setPrizeFilter(prize)
-    setCurrentPage(1)
-    fetchWinners(1, searchTerm, prize, claimFilter)
-  }
-
-  // 페이지 변경
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    fetchWinners(page, searchTerm, prizeFilter, claimFilter)
-  }
-
   // 수령 상태 토글
-  const handleToggleClaimed = async (winnerId: string, isClaimed: boolean) => {
+  const handleToggleClaimed = async (winnerId: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/admin/online-festival/winners/${winnerId}/claim`, {
+      const response = await fetch(`/api/admin/online-festival/winners/${winnerId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_claimed: !isClaimed })
+        body: JSON.stringify({ is_claimed: !currentStatus })
       })
 
-      if (response.ok) {
-        fetchWinners(currentPage, searchTerm, prizeFilter, claimFilter)
-        fetchPrizeStats()
+      const data = await response.json()
+      if (data.success) {
+        await fetchWinners(currentPage, searchTerm, prizeFilter, claimFilter)
+        await fetchPrizeStats()
       } else {
-        alert('수령 상태 변경에 실패했습니다.')
+        alert(data.error || '상태 변경에 실패했습니다.')
       }
     } catch (error) {
-      console.error('Toggle claim failed:', error)
-      alert('수령 상태 변경 중 오류가 발생했습니다.')
+      console.error('Failed to toggle claimed status:', error)
+      alert('상태 변경 중 오류가 발생했습니다.')
     }
   }
 
@@ -160,27 +139,55 @@ export function WinnersTab() {
   const handleExportExcel = async () => {
     try {
       const response = await fetch('/api/admin/online-festival/winners/export')
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `당첨자목록_${new Date().toISOString().split('T')[0]}.xlsx`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-      }
+      
+      if (!response.ok) throw new Error('다운로드 실패')
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `랜덤이벤트_당첨자_${new Date().toISOString().split('T')[0]}.xlsx`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
     } catch (error) {
-      console.error('Export failed:', error)
-      alert('엑셀 다운로드에 실패했습니다.')
+      console.error('Export error:', error)
+      alert('엑셀 다운로드 중 오류가 발생했습니다.')
     }
   }
+
+  const handleSearch = () => {
+    setCurrentPage(1)
+    fetchWinners(1, searchTerm, prizeFilter, claimFilter)
+  }
+
+  const handlePrizeFilter = (value: string) => {
+    setPrizeFilter(value)
+    setCurrentPage(1)
+    fetchWinners(1, searchTerm, value, claimFilter)
+  }
+
+  const handleClaimFilter = (value: string) => {
+    setClaimFilter(value)
+    setCurrentPage(1)
+    fetchWinners(1, searchTerm, prizeFilter, value)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    fetchWinners(page, searchTerm, prizeFilter, claimFilter)
+  }
+
+  useEffect(() => {
+    fetchWinners()
+    fetchPrizeStats()
+  }, [])
 
   return (
     <div className="space-y-6">
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">총 당첨자 수</CardTitle>
@@ -191,7 +198,43 @@ export function WinnersTab() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">수령 완료</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {prizeStats?.claimed_count?.toLocaleString() || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">수령 대기</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {prizeStats?.unclaimed_count?.toLocaleString() || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">총 상품 가치</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">
+              {prizeStats?.total_value?.toLocaleString() || 0}원
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* 상품 확률 설정 */}
+      <PrizeProbabilityManager onUpdate={fetchPrizeStats} />
 
       {/* 상품별 통계 카드 */}
       {prizeStats?.prize_breakdown && prizeStats.prize_breakdown.length > 0 && (
@@ -230,6 +273,16 @@ export function WinnersTab() {
                   {prize.prize_name}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={claimFilter} onValueChange={handleClaimFilter}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="수령 상태" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체</SelectItem>
+              <SelectItem value="true">수령 완료</SelectItem>
+              <SelectItem value="false">수령 대기</SelectItem>
             </SelectContent>
           </Select>
           <Button 
@@ -326,10 +379,10 @@ export function WinnersTab() {
                       onClick={() => handleToggleClaimed(winner.id, winner.is_claimed)}
                       size="sm"
                       variant={winner.is_claimed ? "outline" : "default"}
-                      className={!winner.is_claimed ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                      className={!winner.is_claimed ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
                     >
                       <CheckCircle className="h-4 w-4 mr-1" />
-                      {winner.is_claimed ? '수령 취소' : '수령 완료'}
+                      {winner.is_claimed ? '대기로 변경' : '수령 완료'}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -337,62 +390,55 @@ export function WinnersTab() {
             )}
           </TableBody>
         </Table>
-      </Card>
 
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage > 1) handlePageChange(currentPage - 1)
-                }}
-              />
-            </PaginationItem>
-            
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum
-              if (totalPages <= 5) {
-                pageNum = i + 1
-              } else if (currentPage <= 3) {
-                pageNum = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i
-              } else {
-                pageNum = currentPage - 2 + i
-              }
-              
-              return (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink
-                    href="#"
-                    isActive={pageNum === currentPage}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handlePageChange(pageNum)
-                    }}
-                  >
-                    {pageNum}
-                  </PaginationLink>
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center py-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
                 </PaginationItem>
-              )
-            })}
-            
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage < totalPages) handlePageChange(currentPage + 1)
-                }}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+                
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum: number
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => handlePageChange(pageNum)}
+                        isActive={currentPage === pageNum}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                })}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </Card>
     </div>
   )
 }
