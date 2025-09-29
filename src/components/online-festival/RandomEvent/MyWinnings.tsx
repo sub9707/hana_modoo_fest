@@ -94,23 +94,34 @@ export default function MyWinnings() {
     })
   }
 
-  // 결과 표시 함수
-  const getResultDisplay = (record: MyParticipationRecord) => {
-    if (!record.is_winner) {
+  // 결과 표시 함수 - prize_type으로 정확하게 판단
+    const getResultDisplay = (record: MyParticipationRecord) => {
+      // 실제 당첨 여부: is_winner가 true이고 prize_type이 'none'이 아닌 경우
+      const isRealWinner = record.is_winner && record.prize_type !== 'none'
+      console.log(record)
+    
+    // 꽝인 경우 (prize_type이 'none'이거나 is_winner가 false)
+    if (!isRealWinner) {
       return {
         icon: '💔',
         name: '아쉬워요',
-        description: '다음 기회에!',
-        color: '#6B7280'
+        description: '다음 기회에 도전하세요',
+        color: '#9CA3AF'
       }
     }
 
+    // 실제 상품 당첨인 경우
     return {
       icon: record.prize_icon || '🎁',
       name: record.prize_name || '상품',
       description: record.prize_description || '',
       color: record.prize_color || '#F59E0B'
     }
+  }
+
+  // 실제 당첨 여부 확인 헬퍼 함수
+  const isRealPrizeWinner = (record: MyParticipationRecord): boolean => {
+    return record.is_winner && record.prize_type !== 'none'
   }
 
   return (
@@ -200,6 +211,8 @@ export default function MyWinnings() {
                     <tbody className="divide-y divide-gray-200/50">
                       {participationData.records.map((record) => {
                         const result = getResultDisplay(record)
+                        const isPrizeWinner = isRealPrizeWinner(record)
+                        
                         return (
                           <tr key={record.id} className="hover:bg-white/40 transition-colors">
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -211,15 +224,15 @@ export default function MyWinnings() {
                                   {result.icon}
                                 </div>
                                 <div className="min-w-0">
-                                  <div className={`font-semibold ${record.is_winner ? 'text-green-700' : 'text-gray-600'}`}>
+                                  <div className={`font-semibold ${isPrizeWinner ? 'text-green-700' : 'text-gray-600'}`}>
                                     {result.name}
                                   </div>
                                   <div className="text-sm text-gray-600 truncate">
                                     {result.description}
                                   </div>
-                                  {record.is_winner && record.prize_type !== 'none' && (
+                                  {isPrizeWinner && (
                                     <div className="text-xs text-green-600 font-medium mt-1">
-                                      당첨! 🎉
+                                      당첨
                                     </div>
                                   )}
                                 </div>
@@ -250,7 +263,7 @@ export default function MyWinnings() {
                 아직 참여 내역이 없습니다
               </div>
               <div className="text-gray-500">
-                룰렛을 돌려서 행운의 상품을 받아보세요!
+                룰렛을 돌려서 행운의 상품을 받아보세요
               </div>
             </div>
           )}
@@ -263,7 +276,6 @@ export default function MyWinnings() {
                 <div className="text-sm text-blue-700">
                   <p className="font-medium mb-1">참여 내역 안내</p>
                   <ul className="space-y-1 text-blue-600">
-                    <li>• 최근 10개의 참여 내역만 표시됩니다</li>
                     <li>• 기프티콘은 가입된 전화번호로 전달됩니다</li>
                     <li>• 상품 관련 문의는 고객센터로 연락해주세요</li>
                     <li>• 하루 1회만 참여 가능합니다</li>

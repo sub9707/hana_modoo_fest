@@ -28,7 +28,7 @@ export async function GET() {
       )
     }
 
-    // 해당 유저의 모든 참여 기록 조회 (당첨 여부 상관없이)
+    // 해당 유저의 모든 참여 기록 조회
     const participationRecords = await query(
       `SELECT 
         ep.id,
@@ -40,7 +40,7 @@ export async function GET() {
         p.description as prize_description,
         p.type as prize_type,
         ew.won_at,
-        CASE WHEN ew.id IS NOT NULL THEN 1 ELSE 0 END as is_winner
+        ew.id as winner_id
        FROM event_participations ep
        LEFT JOIN event_winners ew ON ep.id = ew.participation_id
        LEFT JOIN prizes p ON ew.prize_id = p.id
@@ -55,8 +55,8 @@ export async function GET() {
       `SELECT 
         COUNT(ep.id) as total_participations,
         COUNT(ew.id) as total_wins,
-        COUNT(CASE WHEN p.type != 'none' THEN 1 END) as prize_wins,
-        COUNT(CASE WHEN p.type = 'none' THEN 1 END) as consolation_wins
+        COUNT(CASE WHEN p.type IS NOT NULL AND p.type != 'none' THEN 1 END) as prize_wins,
+        COUNT(CASE WHEN ew.id IS NULL OR p.type = 'none' THEN 1 END) as consolation_wins
        FROM event_participations ep
        LEFT JOIN event_winners ew ON ep.id = ew.participation_id
        LEFT JOIN prizes p ON ew.prize_id = p.id
@@ -64,18 +64,27 @@ export async function GET() {
       [user.id]
     )
 
-    const records: MyParticipationRecord[] = participationRecords.map((record: any) => ({
-      id: record.id,
-      participation_date: record.participation_date,
-      participated_at: record.participated_at,
-      prize_name: record.prize_name,
-      prize_icon: record.prize_icon,
-      prize_color: record.prize_color,
-      prize_description: record.prize_description,
-      prize_type: record.prize_type,
-      won_at: record.won_at,
-      is_winner: !!record.is_winner
-    }))
+    // JavaScript에서 is_winner 판단 (더 안전함)
+    const records: MyParticipationRecord[] = participationRecords.map((record: any) => {
+      // 실제 당첨 조건: winner_id가 있고, prize_type이 'none'이 아님
+      const isRealWinner = 
+        record.winner_id != null && 
+        record.prize_type != null && 
+        record.prize_type !== 'none'
+
+      return {
+        id: record.id,
+        participation_date: record.participation_date,
+        participated_at: record.participated_at,
+        prize_name: record.prize_name,
+        prize_icon: record.prize_icon,
+        prize_color: record.prize_color,
+        prize_description: record.prize_description,
+        prize_type: record.prize_type,
+        won_at: record.won_at,
+        is_winner: isRealWinner
+      }
+    })
 
     return NextResponse.json<ApiResponse<{
       records: MyParticipationRecord[]

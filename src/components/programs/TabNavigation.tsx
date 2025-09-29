@@ -1,7 +1,6 @@
 const tabs = [
   { id: 'schedule', label: '행사 일정' },
   { id: 'events', label: '전체행사안내' },
-  { id: 'map', label: '행사장 안내도' }
 ]
 
 interface TabNavigationProps {
