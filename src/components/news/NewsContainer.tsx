@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import NewsFilters from './NewsFilters'
 import NewsList from './NewsList'
-import { NewsSearchParams } from '@/types/Board'
+import { NewsSearchParams, NewsItem } from '@/types/Board'
 
 interface NewsContainerProps {
   initialCategories: Array<{
@@ -11,9 +11,19 @@ interface NewsContainerProps {
     name: string
     count: number
   }>
+  initialNews: NewsItem[]
+  initialTotalCount: number
+  initialHasMore: boolean
+  initialNextCursor?: string
 }
 
-export default function NewsContainer({ initialCategories }: NewsContainerProps) {
+export default function NewsContainer({ 
+  initialCategories,
+  initialNews,
+  initialTotalCount,
+  initialHasMore,
+  initialNextCursor
+}: NewsContainerProps) {
   const [searchParams, setSearchParams] = useState<NewsSearchParams>({
     category: 'all',
     search: '',
@@ -39,7 +49,13 @@ export default function NewsContainer({ initialCategories }: NewsContainerProps)
         
         {/* 메인 콘텐츠 - 뉴스 리스트/상세 */}
         <div className="lg:col-span-3">
-          <NewsList searchParams={searchParams} />
+          <NewsList 
+            searchParams={searchParams}
+            initialNews={initialNews}
+            initialTotalCount={initialTotalCount}
+            initialHasMore={initialHasMore}
+            initialNextCursor={initialNextCursor}
+          />
         </div>
       </div>
     </div>
