@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getCurrentUserAction } from '@/lib/actions/auth'
 
-// 캐시를 위한 간단한 메모리 저장소 (프로덕션에서는 Redis 사용 권장)
+// 캐시를 위한 간단한 메모리 저장소
 const userCache = new Map<string, { user: any; timestamp: number }>()
-const CACHE_DURATION = 5 * 60 * 1000 // 5분
+const CACHE_DURATION = 3 * 60 * 1000
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,12 +15,10 @@ export async function GET(request: NextRequest) {
     if (!sessionToken) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
-        { 
+        {
           status: 401,
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
           }
         }
       )
@@ -29,11 +27,12 @@ export async function GET(request: NextRequest) {
     // 캐시 확인 (같은 세션 토큰에 대한 최근 요청)
     const cached = userCache.get(sessionToken)
     if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
+      console.log('[me] Cache HIT')
       return NextResponse.json(
         { user: cached.user },
         {
           headers: {
-            'Cache-Control': 'private, max-age=300', // 5분 캐시
+            'Cache-Control': 'private, max-age=180',
             'X-Cache': 'HIT'
           }
         }
@@ -44,12 +43,25 @@ export async function GET(request: NextRequest) {
     const result = await getCurrentUserAction()
 
     if (result.error) {
-      // 캐시에서 제거
+
+      console.warn('[me] Auth error:', result.error)
+
+      // ⚠️ 캐시에서 제거
       userCache.delete(sessionToken)
-      
+
+      if (result.error.includes('무효화') || result.error.includes('만료')) {
+        cookieStore.set('session-token', '', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          expires: new Date(0),
+          path: '/'
+        })
+      }
+
       return NextResponse.json(
         { error: result.error },
-        { 
+        {
           status: 401,
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -76,7 +88,7 @@ export async function GET(request: NextRequest) {
       { user: result.user },
       {
         headers: {
-          'Cache-Control': 'private, max-age=300', // 5분 캐시
+          'Cache-Control': 'private, max-age=180',
           'X-Cache': 'MISS'
         }
       }
@@ -86,7 +98,7 @@ export async function GET(request: NextRequest) {
     console.error('Auth me API error:', error)
     return NextResponse.json(
       { error: '서버 오류가 발생했습니다.' },
-      { 
+      {
         status: 500,
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -96,7 +108,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 캐시 정리를 위한 주기적 작업 (선택사항)
+// 캐시 정리를 위한 주기적 작업
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now()

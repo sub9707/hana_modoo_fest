@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useGA4Tracking } from '@/hooks/useGA4Tracking';
+import { useRouter } from "next/navigation";
 
 interface HeaderCTAButtonProps {
   title: string;
@@ -12,11 +13,22 @@ interface HeaderCTAButtonProps {
 function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps) {
   // ✅ GA4 트래킹 훅 추가
   const { trackButtonClick } = useGA4Tracking();
+  const router = useRouter();
 
   // ✅ 클릭 트래킹 함수
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // GA4 트래킹
     const buttonName = title.replace(/\s+/g, '_').toLowerCase();
     trackButtonClick(`${buttonName}_cta`, 'header');
+    
+    // 네비게이션이 작동하지 않는 경우를 대비한 fallback
+    // Link의 기본 동작을 방해하지 않으면서 추가 보장
+    setTimeout(() => {
+      // Link가 정상 작동하면 이 코드는 실행되지 않음 (페이지 전환됨)
+      // 문제가 있을 때만 강제 네비게이션
+      console.info('fallback 이동');
+      router.push(href);
+    }, 200);
   };
 
   if (type === "primary") {
@@ -29,6 +41,7 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
         onClick={handleClick} // ✅ 트래킹 추가
         className={primaryStyle} 
         style={primaryTextShadow}
+        prefetch={true}
       >
         {title}
       </Link>
@@ -42,6 +55,7 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
         href={href} 
         onClick={handleClick} // ✅ 트래킹 추가
         className="block px-6 py-2 rounded-lg font-semibold transition-all duration-200 text-center bg-white text-gray-600 hover:bg-blue-50"
+        prefetch={true}
       >
         {title}
       </Link>

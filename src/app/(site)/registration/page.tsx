@@ -9,18 +9,6 @@ import type { Registration } from '@/types/registration'
 export const metadata: Metadata = {
   title: '사전참가 신청',
   description: '모두하나대축제 2025 사전참가 신청을 해주세요. 원활한 축제 참여를 위해 사전신청을 권장합니다.',
-  openGraph: {
-    title: '사전참가 신청 | 모두하나대축제 2025',
-    description: '축제 참가 신청을 통해 더 많은 혜택을 받으세요.',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
 }
 
 export default async function RegistrationPage() {
@@ -29,7 +17,15 @@ export default async function RegistrationPage() {
 
   // 로그인하지 않은 사용자는 리다이렉트
   if (!user) {
-    redirect('/login?callbackUrl=/registration')
+    redirect('/login?callbackUrl=/registration&message=' +
+      encodeURIComponent('사전참가 신청은 로그인이 필요합니다.'))
+  }
+
+  // ⚠️ 사용자 정보 필수 필드 검증
+  if (!user.phone || !user.name) {
+    console.log('[RegistrationPage] Incomplete profile')
+    redirect('/my-page?message=' +
+      encodeURIComponent('프로필 정보를 먼저 입력해주세요.'))
   }
 
   // 기존 참가신청 조회 (서버사이드에서 직접 DB 조회)

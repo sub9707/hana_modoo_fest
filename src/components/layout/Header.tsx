@@ -26,11 +26,17 @@ const navigation = [
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { user, isLoading: isLoadingAuth } = useAuth()
+  const { user, isLoading: isLoadingAuth, error } = useAuth()
   const pathname = usePathname()
 
   // ✅ GA4 트래킹 훅 사용
   const { trackButtonClick, trackEvent } = useGA4Tracking()
+
+  useEffect(() => {
+    if (error) {
+      console.error('[Header] Auth error:', error)
+    }
+  }, [error])
 
   // 스크롤 이벤트 처리
   useEffect(() => {

@@ -53,6 +53,12 @@ export async function loginAction(formData: FormData) {
             }
         }
 
+        // 기존 세션 확인 (다른 기기 로그인 감지)
+        const existingSession = await queryOne(
+            'SELECT session_token, last_login_at FROM users WHERE id = ? AND session_token IS NOT NULL',
+            [user.id]
+        )
+
         // 세션 토큰 생성 및 저장
         const sessionToken = generateSessionToken()
         const expiresAt = new Date()
@@ -72,7 +78,7 @@ export async function loginAction(formData: FormData) {
             ]
         )
 
-        // NextJS 15: cookies()는 더 이상 async가 아님
+        // 세션 쿠키 저장
         const cookieStore = await cookies()
         cookieStore.set('session-token', sessionToken, {
             httpOnly: true,
@@ -89,7 +95,10 @@ export async function loginAction(formData: FormData) {
                 name: user.name,
                 username: user.username,
                 role: user.role
-            }
+            },
+            warning: existingSession ?
+                '다른 기기에서 로그인한 세션이 자동으로 로그아웃됩니다.' :
+                null
         }
 
     } catch (error) {
@@ -133,7 +142,7 @@ export async function logoutAction() {
     }
 }
 
-// 현재 사용자 정보 조회 (수정됨 - signup_method, email, profile_image 포함)
+// 현재 사용자 정보 조회
 export async function getCurrentUserAction() {
     try {
         const cookieStore = await cookies()
@@ -153,7 +162,8 @@ export async function getCurrentUserAction() {
         )
 
         if (!user) {
-            return { error: '사용자를 찾을 수 없습니다.' }
+            console.warn(' Invalid session token - clearing cookie')
+            return { error: '세션이 무효화되었습니다. 다시 로그인해주세요.' }
         }
 
         // 세션 만료 확인
@@ -163,8 +173,8 @@ export async function getCurrentUserAction() {
                 'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
                 [user.id]
             )
-            
-            return { error: '세션이 만료되었습니다.' }
+
+            return { error: '세션이 만료되었습니다. 다시 로그인해주세요.' }
         }
 
         // 민감한 정보 제거하고 완전한 사용자 정보 반환

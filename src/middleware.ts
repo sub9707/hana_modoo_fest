@@ -34,7 +34,7 @@ interface MiddlewareUser {
 // 보호된 경로 설정
 const PROTECTED_PATHS = [
   '/admin',
-  '/profile', 
+  '/profile',
   '/settings',
   '/my-page',
   '/registration',
@@ -66,7 +66,7 @@ let globalPool: any = null
 
 // 🚀 최적화된 DB 쿼리 함수 (연결 풀 사용)
 async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
-  sql: string, 
+  sql: string,
   params: unknown[] = []
 ): Promise<T | null> {
   try {
@@ -75,13 +75,13 @@ async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
       const { getPool } = await import('@/lib/mysql/connection')
       globalPool = getPool()
     }
-    
+
     const [rows] = await globalPool.execute(sql, params)
-    
+
     if (Array.isArray(rows) && rows.length > 0) {
       return rows[0] as T
     }
-    
+
     return null
   } catch (error) {
     console.error('Middleware database query error:', {
@@ -110,7 +110,7 @@ function transformDatabaseUser(dbUser: DatabaseUser): MiddlewareUser {
 // 정적 파일 체크 함수
 function isStaticFile(pathname: string): boolean {
   return STATIC_FILE_PATTERNS.some(pattern => pathname.startsWith(pattern)) ||
-         pathname.includes('.') && !pathname.endsWith('/')
+    pathname.includes('.') && !pathname.endsWith('/')
 }
 
 // 보호된 경로 체크 함수
@@ -146,7 +146,7 @@ async function clearExpiredSession(userId: string): Promise<void> {
       const { getPool } = await import('@/lib/mysql/connection')
       globalPool = getPool()
     }
-    
+
     await globalPool.execute(
       'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
       [userId]
@@ -178,39 +178,49 @@ async function updateUserActivity(userId: string): Promise<void> {
 async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | null> {
   if (!sessionToken) return null
 
-  // SNS 계정 정보와 함께 사용자 정보 조회 (한 번의 쿼리로)
-  const dbUser = await queryDatabase<DatabaseUser>(
-    `SELECT 
-       u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
-       u.session_expires_at, u.last_activity_at
-     FROM users u
-     WHERE u.session_token = ?`,
-    [sessionToken]
-  )
+  try {
+    // SNS 계정 정보와 함께 사용자 정보 조회
+    const dbUser = await queryDatabase<DatabaseUser>(
+      `SELECT 
+         u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
+         u.session_expires_at, u.last_activity_at
+       FROM users u
+       WHERE u.session_token = ?`,
+      [sessionToken]
+    )
 
-  if (!dbUser) return null
+    // DB에 해당 토큰이 없음 → 무효화된 세션처리
+    if (!dbUser) {
+      console.warn('등록되지않은 토큰입니다.:', sessionToken.substring(0, 8))
+      return null
+    }
 
-  const user = transformDatabaseUser(dbUser)
+    const user = transformDatabaseUser(dbUser)
 
-  // 세션 만료 확인
-  if (isSessionExpired(user.session_expires_at)) {
-    await clearExpiredSession(user.id)
+    // 세션 만료 확인
+    if (isSessionExpired(user.session_expires_at)) {
+      console.warn('만료된 토큰입니다:')
+      await clearExpiredSession(dbUser.id)
+      return null
+    }
+
+    return user
+  } catch (error) {
+    console.error('인증에러 발생:', error)
     return null
   }
-
-  return user
 }
 
 // 리다이렉트 URL 생성 함수
 function createRedirectUrl(request: NextRequest, path: string, params?: Record<string, string>): URL {
   const url = new URL(path, request.url)
-  
+
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.set(key, value)
     })
   }
-  
+
   return url
 }
 
@@ -228,7 +238,7 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
-  // 🚀 정적 파일들은 미들웨어를 거치지 않음 (빠른 스�ip)
+  // 🚀 정적 파일들은 미들웨어를 거치지 않음
   if (isStaticFile(pathname)) {
     return NextResponse.next()
   }
@@ -236,14 +246,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.next()
   const sessionToken = request.cookies.get('session-token')?.value
 
-  // 🚀 사용자 인증 (최적화된 단일 쿼리)
+  // 사용자 인증
   let user: MiddlewareUser | null = null
-  
+
   if (sessionToken) {
     user = await authenticateUser(sessionToken)
-    
+
     // 만료된 세션인 경우 쿠키 삭제
     if (!user && sessionToken) {
+      console.warn('유효하지않은 세션입니다. - 쿠키를 삭제합니다:', sessionToken.substring(0, 8))
       response.cookies.set('session-token', '', {
         ...getCookieOptions(),
         expires: new Date(0)
@@ -251,7 +262,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // 🚀 로그인 페이지 접근 처리 (누락되었던 기능)
+  // 로그인 페이지 접근 처리
   if (pathname === '/login') {
     if (user) {
       const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/'
@@ -260,20 +271,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
-  // 🚀 회원가입 페이지 접근 처리 (누락되었던 기능)
-  if (pathname === '/register') {
-    if (user) {
-      const dashboardUrl = createRedirectUrl(request, '/', {
-        message: '이미 로그인된 상태입니다.'
-      })
-      return NextResponse.redirect(dashboardUrl)
-    }
-    return response
-  }
 
-  // 🚀 로그인이 필요한 경로 체크
+  // 로그인이 필요한 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
+      // 무한 리다이렉트 방지: referer 체크
+      const referer = request.headers.get('referer')
+      if (referer && referer.includes('/login')) {
+        return response
+      }
+
       const loginUrl = createRedirectUrl(request, '/login', {
         callbackUrl: pathname,
         message: '로그인이 필요한 서비스입니다.'
@@ -304,36 +311,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // 🚀 사용자 활동 시간 업데이트 (30분마다로 변경)
-    const lastActivityCookie = request.cookies.get('last-activity')?.value
-    const now = Date.now()
-    const thirtyMinutesInMs = 30 * 60 * 1000 // 🚀 5분 → 30분으로 변경
+    // 사용자 활동 시간 업데이트 (30분마다)
 
-    if (!lastActivityCookie || now - parseInt(lastActivityCookie, 10) > thirtyMinutesInMs) {
-      // 🚀 비동기로 실행하여 응답 지연을 방지
-      updateUserActivity(user.id).catch(error => {
-        console.error('Failed to update user activity:', error)
-      })
-
-      response.cookies.set('last-activity', now.toString(), {
-        ...getCookieOptions(),
-        maxAge: 60 * 60 * 24 * 7 // 7일
-      })
-    }
-
-    // 🚀 사용자 정보를 헤더에 추가 (클라이언트에서 사용 가능)
-    response.headers.set('x-user-id', user.id)
-    response.headers.set('x-user-role', user.role)
-    response.headers.set('x-user-signup-method', user.signup_method)
-    
-    // SNS 사용자의 경우 추가 정보
-    if (user.signup_method !== 'phone') {
-      if (user.email) {
-        response.headers.set('x-user-email', user.email)
-      }
-      if (user.profile_image) {
-        response.headers.set('x-user-profile-image', user.profile_image)
-      }
+    const lastActivity = user.last_activity_at
+    if (!lastActivity || (new Date().getTime() - lastActivity.getTime()) > 30 * 60 * 1000) {
+      // 비동기로 실행
+      updateUserActivity(user.id).catch(err =>
+        console.error('Failed to update user activity:', err)
+      )
     }
   }
 

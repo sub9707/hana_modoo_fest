@@ -34,7 +34,7 @@ export default function HeroSection() {
           {/* 메인 타이틀 */}
           <h1 className="font-black text-gray-900">
             <div 
-              className={`block text-7xl sm:text-4xl md:text-6xl lg:text-[8rem] xl:text-[10rem] transition-all duration-500 ease-out ${
+              className={`block text-7xl md:text-6xl lg:text-[8rem] xl:text-[10rem] transition-all duration-500 ease-out ${
                 animationStage >= 1 
                   ? 'opacity-100 translate-y-0' 
                   : 'opacity-0 translate-y-6'

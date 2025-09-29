@@ -7,6 +7,7 @@ import type { User } from '@/types/auth'
 interface AuthContextType {
   user: User | null
   isLoading: boolean
+  error: string | null
   login: (user: User) => void
   logout: () => void
   refreshUser: () => Promise<void>
@@ -21,25 +22,44 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   // 사용자 정보 가져오기
   const fetchUser = useCallback(async (): Promise<User | null> => {
     try {
+      setError(null)
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
-        cache: 'no-store'
+        cache: 'no-store',
+        signal: AbortSignal.timeout(10000)
       })
 
       if (response.ok) {
         const userData = await response.json()
         return userData.user
+      } else if (response.status === 401) {
+        // 무효 세션 감지 - 클라이언트 상태 즉시 초기화
+        console.warn('유효하지않은 세션입니다. - 유저 상태 초기화')
+        return null
       } else {
+        console.error('유저 정보 fetch 에러:', response.status)
+        setError('사용자 정보를 불러올 수 없습니다.')
         return null
       }
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
+
+    } catch (error: any) {
+      console.error('[AuthContext] Failed to fetch user:', error)
+
+      if (error.name === 'TimeoutError') {
+        setError('요청 시간이 초과되었습니다.')
+      } else if (error.name === 'AbortError') {
+        setError('요청이 취소되었습니다.')
+      } else {
+        setError('네트워크 오류가 발생했습니다.')
+      }
+
       return null
     }
   }, [])
@@ -47,6 +67,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // 초기 사용자 정보 로드
   useEffect(() => {
     let mounted = true
+    let retryCount = 0
+    const maxRetries = 2
 
     const loadUser = async () => {
       setIsLoading(true)
@@ -57,6 +79,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } catch (error) {
         console.error('Error loading user:', error)
+
+        // ⚠️ 재시도 로직 (최대 2회)
+        if (mounted && retryCount < maxRetries) {
+          retryCount++
+          console.warn(`재시도중... (${retryCount}/${maxRetries})`)
+          setTimeout(() => loadUser(), 1000 * retryCount)
+          return
+        }
+
         if (mounted) {
           setUser(null)
         }
@@ -80,7 +111,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const userData = await fetchUser()
       setUser(userData)
     } catch (error) {
-      console.error('Error refreshing user:', error)
+      console.error('유저정보 새로고침 중 에러:', error)
       setUser(null)
     }
   }, [fetchUser])
@@ -88,12 +119,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // 로그인
   const login = useCallback((userData: User) => {
     setUser(userData)
+    setError(null)
   }, [])
 
   // 로그아웃
   const logout = useCallback(async () => {
     try {
       setUser(null)
+      setError(null)
       // 서버에 로그아웃 요청
       await fetch('/api/auth/logout', {
         method: 'POST',
@@ -110,10 +143,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const contextValue = useMemo(() => ({
     user,
     isLoading,
+    error,
     login,
     logout,
     refreshUser
-  }), [user, isLoading, login, logout, refreshUser])
+  }), [user, isLoading, error, login, logout, refreshUser])
 
   return (
     <AuthContext.Provider value={contextValue}>
