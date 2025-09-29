@@ -1,91 +1,70 @@
 import { z } from 'zod'
 
-// 기본 유효성 검증 함수들
-const koreanPhoneRegex = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/
-const zipCodeRegex = /^\d{5}$/
-
-// 참가자 유형 스키마
+// 참가자 유형
 export const participantTypeSchema = z.enum([
   'citizen',
-  'single-parent', 
+  'single-parent',
   'self-help',
   'volunteer',
   'organization'
-], {
-  message: '올바른 참가 유형을 선택해주세요.'
-})
+], { message: '참가자 유형을 선택해주세요.' })
 
-// 등록 상태 스키마
+// 신청 상태
 export const registrationStatusSchema = z.enum([
   'pending',
   'confirmed',
   'cancelled'
-], {
-  message: '올바른 등록 상태를 선택해주세요.'
-})
+], { message: '올바른 상태값이 아닙니다.' })
 
-// 이메일 스키마
-export const emailSchema = z
-  .string({ message: '이메일을 입력해주세요.' })
-  .min(1, '이메일을 입력해주세요.')
-  .email('올바른 이메일 형식이 아닙니다.')
-  .max(100, '이메일은 100자 이내로 입력해주세요.')
+// 동반자 수
+export const companionsSchema = z
+  .number({ message: '동반자 수는 숫자여야 합니다.' })
+  .int('동반자 수는 정수여야 합니다.')
+  .min(0, '동반자 수는 0명 이상이어야 합니다.')
+  .max(10, '동반자 수는 최대 10명까지 가능합니다.')
 
-// 전화번호 스키마
-export const phoneSchema = z
-  .string({ message: '전화번호를 입력해주세요.' })
-  .min(1, '전화번호를 입력해주세요.')
-  .regex(koreanPhoneRegex, '올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)')
+// 동반자 상세정보
+export const companionDetailsSchema = z
+  .string()
+  .max(500, '동반자 정보는 500자 이내로 입력해주세요.')
+  .optional()
+  .nullable()
 
-// 우편번호 스키마
-export const zipCodeSchema = z
-  .string({ message: '우편번호를 입력해주세요.' })
-  .min(1, '우편번호를 입력해주세요.')
-  .regex(zipCodeRegex, '올바른 우편번호 형식이 아닙니다. (5자리 숫자)')
-
-// 주소 스키마
+// 주소
 export const addressSchema = z
   .string({ message: '주소를 입력해주세요.' })
   .min(1, '주소를 입력해주세요.')
   .max(200, '주소는 200자 이내로 입력해주세요.')
 
-// 상세주소 스키마 (선택사항)
+// 상세주소
 export const addressDetailSchema = z
   .string()
   .max(100, '상세주소는 100자 이내로 입력해주세요.')
   .optional()
+  .nullable()
 
-// 동반자 수 스키마
-export const companionsSchema = z
-  .number({ message: '올바른 숫자를 입력해주세요.' })
-  .int('정수를 입력해주세요.')
-  .min(0, '동반자 수는 0명 이상이어야 합니다.')
-  .max(10, '동반자 수는 10명을 초과할 수 없습니다.')
+// 우편번호
+export const zipCodeSchema = z
+  .string({ message: '우편번호를 입력해주세요.' })
+  .min(1, '우편번호를 입력해주세요.')
+  .regex(/^\d{5}$/, '올바른 우편번호 형식이 아닙니다. (5자리)')
 
-// 동반자 세부정보 스키마 (선택사항)
-export const companionDetailsSchema = z
-  .string()
-  .max(500, '동반자 정보는 500자 이내로 입력해주세요.')
-  .optional()
-
-// 특별 요청사항 스키마 (선택사항)
+// 특별 요청사항
 export const specialRequestsSchema = z
   .string()
   .max(1000, '특별 요청사항은 1000자 이내로 입력해주세요.')
   .optional()
+  .nullable()
 
-// 동의 스키마
-export const consentSchema = z
-  .boolean({ message: '동의 여부를 선택해주세요.' })
+// 동의 여부
+export const consentSchema = z.boolean()
 
-// 필수 동의 스키마
+// 필수 동의
 export const requiredConsentSchema = z
-  .boolean({ message: '필수 동의가 필요합니다.' })
-  .refine(val => val === true, {
-    message: '필수 동의 항목에 동의해주세요.'
-  })
+  .boolean()
+  .refine(val => val === true, { message: '필수 동의 항목입니다.' })
 
-// 등록 폼 데이터 스키마
+// 등록 폼 스키마
 export const registrationFormSchema = z.object({
   participant_type: participantTypeSchema,
   companions: companionsSchema,
@@ -94,16 +73,15 @@ export const registrationFormSchema = z.object({
   address_detail: addressDetailSchema,
   zip_code: zipCodeSchema,
   special_requests: specialRequestsSchema,
-  privacy_consent: requiredConsentSchema,
-  marketing_consent: consentSchema
-}).refine((data) => {
-  // 동반자가 있으면 동반자 정보가 있는 것이 좋음 (경고용)
-  if (data.companions > 0 && !data.companion_details?.trim()) {
-    return true // 필수는 아니므로 true 반환
+  marketing_consent: consentSchema,
+  privacy_consent: requiredConsentSchema
+}).refine(data => {
+  if (data.companions > 0 && !data.companion_details) {
+    return false
   }
   return true
 }, {
-  message: '동반자가 있는 경우 동반자 정보를 입력하는 것을 권장합니다.',
+  message: '동반자가 있는 경우 동반자 정보를 입력해주세요.',
   path: ['companion_details']
 })
 
@@ -135,11 +113,11 @@ export const registrationSearchSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20)
 }).partial()
 
-// 등록번호 검증 스키마
+// 등록번호 검증 스키마 (숫자 1~5자리로 수정)
 export const registrationNumberSchema = z
   .string({ message: '등록번호를 입력해주세요.' })
   .min(1, '등록번호를 입력해주세요.')
-  .regex(/^MH\d{4}-[A-Z0-9]{8,12}$/, '올바른 등록번호 형식이 아닙니다.')
+  .regex(/^\d{1,5}$/, '올바른 등록번호 형식이 아닙니다. (숫자 1~5자리)')
 
 // 관리자용 등록 생성 스키마
 export const adminRegistrationSchema = z.object({
@@ -163,7 +141,13 @@ export const bulkRegistrationSchema = z.object({
 
 // CSV 업로드 스키마
 export const csvRegistrationSchema = z.object({
-  file: z.instanceof(File, { message: 'CSV 파일을 선택해주세요.' }),
+  file: z.instanceof(File, { message: 'CSV 파일을 선택해주세요.' })
+    .refine(file => file.type === 'text/csv' || file.name.endsWith('.csv'), {
+      message: 'CSV 파일만 업로드 가능합니다.'
+    })
+    .refine(file => file.size <= 10 * 1024 * 1024, {
+      message: '파일 크기는 10MB를 초과할 수 없습니다.'
+    }),
   override: z.boolean().default(false)
 })
 
@@ -222,6 +206,7 @@ export function getFieldError(error: z.ZodError, fieldName: string): string | un
   return fieldError?.message
 }
 
+// 직접 회원가입 스키마
 export const directRegistrationSchema = z.object({
   name: z.string()
     .min(2, '이름은 2자 이상이어야 합니다')
@@ -285,6 +270,7 @@ export const directRegistrationSchema = z.object({
 
 export type DirectRegistrationData = z.infer<typeof directRegistrationSchema>
 
+// 사용자명 중복 확인 스키마
 export const usernameCheckSchema = z.object({
   username: z.string()
     .min(4, '사용자명은 4자 이상이어야 합니다')
@@ -292,6 +278,7 @@ export const usernameCheckSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, '사용자명은 영문, 숫자, 언더스코어(_)만 사용 가능합니다')
 })
 
+// 전화번호 중복 확인 스키마
 export const phoneCheckSchema = z.object({
   phone: z.string()
     .regex(/^010\d{8}$/, '올바른 휴대폰 번호를 입력해주세요')

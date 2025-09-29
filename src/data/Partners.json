@@ -271,9 +271,9 @@
     {
       "id": "duri-support",
       "name": "한국두리모지원협의회",
-      "logo": null,
-      "description": null,
-      "website": null,
+      "logo": "/images/partners/logos/dorimo.webp",
+      "description": "두리모(미혼모/부)에 대한 인식개선과 복지향상을 위한 정책/이슈 개발",
+      "website": "https://www.kdurimosupport.com/",
       "category": "참여기관"
     },
     {

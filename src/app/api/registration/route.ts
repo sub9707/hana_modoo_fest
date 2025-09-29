@@ -1,13 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
-import { query, queryOne, transaction } from '@/lib/mysql/connection'
-import type { RegistrationFormData, Registration } from '@/types/registration'
+import { query, queryOne } from '@/lib/mysql/connection'
+import type { RegistrationFormData } from '@/types/registration'
 
-// 신청번호 생성 함수
-function generateRegistrationNumber(): string {
-  const year = new Date().getFullYear()
-  const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase()
-  return `MH${year}-${randomStr}`
+// 신청번호 생성 함수 - 순차적 인덱스 기반
+async function generateRegistrationNumber(): Promise<string> {
+  try {
+    // 현재 가장 큰 registration_number 조회 (숫자만)
+    const result = await queryOne(
+      `SELECT registration_number 
+       FROM registrations 
+       WHERE registration_number REGEXP '^[0-9]+$'
+       ORDER BY CAST(registration_number AS UNSIGNED) DESC 
+       LIMIT 1`
+    )
+
+    let nextNumber = 1
+    
+    if (result && result.registration_number) {
+      const currentMax = parseInt(result.registration_number, 10)
+      nextNumber = currentMax + 1
+    }
+
+    // 자리수에 따라 포맷팅
+    // 0-9999: 4자리 (0000-9999)
+    // 10000 이상: 그대로 (10000, 10001, ...)
+    if (nextNumber <= 9999) {
+      return nextNumber.toString().padStart(4, '0')
+    } else {
+      return nextNumber.toString()
+    }
+  } catch (error) {
+    console.error('Registration number generation error:', error)
+    throw new Error('신청번호 생성 중 오류가 발생했습니다.')
+  }
 }
 
 // GET: 현재 사용자의 참가신청 조회
@@ -99,54 +125,44 @@ export async function POST(request: NextRequest) {
 
     // 이미 신청한 사용자인지 확인 (활성 신청만)
     const existingRegistration = await queryOne(
-      'SELECT id, status FROM registrations WHERE user_id = ?',
+      'SELECT id, status FROM registrations WHERE user_id = ? AND status != "cancelled"',
       [user.id]
     )
 
-    if (existingRegistration && existingRegistration.status !== 'cancelled') {
+    if (existingRegistration) {
       return NextResponse.json(
         { error: '이미 참가신청을 완료하셨습니다.' },
         { status: 409 }
       )
     }
 
-    // UUID 생성 (Node.js 18+ 내장)
+    // 트랜잭션으로 신청번호 생성 및 등록 처리
+    const registrationNumber = await generateRegistrationNumber()
     const registrationId = crypto.randomUUID()
-    
-    // 신청번호 생성
-    let registrationNumber = generateRegistrationNumber()
-    
-    // 신청번호 중복 확인 및 재생성
-    let attempts = 0
-    const maxAttempts = 10
-    
-    while (attempts < maxAttempts) {
-      const existing = await queryOne(
-        'SELECT id FROM registrations WHERE registration_number = ?',
-        [registrationNumber]
-      )
-      
-      if (!existing) {
-        break // 중복되지 않으면 사용
-      }
-      
-      registrationNumber = generateRegistrationNumber()
-      attempts++
-      
-      if (attempts >= maxAttempts) {
-        throw new Error('신청번호 생성에 실패했습니다.')
-      }
-    }
 
-    // 기존 취소된 레코드가 있으면 업데이트, 없으면 새로 삽입
-    if (existingRegistration && existingRegistration.status === 'cancelled') {
-      // 기존 취소된 레코드를 업데이트
+    // 취소된 신청이 있는지 확인
+    const cancelledRegistration = await queryOne(
+      'SELECT id FROM registrations WHERE user_id = ? AND status = "cancelled"',
+      [user.id]
+    )
+
+    if (cancelledRegistration) {
+      // 기존 레코드 업데이트
       await query(
-        `UPDATE registrations SET 
-         registration_number = ?, participant_type = ?, companions = ?, companion_details = ?,
-         address = ?, address_detail = ?, zip_code = ?, special_requests = ?,
-         marketing_consent = ?, privacy_consent = ?, status = ?, updated_at = NOW()
-         WHERE user_id = ?`,
+        `UPDATE registrations SET
+          registration_number = ?,
+          participant_type = ?,
+          companions = ?,
+          companion_details = ?,
+          address = ?,
+          address_detail = ?,
+          zip_code = ?,
+          special_requests = ?,
+          marketing_consent = ?,
+          privacy_consent = ?,
+          status = 'confirmed',
+          updated_at = NOW()
+        WHERE id = ?`,
         [
           registrationNumber,
           data.participant_type,
@@ -158,25 +174,21 @@ export async function POST(request: NextRequest) {
           data.special_requests || null,
           data.marketing_consent ? 1 : 0,
           data.privacy_consent ? 1 : 0,
-          'confirmed',
-          user.id
+          cancelledRegistration.id
         ]
       )
-      
-      // 업데이트된 레코드의 ID는 기존 ID 사용
-      const finalRegistrationId = existingRegistration.id
-      
+
       // 업데이트된 신청 정보 조회
       const updatedRegistration = await queryOne(
         `SELECT r.*, u.name as user_name, u.phone as user_phone 
          FROM registrations r 
          JOIN users u ON r.user_id = u.id 
          WHERE r.id = ?`,
-        [finalRegistrationId]
+        [cancelledRegistration.id]
       )
 
       if (!updatedRegistration) {
-        throw new Error('업데이트된 등록 정보 조회에 실패했습니다.')
+        throw new Error('등록 정보 조회에 실패했습니다.')
       }
 
       return NextResponse.json({

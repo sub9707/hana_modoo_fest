@@ -1,92 +1,42 @@
-import type { ParticipantType, RegistrationStatus, ParticipantTypeOption } from '@/types/registration'
+import type { ParticipantType } from '@/types/registration'
 
-// 참가자 유형 라벨 맵핑
+// 참가자 유형 옵션
+export const participantTypeOptions = [
+  { id: 'citizen', label: '일반시민', description: '서초구 거주 일반 시민' },
+  { id: 'single-parent', label: '한부모가족', description: '한부모가족 지원 대상자' },
+  { id: 'self-help', label: '자활사업단', description: '자활근로사업단 참여자' },
+  { id: 'volunteer', label: '자원봉사자', description: '자원봉사활동 참여자' },
+  { id: 'organization', label: '복지기관', description: '복지시설 및 기관 종사자' }
+] as const
+
+// 참가자 유형 라벨 가져오기
 export const getParticipantTypeLabel = (type: ParticipantType): string => {
-  const typeLabels: Record<ParticipantType, string> = {
-    'citizen': '일반시민',
-    'single-parent': '한부모가족',
-    'self-help': '자조모임',
-    'volunteer': '자원봉사자',
-    'organization': '유관기관'
-  }
-  return typeLabels[type] || type
+  const option = participantTypeOptions.find(opt => opt.id === type)
+  return option?.label || type
 }
 
-// 상태 라벨 맵핑
-export const getStatusLabel = (status: RegistrationStatus): string => {
-  const statusLabels: Record<RegistrationStatus, string> = {
+// 신청 상태 라벨 가져오기
+export const getStatusLabel = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    'pending': '대기중',
     'confirmed': '확정',
-    'pending': '대기',
-    'cancelled': '취소'
+    'cancelled': '취소됨'
   }
-  return statusLabels[status] || status
+  return statusMap[status] || status
 }
 
-// 상태별 색상 클래스 맵핑
-export const getStatusColor = (status: RegistrationStatus): string => {
-  const statusColors: Record<RegistrationStatus, string> = {
-    'confirmed': 'bg-green-100 text-green-800',
-    'pending': 'bg-yellow-100 text-yellow-800',
-    'cancelled': 'bg-red-100 text-red-800'
-  }
-  return statusColors[status] || 'bg-gray-100 text-gray-800'
-}
-
-// 상태별 뱃지 variant 맵핑 (shadcn/ui Badge 컴포넌트용)
-export const getStatusBadgeVariant = (status: RegistrationStatus): 'default' | 'destructive' | 'outline' | 'secondary' => {
-  const statusVariants: Record<RegistrationStatus, 'default' | 'destructive' | 'outline' | 'secondary'> = {
-    'confirmed': 'default',
-    'pending': 'secondary',
-    'cancelled': 'destructive'
-  }
-  return statusVariants[status] || 'outline'
-}
-
-// 참가자 유형 옵션 목록
-export const participantTypeOptions: ParticipantTypeOption[] = [
-  {
-    id: 'citizen',
-    label: '일반시민',
-    description: '지역 주민 및 일반 시민',
-    icon: '👥'
-  },
-  {
-    id: 'single-parent',
-    label: '한부모가족',
-    description: '한부모가족 지원 대상자',
-    icon: '👨‍👧‍👦'
-  },
-  {
-    id: 'self-help',
-    label: '자조모임',
-    description: '지역 내 자조모임 회원',
-    icon: '🤝'
-  },
-  {
-    id: 'volunteer',
-    label: '자원봉사자',
-    description: '축제 운영 자원봉사자',
-    icon: '🙋‍♀️'
-  },
-  {
-    id: 'organization',
-    label: '유관기관',
-    description: '협력 유관기관 관계자',
-    icon: '🏢'
-  }
-]
-
-// 신청번호 생성 함수
+// 신청번호 생성 함수 (서버 사이드에서만 사용)
+// 이 함수는 더 이상 사용되지 않으며, API route에서 직접 생성합니다
 export const generateRegistrationNumber = (): string => {
-  const year = new Date().getFullYear()
-  const timestamp = Date.now().toString().slice(-6)
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-  return `MH${year}-${timestamp}${random}`
+  // Deprecated: 서버 API에서 직접 생성
+  console.warn('generateRegistrationNumber is deprecated. Use API route instead.')
+  return '0000'
 }
 
 // 신청번호 유효성 검사
 export const isValidRegistrationNumber = (number: string): boolean => {
-  const pattern = /^MH\d{4}-\d{9}$/
+  // 숫자만으로 구성된 1~5자리 (0000 ~ 99999)
+  const pattern = /^\d{1,5}$/
   return pattern.test(number)
 }
 
@@ -159,8 +109,8 @@ export const getParticipantTypeColor = (type: ParticipantType): string => {
 // 동의 상태 아이콘 및 텍스트
 export const getConsentDisplay = (consent: boolean): { icon: string; text: string; color: string } => {
   return consent 
-    ? { icon: '✅', text: '동의', color: 'text-green-600' }
-    : { icon: '❌', text: '비동의', color: 'text-red-600' }
+    ? { icon: '✓', text: '동의', color: 'text-green-600' }
+    : { icon: '✗', text: '비동의', color: 'text-red-600' }
 }
 
 // 검색 키워드 하이라이트 함수 (HTML 문자열 반환)

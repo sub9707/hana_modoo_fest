@@ -57,7 +57,7 @@ export default function DirectionsPage() {
       <ParkingSection />
 
       {/* 접근성 & 편의시설 */}
-      <AccessibilitySection />
+      {/* <AccessibilitySection /> */}
     </div >
   )
 }

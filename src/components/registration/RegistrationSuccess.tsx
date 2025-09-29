@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { User } from '@/types/auth'
 import type { Registration } from '@/types/registration'
@@ -15,9 +15,12 @@ export default function RegistrationSuccess({ user, registration }: Registration
     const cardRef = useRef<HTMLDivElement>(null)
     const [isDownloading, setIsDownloading] = useState(false)
     const [isSharing, setIsSharing] = useState(false)
+    const [tempUUID, setTempUUID] = useState('')
 
-    // 임시 UUID (실제로는 registration.id 사용)
-    const tempUUID = `reg-${registration.id}-${Date.now().toString(36)}`
+    // 클라이언트에서만 UUID 생성 (Hydration 에러 방지)
+    useEffect(() => {
+        setTempUUID(`reg-${registration.id}-${Date.now().toString(36)}`)
+    }, [registration.id])
 
     // 날짜 포맷팅
     const formatDate = (dateString: string) => {
@@ -88,6 +91,29 @@ export default function RegistrationSuccess({ user, registration }: Registration
         }
     }
 
+    // 공유하기
+    const shareCard = async () => {
+        setIsSharing(true)
+
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: '모두하나대축제 2025 접수증',
+                    text: `접수번호: ${registration.registration_number}`,
+                    url: window.location.href
+                })
+            } else {
+                // 공유 API가 지원되지 않는 경우 클립보드에 복사
+                await navigator.clipboard.writeText(window.location.href)
+                alert('링크가 클립보드에 복사되었습니다.')
+            }
+        } catch (error) {
+            console.error('Share error:', error)
+        } finally {
+            setIsSharing(false)
+        }
+    }
+
     return (
         <div className="min-h-screen font-paper" style={{ backgroundColor: '#f8fafc' }}>
             {/* 헤더 - 오렌지-핑크 그라데이션 */}
@@ -153,10 +179,12 @@ export default function RegistrationSuccess({ user, registration }: Registration
                             </div>
 
                             <div className="relative z-10 p-8">
-                                {/* UUID */}
-                                <div className="absolute top-4 left-4 text-xs font-mono opacity-40">
-                                    {tempUUID}
-                                </div>
+                                {/* UUID - 클라이언트에서만 렌더링 */}
+                                {tempUUID && (
+                                    <div className="absolute top-4 left-4 text-xs font-mono opacity-40">
+                                        {tempUUID}
+                                    </div>
+                                )}
 
                                 {/* 접수 완료 뱃지 */}
                                 <div className="text-center mb-8 pt-6">
@@ -167,7 +195,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                             boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.4)'
                                         }}
                                     >
-                                        <span className="text-2xl">✅</span>
+                                        <span className="text-2xl">✓</span>
                                         <span>접수 완료</span>
                                     </div>
                                 </div>
@@ -192,117 +220,99 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                 <div className="grid md:grid-cols-2 gap-6 mb-10">
                                     <div className="space-y-4">
                                         {[
-                                            { label: '신청자', value: user.name, icon: '👤' },
-                                            { label: '참가인원', value: `${registration.companions + 1}명 (본인 포함)`, icon: '👥' },
-                                            { label: '참가유형', value: getParticipantTypeText(registration.participant_type), icon: '🏷️' }
+                                            { label: '신청자', value: user.name, icon: '사람' },
+                                            { label: '참가인원', value: `${registration.companions + 1}명 (본인 포함)`, icon: '그룹' },
+                                            { label: '참가유형', value: getParticipantTypeText(registration.participant_type), icon: '태그' }
                                         ].map((item, index) => (
                                             <div 
                                                 key={index}
                                                 className="flex items-center justify-between p-4 rounded-xl"
-                                                style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}
+                                                style={{ backgroundColor: '#f9fafb' }}
                                             >
-                                                <div className="flex items-center space-x-3">
-                                                    <span className="text-xl">{item.icon}</span>
-                                                    <span className="font-medium" style={{ color: '#64748b' }}>{item.label}</span>
-                                                </div>
-                                                <span className="font-bold" style={{ color: '#1e293b' }}>{item.value}</span>
+                                                <span className="text-sm font-medium" style={{ color: '#6b7280' }}>
+                                                    {item.label}
+                                                </span>
+                                                <span className="font-semibold" style={{ color: '#111827' }}>
+                                                    {item.value}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
-
                                     <div className="space-y-4">
                                         {[
-                                            { label: '신청일시', value: formatDate(registration.created_at), icon: '📅' },
-                                            { label: '연락처', value: user.phone, icon: '📞' },
+                                            { label: '전화번호', value: user.phone, icon: '전화' },
+                                            { label: '신청일시', value: formatDate(registration.created_at), icon: '달력' },
+                                            { label: '상태', value: '확정', icon: '체크' }
                                         ].map((item, index) => (
                                             <div 
                                                 key={index}
                                                 className="flex items-center justify-between p-4 rounded-xl"
-                                                style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}
+                                                style={{ backgroundColor: '#f9fafb' }}
                                             >
-                                                <div className="flex items-center space-x-3">
-                                                    <span className="text-xl">{item.icon}</span>
-                                                    <span className="font-medium" style={{ color: '#64748b' }}>{item.label}</span>
-                                                </div>
-                                                <span className="font-bold text-sm" style={{ color: '#1e293b' }}>{item.value}</span>
+                                                <span className="text-sm font-medium" style={{ color: '#6b7280' }}>
+                                                    {item.label}
+                                                </span>
+                                                <span className="font-semibold" style={{ color: '#111827' }}>
+                                                    {item.value}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
 
-                                {/* 경품 수령 주소 */}
-                                <div className="mb-8">
-                                    <h4 className="font-bold text-lg mb-4" style={{ color: '#374151' }}>
-                                        🏠 경품 수령 주소
-                                    </h4>
-                                    <div 
-                                        className="p-4 rounded-xl"
-                                        style={{ backgroundColor: '#fef3c7', border: '1px solid #fcd34d' }}
-                                    >
-                                        <div className="font-medium" style={{ color: '#92400e' }}>
-                                            [{registration.zip_code}] {registration.address}
-                                            {registration.address_detail && ` ${registration.address_detail}`}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 축제 정보 */}
+                                {/* 배송지 정보 */}
                                 <div 
-                                    className="rounded-2xl p-8 mb-8 relative overflow-hidden"
-                                    style={{ 
-                                        background: 'linear-gradient(135deg, #fef3c7 0%, #fae8ff 50%, #ddd6fe 100%)',
-                                        border: '1px solid rgba(255, 255, 255, 0.3)'
-                                    }}
+                                    className="p-6 rounded-xl mb-8"
+                                    style={{ backgroundColor: '#fef3c7', border: '2px dashed #f59e0b' }}
                                 >
-                                    <div className="relative z-10">
-                                        <h3 className="text-2xl font-bold text-center mb-8" style={{ color: '#374151' }}>
-                                            🎪 모두하나대축제 2025 🎪
-                                        </h3>
-                                        <div className="grid grid-cols-3 gap-6 text-center">
-                                            {[
-                                                { icon: '📅', title: '일시', line1: '2025.10.18 (토)', line2: '11:00-17:00' },
-                                                { icon: '📍', title: '장소', line1: '여의도공원', line2: '문화의마당' },
-                                                { icon: '🎟️', title: '입장', line1: '무료 입장', line2: '접수번호 지참' }
-                                            ].map((item, index) => (
-                                                <div 
-                                                    key={index}
-                                                    className="p-4 rounded-xl bg-white bg-opacity-60 backdrop-blur-sm"
-                                                >
-                                                    <div className="text-3xl mb-3">{item.icon}</div>
-                                                    <div className="font-bold text-lg mb-2" style={{ color: '#374151' }}>{item.title}</div>
-                                                    <div className="text-sm font-medium" style={{ color: '#6b7280' }}>{item.line1}</div>
-                                                    <div className="text-sm font-medium" style={{ color: '#6b7280' }}>{item.line2}</div>
-                                                </div>
-                                            ))}
+                                    <div className="flex items-start space-x-3">
+                                        <span className="text-2xl">📦</span>
+                                        <div className="flex-1">
+                                            <div className="font-bold mb-2" style={{ color: '#92400e' }}>
+                                                경품 배송지
+                                            </div>
+                                            <div className="text-sm space-y-1" style={{ color: '#78350f' }}>
+                                                <div>({registration.zip_code}) {registration.address}</div>
+                                                {registration.address_detail && (
+                                                    <div>{registration.address_detail}</div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* 주관 기관 */}
-                                <div className="text-center text-sm border-t pt-6" style={{ 
-                                    borderColor: '#e5e7eb',
-                                    color: '#9ca3af'
-                                }}>
-                                    <div className="mb-2 font-medium">주최: 서울특별시 | 주관: 서울특별시한부모가족지원센터</div>
-                                    <div>02-861-3020 | hanbumo1@seoul.go.kr</div>
-                                </div>
+                                {/* 특별 요청사항 */}
+                                {registration.special_requests && (
+                                    <div 
+                                        className="p-6 rounded-xl"
+                                        style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac' }}
+                                    >
+                                        <div className="flex items-start space-x-3">
+                                            <span className="text-2xl">💬</span>
+                                            <div className="flex-1">
+                                                <div className="font-bold mb-2" style={{ color: '#166534' }}>
+                                                    특별 요청사항
+                                                </div>
+                                                <div className="text-sm" style={{ color: '#15803d' }}>
+                                                    {registration.special_requests}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* 다운로드 버튼 */}
-                        <div className="text-center">
+                        <div className="text-center space-y-4">
                             <button
                                 onClick={downloadCard}
                                 disabled={isDownloading}
-                                className="relative group"
-                                style={{
-                                    background: 'linear-gradient(135deg, #f97316 0%, #ec4899 100%)',
-                                    padding: '16px 32px',
-                                    borderRadius: '16px',
-                                    color: 'white',
-                                    fontWeight: '600',
-                                    fontSize: '16px',
-                                    border: 'none',
+                                className="inline-block px-10 py-5 rounded-2xl font-bold text-lg text-white w-full md:w-auto"
+                                style={{ 
+                                    background: isDownloading 
+                                        ? 'linear-gradient(135deg, #9ca3af, #6b7280)'
+                                        : 'linear-gradient(135deg, #f97316, #ec4899)',
                                     cursor: isDownloading ? 'not-allowed' : 'pointer',
                                     transition: 'all 0.3s ease',
                                     boxShadow: '0 10px 25px -5px rgba(249, 115, 22, 0.4)',
@@ -310,7 +320,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                 }}
                             >
                                 {isDownloading ? (
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center justify-center space-x-3">
                                         <div 
                                             className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                                             style={{ animation: 'spin 1s linear infinite' }}
@@ -318,7 +328,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                         <span>이미지 생성 중...</span>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center justify-center space-x-3">
                                         <span className="text-xl">💾</span>
                                         <span>접수증 이미지 다운로드</span>
                                         <span className="text-xl">✨</span>
@@ -329,6 +339,55 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                 접수증을 이미지로 저장하여 휴대폰에 보관하세요
                             </p>
                         </div>
+                    </div>
+
+                    {/* 안내 사항 */}
+                    <div 
+                        className="p-8 rounded-2xl space-y-6"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                    >
+                        <h2 className="text-2xl font-bold mb-4" style={{ color: '#111827' }}>
+                            📋 안내 사항
+                        </h2>
+                        <div className="space-y-4">
+                            {[
+                                '행사 당일 접수번호를 제시해주시기 바랍니다.',
+                                '경품 추첨 결과는 행사 종료 후 개별 연락드립니다.',
+                                '등록하신 주소로 경품이 배송될 예정입니다.',
+                                '문의사항은 고객센터(02-1234-5678)로 연락 주세요.'
+                            ].map((text, index) => (
+                                <div key={index} className="flex items-start space-x-3">
+                                    <span className="text-orange-500 font-bold flex-shrink-0 mt-1">•</span>
+                                    <span style={{ color: '#4b5563' }}>{text}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 액션 버튼들 */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <button
+                            onClick={() => router.push('/')}
+                            className="px-8 py-4 rounded-xl font-bold text-lg transition-all"
+                            style={{
+                                backgroundColor: '#ffffff',
+                                color: '#f97316',
+                                border: '2px solid #f97316',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            }}
+                        >
+                            홈으로 돌아가기
+                        </button>
+                        <button
+                            onClick={() => router.push('/my-page')}
+                            className="px-8 py-4 rounded-xl font-bold text-lg text-white transition-all"
+                            style={{
+                                background: 'linear-gradient(135deg, #f97316, #ec4899)',
+                                boxShadow: '0 10px 25px -5px rgba(249, 115, 22, 0.4)'
+                            }}
+                        >
+                            마이페이지로 이동
+                        </button>
                     </div>
                 </div>
             </div>

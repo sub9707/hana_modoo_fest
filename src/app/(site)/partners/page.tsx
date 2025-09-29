@@ -26,10 +26,10 @@ export default async function PartnersPage() {
   const partners = partnersData as PartnersData
 
   // 서버에서 파트너 통계 계산
-  const totalPartners = partners.organizers.length + 
-                       partners.sponsors.length + 
-                       partners.operators.length + 
-                       partners.participants.length
+  const totalPartners = partners.organizers.length +
+    partners.sponsors.length +
+    partners.operators.length +
+    partners.participants.length
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-cyan-50 font-paper">
@@ -50,23 +50,7 @@ export default async function PartnersPage() {
             </svg>
           }
           gradient="from-purple-600 to-indigo-600"
-          bgGradient="bg-gradient-to-br from-white via-white to-indigo-50"
-          cardSize="large"
-        />
-
-        {/* 후원 섹션 */}
-        <PartnerSection
-          title="후원"
-          subtitle="든든한 지원으로"
-          description="축제의 가치에 공감하며 재정적, 물질적 지원으로 함께해주시는 소중한 파트너입니다"
-          partners={partners.sponsors}
-          icon={
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          }
-          gradient="from-orange-400 to-pink-500"
-          bgGradient="bg-gradient-to-br from-white via-indigo-50 to-white"
+          bgGradient="bg-gradient-to-br from-indigo-50 via-white to-indigo-50"
           cardSize="large"
         />
 
@@ -83,9 +67,27 @@ export default async function PartnersPage() {
             </svg>
           }
           gradient="from-cyan-600 to-indigo-300"
+          bgGradient="bg-gradient-to-br from-white via-indigo-50 to-white"
+          cardSize="large"
+        />
+
+        {/* 후원 섹션 */}
+        <PartnerSection
+          title="후원"
+          subtitle="든든한 지원으로"
+          description="축제의 가치에 공감하며 재정적, 물질적 지원으로 함께해주시는 소중한 파트너입니다"
+          partners={partners.sponsors}
+          icon={
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          }
+          gradient="from-orange-400 to-pink-500"
           bgGradient="bg-gradient-to-br from-indigo-50 via-white to-indigo-50"
           cardSize="large"
         />
+
+
 
         {/* 참여기관 섹션 - 가장 큰 섹션 */}
         <PartnerSection
@@ -118,7 +120,7 @@ export default async function PartnersPage() {
                   개 기관과 함께
                 </h2>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  모두하나대축제 2025는 다양한 분야의 파트너들과 함께 
+                  모두하나대축제 2025는 다양한 분야의 파트너들과 함께
                   더 큰 가치를 만들어가고 있습니다
                 </p>
               </div>
@@ -131,7 +133,7 @@ export default async function PartnersPage() {
                   { label: '운영법인', count: partners.operators.length, gradient: 'from-cyan-500 to-purple-500' },
                   { label: '참여기관', count: partners.participants.length, gradient: 'from-purple-400 to-cyan-400' }
                 ].map((stat, index) => (
-                  <div 
+                  <div
                     key={stat.label}
                     className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/40 hover:bg-white/80 transition-all duration-300 hover:scale-105 shadow-lg"
                   >
@@ -151,10 +153,10 @@ export default async function PartnersPage() {
                   함께해주셔서 감사합니다
                 </h3>
                 <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
-                  모든 파트너 기관들의 소중한 참여와 지원으로 
+                  모든 파트너 기관들의 소중한 참여와 지원으로
                   모두하나대축제 2025가 더욱 의미 있는 행사가 될 수 있습니다
                 </p>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
