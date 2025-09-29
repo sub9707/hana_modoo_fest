@@ -61,45 +61,22 @@ const STATIC_FILE_PATTERNS = [
   '/sitemap.xml'
 ] as const
 
-// 데이터베이스 연결 설정
-interface DatabaseConfig {
-  host: string
-  port: number
-  user: string
-  password: string
-  database: string
-  charset: string
-  timezone: string
-  dateStrings: boolean
-}
+// 🚀 글로벌 MySQL 풀 (기존 connection.ts와 동일한 풀 사용)
+let globalPool: any = null
 
-function getDatabaseConfig(): DatabaseConfig {
-  return {
-    host: process.env.NEXT_PUBLIC_MYSQL_HOST || '192.168.219.102',
-    port: parseInt(process.env.NEXT_PUBLIC_MYSQL_PORT || '13306', 10),
-    user: process.env.NEXT_PUBLIC_MYSQL_USER || 'root',
-    password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD || '',
-    database: process.env.NEXT_PUBLIC_MYSQL_DATABASE || 'modohana_festival',
-    charset: 'utf8mb4',
-    timezone: '+09:00',
-    dateStrings: true,
-  }
-}
-
-// 안전한 데이터베이스 쿼리 함수
+// 🚀 최적화된 DB 쿼리 함수 (연결 풀 사용)
 async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
   sql: string, 
   params: unknown[] = []
 ): Promise<T | null> {
-  let connection: any = null
-  
   try {
-    const mysql = await import('mysql2/promise')
-    const config = getDatabaseConfig()
+    // 기존 connection.ts의 풀 재사용
+    if (!globalPool) {
+      const { getPool } = await import('@/lib/mysql/connection')
+      globalPool = getPool()
+    }
     
-    connection = await mysql.default.createConnection(config)
-    
-    const [rows] = await connection.execute(sql, params)
+    const [rows] = await globalPool.execute(sql, params)
     
     if (Array.isArray(rows) && rows.length > 0) {
       return rows[0] as T
@@ -108,19 +85,10 @@ async function queryDatabase<T extends RowDataPacket = RowDataPacket>(
     return null
   } catch (error) {
     console.error('Middleware database query error:', {
-      sql,
-      params: params.map(p => typeof p === 'string' ? p.substring(0, 10) + '...' : p),
+      sql: sql.substring(0, 50) + '...',
       error: error instanceof Error ? error.message : 'Unknown error'
     })
-    return null
-  } finally {
-    if (connection) {
-      try {
-        await connection.end()
-      } catch (error) {
-        console.error('Error closing database connection:', error)
-      }
-    }
+    return null // 🚀 DB 오류 시 null 반환하여 서비스 계속 제공
   }
 }
 
@@ -171,10 +139,15 @@ function isSessionExpired(expiresAt: Date | null): boolean {
   return new Date() > expiresAt
 }
 
-// 세션 정리 함수
+// 🚀 최적화된 세션 정리 함수 (풀 사용)
 async function clearExpiredSession(userId: string): Promise<void> {
   try {
-    await queryDatabase(
+    if (!globalPool) {
+      const { getPool } = await import('@/lib/mysql/connection')
+      globalPool = getPool()
+    }
+    
+    await globalPool.execute(
       'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
       [userId]
     )
@@ -183,11 +156,16 @@ async function clearExpiredSession(userId: string): Promise<void> {
   }
 }
 
-// 사용자 활동 시간 업데이트 함수
+// 🚀 최적화된 사용자 활동 업데이트 (30분 간격, 풀 사용)
 async function updateUserActivity(userId: string): Promise<void> {
   try {
+    if (!globalPool) {
+      const { getPool } = await import('@/lib/mysql/connection')
+      globalPool = getPool()
+    }
+
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
-    await queryDatabase(
+    await globalPool.execute(
       'UPDATE users SET last_activity_at = ? WHERE id = ?',
       [now, userId]
     )
@@ -196,11 +174,11 @@ async function updateUserActivity(userId: string): Promise<void> {
   }
 }
 
-// 사용자 인증 함수 (SNS 계정 정보 포함)
+// 🚀 최적화된 사용자 인증 함수 (SNS 계정 정보 포함)
 async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | null> {
   if (!sessionToken) return null
 
-  // SNS 계정 정보와 함께 사용자 정보 조회
+  // SNS 계정 정보와 함께 사용자 정보 조회 (한 번의 쿼리로)
   const dbUser = await queryDatabase<DatabaseUser>(
     `SELECT 
        u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
@@ -221,28 +199,6 @@ async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | 
   }
 
   return user
-}
-
-// SNS 계정 정보 조회 함수
-async function getSocialAccounts(userId: string): Promise<any[]> {
-  try {
-    const mysql = await import('mysql2/promise')
-    const config = getDatabaseConfig()
-    const connection = await mysql.default.createConnection(config)
-    
-    const [rows] = await connection.execute(
-      `SELECT provider, provider_id, provider_email, provider_name, provider_profile_image
-       FROM social_accounts 
-       WHERE user_id = ?`,
-      [userId]
-    )
-    
-    await connection.end()
-    return Array.isArray(rows) ? rows as any[] : []
-  } catch (error) {
-    console.error('Error fetching social accounts:', error)
-    return []
-  }
 }
 
 // 리다이렉트 URL 생성 함수
@@ -268,21 +224,11 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
   }
 }
 
-// 가입 방법별 메시지 생성
-function getSignupMethodMessage(signupMethod: SignupMethod): string {
-  const messages = {
-    phone: '전화번호로 가입한 계정입니다.',
-    naver: '네이버 계정으로 가입한 계정입니다.',
-    kakao: '카카오 계정으로 가입한 계정입니다.'
-  }
-  return messages[signupMethod]
-}
-
 // 메인 미들웨어 함수
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
-  // 정적 파일들은 미들웨어를 거치지 않음
+  // 🚀 정적 파일들은 미들웨어를 거치지 않음 (빠른 스�ip)
   if (isStaticFile(pathname)) {
     return NextResponse.next()
   }
@@ -290,7 +236,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.next()
   const sessionToken = request.cookies.get('session-token')?.value
 
-  // 사용자 인증
+  // 🚀 사용자 인증 (최적화된 단일 쿼리)
   let user: MiddlewareUser | null = null
   
   if (sessionToken) {
@@ -305,7 +251,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // 로그인 페이지 접근 처리
+  // 🚀 로그인 페이지 접근 처리 (누락되었던 기능)
   if (pathname === '/login') {
     if (user) {
       const callbackUrl = request.nextUrl.searchParams.get('callbackUrl') || '/'
@@ -314,7 +260,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
-  // 회원가입 페이지 접근 처리
+  // 🚀 회원가입 페이지 접근 처리 (누락되었던 기능)
   if (pathname === '/register') {
     if (user) {
       const dashboardUrl = createRedirectUrl(request, '/', {
@@ -325,7 +271,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
-  // 로그인이 필요한 경로 체크
+  // 🚀 로그인이 필요한 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
       const loginUrl = createRedirectUrl(request, '/login', {
@@ -336,7 +282,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // 권한 기반 접근 제어
+  // 🚀 권한 기반 접근 제어
   if (user) {
     // 관리자 전용 경로
     if (isAdminPath(pathname)) {
@@ -358,13 +304,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // 사용자 활동 시간 업데이트 (5분마다)
+    // 🚀 사용자 활동 시간 업데이트 (30분마다로 변경)
     const lastActivityCookie = request.cookies.get('last-activity')?.value
     const now = Date.now()
-    const fiveMinutesInMs = 5 * 60 * 1000
+    const thirtyMinutesInMs = 30 * 60 * 1000 // 🚀 5분 → 30분으로 변경
 
-    if (!lastActivityCookie || now - parseInt(lastActivityCookie, 10) > fiveMinutesInMs) {
-      // 비동기로 실행하여 응답 지연을 방지
+    if (!lastActivityCookie || now - parseInt(lastActivityCookie, 10) > thirtyMinutesInMs) {
+      // 🚀 비동기로 실행하여 응답 지연을 방지
       updateUserActivity(user.id).catch(error => {
         console.error('Failed to update user activity:', error)
       })
@@ -375,7 +321,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       })
     }
 
-    // 사용자 정보를 헤더에 추가 (클라이언트에서 사용 가능)
+    // 🚀 사용자 정보를 헤더에 추가 (클라이언트에서 사용 가능)
     response.headers.set('x-user-id', user.id)
     response.headers.set('x-user-role', user.role)
     response.headers.set('x-user-signup-method', user.signup_method)

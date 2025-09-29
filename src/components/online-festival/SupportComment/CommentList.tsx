@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Filter, RefreshCw, Zap } from 'lucide-react'
 import CommentItem from './CommentItem'
 
@@ -30,9 +30,10 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadingRef = useRef<HTMLDivElement | null>(null)
+  const currentPageRef = useRef(1) // ref로 page 관리
 
-  // 댓글 목록 초기화 및 첫 페이지 로드 (성능 개선)
-  const loadComments = useCallback(async (isRefresh = false) => {
+  // 댓글 목록 로드 함수 (useCallback 제거로 무한 루프 방지)
+  const loadComments = async (isRefresh = false) => {
     if (isLoading) return
 
     setIsLoading(true)
@@ -40,7 +41,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     const startTime = Date.now()
 
     try {
-      const targetPage = isRefresh ? 1 : page
+      const targetPage = isRefresh ? 1 : currentPageRef.current
       const response = await fetch(
         `/api/support-comments?page=${targetPage}&limit=10&sortBy=${sortBy}`
       )
@@ -55,9 +56,12 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       if (isRefresh) {
         setComments(data.comments)
         setPage(2)
+        currentPageRef.current = 2
       } else {
         setComments(prev => [...prev, ...data.comments])
-        setPage(prev => prev + 1)
+        const nextPage = currentPageRef.current + 1
+        setPage(nextPage)
+        currentPageRef.current = nextPage
       }
 
       setHasMore(data.hasMore)
@@ -78,12 +82,13 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [page, sortBy, isLoading])
+  }
 
   // 정렬 변경 시 댓글 목록 새로고침
   useEffect(() => {
     setComments([])
     setPage(1)
+    currentPageRef.current = 1
     setHasMore(true)
     loadComments(true)
   }, [sortBy])
@@ -93,6 +98,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     if (refreshTrigger > 0) {
       setComments([])
       setPage(1)
+      currentPageRef.current = 1
       setHasMore(true)
       loadComments(true)
     }
@@ -122,7 +128,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
         observerRef.current.disconnect()
       }
     }
-  }, [hasMore, isLoading, loadComments])
+  }, [hasMore, isLoading])
 
   // 초기 로드
   useEffect(() => {
@@ -143,6 +149,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   const handleRefresh = () => {
     setComments([])
     setPage(1)
+    currentPageRef.current = 1
     setHasMore(true)
     loadComments(true)
   }
@@ -233,6 +240,14 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       {!hasMore && comments.length > 0 && (
         <div className="text-center py-8 text-gray-400 text-sm">
           모든 댓글을 확인했습니다
+        </div>
+      )}
+
+      {/* 댓글이 없을 때 */}
+      {!hasMore && comments.length === 0 && !isLoading && !error && (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-lg mb-2">아직 응원 메시지가 없습니다</div>
+          <div className="text-gray-500 text-sm">첫 번째 응원 메시지를 남겨보세요!</div>
         </div>
       )}
     </div>

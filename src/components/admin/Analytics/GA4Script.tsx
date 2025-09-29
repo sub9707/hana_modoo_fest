@@ -40,8 +40,6 @@ export function GA4Script() {
               allow_google_signals: false,
               allow_ad_personalization_signals: false
             });
-            
-            console.log('GA4 초기화 완료:', '${GA4_TRACKING_ID}');
           `,
         }}
       />
