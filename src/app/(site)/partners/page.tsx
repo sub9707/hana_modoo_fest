@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     description: '모두하나대축제 2025와 함께하는 주최, 후원, 협력, 참여기관을 소개합니다.',
     images: [
       {
-        url: '/images/partners/partners-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: '모두하나대축제 2025 함께하는 기관',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },

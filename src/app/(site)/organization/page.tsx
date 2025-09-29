@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     description: '서울특별시한부모가족지원센터를 소개합니다. 돌봄, 소통, 혁신의 가치로 한부모가족의 자립과 복지 증진을 위해 노력합니다.',
     images: [
       {
-        url: '/images/organization/organization-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: '서울특별시한부모가족지원센터 소개',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },

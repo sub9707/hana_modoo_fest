@@ -14,10 +14,10 @@ export const metadata: Metadata = {
     description: '여의도공원 문화의마당에서 10월 18일 만나요. 대중교통 및 주차 안내 정보를 확인하세요.',
     images: [
       {
-        url: '/images/directions/directions-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: '모두하나대축제 2025 오시는 길',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },

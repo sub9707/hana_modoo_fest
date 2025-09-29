@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     description: '모두하나대축제 2025의 개인정보 처리방침',
     type: 'website',
     locale: 'ko_KR',
+    images: [
+      {
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
+      },
+    ],
   },
   alternates: {
     canonical: '/privacy-policy'

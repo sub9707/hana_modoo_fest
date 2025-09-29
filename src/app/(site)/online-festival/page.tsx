@@ -9,6 +9,14 @@ export const metadata: Metadata = {
     title: '온라인 축제 | 모두하나대축제 2025',
     description: '모두하나대축제 2025 온라인 축제에 참여하세요. 퀴즈, 응원 댓글, 가족 글짓기, 랜덤 이벤트 등 다양한 온라인 활동으로 축제의 즐거움을 함께 나눠요.',
     url: 'https://moduhana2025.seoul.kr/online-festival',
+    images: [
+      {
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
+      },
+    ],
   },
 }
 
@@ -16,7 +24,7 @@ export default function OnlineFestivalPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
       {/* 히어로 영역 */}
-      <OnelineFestivalHero/>
+      <OnelineFestivalHero />
 
       {/* 메인 콘텐츠 - 탭 섹션 */}
       <section className="relative pb-20">

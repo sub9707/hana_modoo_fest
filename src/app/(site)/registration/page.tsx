@@ -12,13 +12,21 @@ export const metadata: Metadata = {
   openGraph: {
     title: '사전참가 신청 | 모두하나대축제 2025',
     description: '축제 참가 신청을 통해 더 많은 혜택을 받으세요.',
+    images: [
+      {
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
+      },
+    ],
   },
 }
 
 export default async function RegistrationPage() {
   // 서버에서 현재 사용자 정보 가져오기
   const user = await getCurrentUser()
-  
+
   // 로그인하지 않은 사용자는 리다이렉트
   if (!user) {
     redirect('/login?callbackUrl=/registration')
@@ -58,7 +66,7 @@ export default async function RegistrationPage() {
     <div className="min-h-screen bg-gray-50 font-paper">
       {/* 히어로 섹션 */}
       <RegistrationHero />
-      
+
       {/* 메인 콘텐츠 */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -71,9 +79,9 @@ export default async function RegistrationPage() {
                   이미 사전참가 신청을 완료하셨습니다.
                 </p>
               </div>
-              
+
               <div className="p-6">
-                <ExistingRegistration 
+                <ExistingRegistration
                   user={user}
                   registration={registration}
                 />
@@ -88,7 +96,7 @@ export default async function RegistrationPage() {
                   축제 당일 원활한 참여를 위해 사전신청을 해주세요.
                 </p>
               </div>
-              
+
               <div className="p-6">
                 <RegistrationForm user={user} />
               </div>

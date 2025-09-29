@@ -16,10 +16,10 @@ export const metadata: Metadata = {
     url: 'https://모두하나대축제.com',
     images: [
       {
-        url: '/images/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: '모두하나대축제 2025 포스터',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },
@@ -38,16 +38,16 @@ export default async function HomePage() {
         <Introduction />
       </div>
       <div>
-        <ProgramCardSection/>
+        <ProgramCardSection />
       </div>
       <div>
-        <CampaignOverview/>
+        <CampaignOverview />
       </div>
       <div>
-        <JoinCampaignsSection/>
+        <JoinCampaignsSection />
       </div>
       <div>
-        <CampaignSection/>
+        <CampaignSection />
       </div>
     </div>
   )

@@ -22,14 +22,14 @@ export const metadata: Metadata = {
         title: '모두하나대축제 2025 | 서울시 대표 가족축제',
         description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
         siteName: '모두하나대축제',
-        images: [
-            {
-                url: '/images/og-image.jpg',
-                width: 1200,
-                height: 630,
-                alt: '모두하나대축제 2025 포스터',
-            },
-        ],
+    images: [
+      {
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
+      },
+    ],
     },
     twitter: {
         card: 'summary_large_image',

@@ -26,7 +26,7 @@ export default function HeroCTAButton({
             className={`bg-gradient-to-r from-pink-300 via-purple-300 to-sky-300 
              text-white font-extrabold text-center text-shadow-md py-3 px-6  text-2xl
              rounded-tl-4xl rounded-br-4xl rounded-tr-md rounded-bl-md
-             shadow-md transition-transform hover:scale-105`}
+             shadow-md transition-transform hover:scale-105 w-full`}
         >
             {text}
         </Link>

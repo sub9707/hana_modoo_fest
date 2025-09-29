@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     description: '축제 관련 최신 소식과 중요 공지사항을 확인하세요.',
     type: 'website',
     locale: 'ko_KR',
+    images: [
+      {
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -39,7 +47,7 @@ async function getInitialData() {
     }
   } catch (error) {
     console.error('Failed to fetch initial data:', error)
-    
+
     // 폴백 데이터
     return {
       categories: [{ id: 'all', name: '전체', count: 0 }],
@@ -57,8 +65,8 @@ export default async function NewsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
       {/* 히어로 섹션 */}
-      <NewsHero/>
-      
+      <NewsHero />
+
       {/* 메인 콘텐츠 */}
       <NewsContainer initialCategories={initialData.categories} />
     </div>

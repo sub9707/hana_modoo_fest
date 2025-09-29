@@ -15,10 +15,10 @@ export const metadata: Metadata = {
     description: '서울시 대표 가족축제 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
     images: [
       {
-        url: '/images/festival/festival-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: '모두하나대축제 2025 포스터',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },

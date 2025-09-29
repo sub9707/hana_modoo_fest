@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     description: '모두하나대축제 2025 행사 프로그램 안내. 행사 일정, 전체행사안내, 행사장 안내도를 확인하세요.',
     images: [
       {
-        url: '/images/program/program-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: '모두하나대축제 2025 행사 프로그램',
+        url: '/images/modoo_hana_image.png',
+        width: 332,
+        height: 265,
+        alt: '모두하나대축제 2025 로고',
       },
     ],
   },
