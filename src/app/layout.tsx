@@ -28,6 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={`${inter.variable} ${notoSansKR.variable} ${paperlogy.variable}`}>
+      <meta name="naver-site-verification" content="1471d6b4b4ff9f6ec82d54b4ed4f0af70a262871" />
       <body className="min-h-screen bg-background font-noto-sans antialiased">
           <Providers>
             {children}
