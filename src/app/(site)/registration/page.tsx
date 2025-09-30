@@ -11,6 +11,10 @@ import { Loader2 } from 'lucide-react'
 export const metadata: Metadata = {
   title: '사전참가 신청',
   description: '모두하나대축제 2025 사전참가 신청을 해주세요. 원활한 축제 참여를 위해 사전신청을 권장합니다.',
+  robots:{
+    index:false,
+    follow:false
+  }
 }
 
 // ✅ NextJS 15: 캐시 무효화 설정 추가

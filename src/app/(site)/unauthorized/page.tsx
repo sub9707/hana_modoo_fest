@@ -5,6 +5,10 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: '접근 권한 없음 | 모두하나대축제 2025',
   description: '접근 권한이 없는 페이지입니다.',
+  robots:{
+    follow:false,
+    index:false
+  }
 }
 
 export default function UnauthorizedPage() {

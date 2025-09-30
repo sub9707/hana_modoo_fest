@@ -21,6 +21,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  icons: {
+    icon: '/favicon.ico',
+  }
 };
 
 // 행사장 정보 데이터

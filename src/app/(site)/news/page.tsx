@@ -23,6 +23,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  icons: {
+    icon: '/favicon.ico',
+  }
 }
 
 // NextJS 15: 서버에서 초기 데이터 fetch
@@ -31,9 +34,9 @@ async function getInitialData() {
     // 병렬로 데이터 요청 (성능 최적화)
     const [categories, initialNews] = await Promise.all([
       NewsService.getCategories(),
-      NewsService.getNewsList({ 
-        sort: 'newest', 
-        limit: 10 
+      NewsService.getNewsList({
+        sort: 'newest',
+        limit: 10
       })
     ])
 
@@ -67,7 +70,7 @@ export default async function NewsPage() {
 
       {/* 메인 콘텐츠 with Suspense */}
       <Suspense fallback={<NewsListSkeleton />}>
-        <NewsContainer 
+        <NewsContainer
           initialCategories={initialData.categories}
           initialNews={initialData.initialNews}
           initialTotalCount={initialData.totalCount}

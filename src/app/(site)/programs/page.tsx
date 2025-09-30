@@ -17,6 +17,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  icons: {
+    icon: '/favicon.ico',
+  }
 }
 
 export default function ProgramPage() {
@@ -24,7 +27,7 @@ export default function ProgramPage() {
     <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
       {/* 히어로 섹션 */}
       <ProgramHero />
-      
+
       {/* 탭 및 컨텐츠 섹션 */}
       <ProgramTabs />
     </div>

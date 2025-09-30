@@ -22,6 +22,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  icons: {
+    icon: '/favicon.ico',
+  }
 }
 
 
@@ -30,25 +33,25 @@ export default async function AboutPage() {
     <div className="min-h-screen font-paper">
       {/* 히어로 섹션 */}
       <FestivalHero />
-      
+
       {/* 핵심 가치 섹션 */}
-      <CoreValues/>
+      <CoreValues />
 
       {/* 축제 개요 섹션 */}
-      <FestivalOverview/>
-      
+      <FestivalOverview />
+
       {/* 축제 정보 섹션 */}
       <FestivalInfo />
 
       {/* 주요 프로그램 섹션 */}
-      <FestivalPrograms/>
+      <FestivalPrograms />
 
       {/* 참여방법 섹션 */}
-      <FestivalJoinGuide/>
+      <FestivalJoinGuide />
 
       {/* 참여유도 섹션 */}
-      <JoinFestival/>
-      
+      <JoinFestival />
+
 
     </div>
   )

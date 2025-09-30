@@ -6,6 +6,10 @@ import { Metadata } from 'next'
 export const metadata: Metadata = {
   title: '회원탈퇴 | 모두하나대축제',
   description: '회원탈퇴를 진행하세요',
+  robots: {
+    index: false,
+    follow: false
+  }
 }
 
 // NextJS 15: 동적 렌더링

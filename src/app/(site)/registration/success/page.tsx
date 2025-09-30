@@ -8,6 +8,10 @@ import type { Registration } from '@/types/registration'
 export const metadata: Metadata = {
   title: '신청 완료',
   description: '모두하나대축제 2025 사전참가 신청이 완료되었습니다.',
+  robots:{
+    index:false,
+    follow:false
+  }
 }
 
 interface PageProps {

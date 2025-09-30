@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: '개인정보 처리방침 | 모두하나대축제 2025',
   description: '모두하나대축제 2025의 개인정보 처리방침입니다. 개인정보 수집, 이용, 보관, 파기에 대한 상세한 내용을 확인하세요.',
   keywords: '개인정보처리방침, 개인정보보호, 모두하나대축제, 카카오로그인',
-  robots: 'index, follow',
+  robots: {
+    follow: false,
+    index: false
+  },
   openGraph: {
     title: '개인정보 처리방침 | 모두하나대축제 2025',
     description: '모두하나대축제 2025의 개인정보 처리방침',
@@ -23,7 +26,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/privacy-policy'
-  }
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 // NextJS 15 Server Component 활용

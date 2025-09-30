@@ -12,7 +12,10 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: '비밀번호 변경 | 모두하나축제',
   description: '계정 보안을 위해 비밀번호를 변경하세요.',
-  robots: 'noindex, nofollow', // 개인 설정 페이지는 검색 엔진에 노출되지 않도록
+  robots: {
+    index:false,
+    follow:false
+  }
 }
 
 // NextJS 15: 향상된 사용자 인증 확인
