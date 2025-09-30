@@ -16,7 +16,7 @@ export default function Providers({ children }: ProvidersProps) {
         <AuthRefreshHandler />
       </Suspense>
       {children}
-      {/* 페이지 전환 프로그레스 바 */}
+      {/* 페이지 전환 UI */}
       <ProgressBar
         height="3px"
         color="#ea580c"
