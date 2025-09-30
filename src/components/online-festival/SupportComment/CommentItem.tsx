@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Heart, Clock } from 'lucide-react'
+import React, { useState } from 'react'
+import { Heart } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Comment {
@@ -19,11 +19,9 @@ interface CommentItemProps {
   onLikeToggle: (commentId: string, isLiked: boolean, newLikes: number) => void
 }
 
-export default function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
+function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
   const { user } = useAuth()
   const [isLiking, setIsLiking] = useState(false)
-  const [showProcessingTime, setShowProcessingTime] = useState(false)
-  const [lastProcessingTime, setLastProcessingTime] = useState<number | null>(null)
 
   const handleLike = async () => {
     if (!user || isLiking) return
@@ -49,11 +47,9 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
           onLikeToggle(comment.id, data.isLiked, data.likes)
         }
         
-        // 개발 환경에서 처리 시간 표시
+        // 🔥 개발 환경에서 console.log만 사용 (UI 업데이트 제거)
         if (process.env.NODE_ENV === 'development' && data.processingTime) {
-          setLastProcessingTime(data.processingTime)
-          setShowProcessingTime(true)
-          setTimeout(() => setShowProcessingTime(false), 3000)
+          console.log(`좋아요 처리: ${data.processingTime}ms`)
         }
         
       } else {
@@ -99,15 +95,7 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
   }
 
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-6 hover:bg-white/80 transition-all duration-200 group relative">
-      {/* 개발 환경에서 처리 시간 표시 */}
-      {showProcessingTime && lastProcessingTime && (
-        <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
-          <Clock className="w-3 h-3" />
-          <span>{lastProcessingTime}ms</span>
-        </div>
-      )}
-      
+    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-6 hover:bg-white/80 transition-all duration-200 group">
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -164,3 +152,5 @@ export default function CommentItem({ comment, onLikeToggle }: CommentItemProps)
     </div>
   )
 }
+
+export default React.memo(CommentItem)

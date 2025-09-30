@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { Filter, RefreshCw, Zap } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Filter, RefreshCw } from 'lucide-react'
 import CommentItem from './CommentItem'
 
 interface Comment {
@@ -22,23 +22,61 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   const [comments, setComments] = useState<Comment[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-  const [page, setPage] = useState(1)
   const [sortBy, setSortBy] = useState<'latest' | 'popular'>('latest')
   const [error, setError] = useState('')
-  const [lastLoadTime, setLastLoadTime] = useState<number | null>(null)
-  const [showPerformanceInfo, setShowPerformanceInfo] = useState(false)
   
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadingRef = useRef<HTMLDivElement | null>(null)
-  const currentPageRef = useRef(1) // ref로 page 관리
+  
+  // 🔥 페이지는 ref로만 관리 (state 제거)
+  const currentPageRef = useRef(1)
+  
+  // 🔥 최신 상태를 ref로 관리 (IntersectionObserver 클로저 문제 해결)
+  const isLoadingRef = useRef(false)
+  const hasMoreRef = useRef(true)
+  const lastTriggerTimeRef = useRef(0)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // 🔥 모바일 감지 (UA + 터치 지원 + 화면 크기)
+  const isMobile = useRef(false)
+  
+  useEffect(() => {
+    isMobile.current = 
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      (window.innerWidth <= 768 && 'ontouchstart' in window)
+  }, [])
 
-  // 댓글 목록 로드 함수 (useCallback 제거로 무한 루프 방지)
+  // 🔥 Debounced loadComments (모바일 전용)
+  const loadCommentsDebounced = (isRefresh = false) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    // 모바일: 400ms, 데스크톱: 200ms
+    const debounceDelay = isMobile.current ? 400 : 200
+
+    debounceTimerRef.current = setTimeout(() => {
+      loadComments(isRefresh)
+    }, debounceDelay)
+  }
+
+  // 댓글 목록 로드 함수
   const loadComments = async (isRefresh = false) => {
-    if (isLoading) return
+    // 중복 호출 방지
+    if (isLoadingRef.current || !hasMoreRef.current) return
+    
+    // Throttle: 마지막 트리거로부터 일정 시간 이내면 중단
+    const now = Date.now()
+    const throttleDelay = isMobile.current ? 800 : 400
+    
+    if (!isRefresh && now - lastTriggerTimeRef.current < throttleDelay) {
+      return
+    }
+    lastTriggerTimeRef.current = now
 
+    isLoadingRef.current = true
     setIsLoading(true)
     setError('')
-    const startTime = Date.now()
 
     try {
       const targetPage = isRefresh ? 1 : currentPageRef.current
@@ -51,60 +89,57 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       }
 
       const data = await response.json()
-      const loadTime = Date.now() - startTime
 
       if (isRefresh) {
         setComments(data.comments)
-        setPage(2)
         currentPageRef.current = 2
       } else {
         setComments(prev => [...prev, ...data.comments])
-        const nextPage = currentPageRef.current + 1
-        setPage(nextPage)
-        currentPageRef.current = nextPage
+        currentPageRef.current += 1
       }
 
       setHasMore(data.hasMore)
-      setLastLoadTime(loadTime)
+      hasMoreRef.current = data.hasMore
 
-      // 개발 환경에서 성능 정보 표시
+      // 🔥 개발 환경에서 성능 정보 (console만 사용, UI 업데이트 제거)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`댓글 로딩 시간: ${loadTime}ms`, data.fromCache ? '(캐시)' : '(DB)')
-        if (data.processingTime) {
-          console.log(`서버 처리 시간: ${data.processingTime}ms`)
-        }
-        setShowPerformanceInfo(true)
-        setTimeout(() => setShowPerformanceInfo(false), 3000)
+        console.log(
+          `댓글 로딩: ${data.processingTime || 'N/A'}ms`,
+          data.fromCache ? '(캐시)' : '(DB)',
+          `| 페이지: ${targetPage}`
+        )
       }
 
     } catch (error) {
       setError(error instanceof Error ? error.message : '댓글을 불러오는데 실패했습니다.')
     } finally {
+      isLoadingRef.current = false
       setIsLoading(false)
     }
   }
 
-  // 정렬 변경 시 댓글 목록 새로고침
+  // 🔥 정렬 변경 시 - 기존 데이터 유지하면서 새로 로드 (깜빡임 방지)
   useEffect(() => {
-    setComments([])
-    setPage(1)
     currentPageRef.current = 1
-    setHasMore(true)
+    hasMoreRef.current = true
+    lastTriggerTimeRef.current = 0
+    // setComments([]) 제거 - 기존 데이터 유지
     loadComments(true)
   }, [sortBy])
 
   // 새 댓글 작성 시 목록 새로고침
   useEffect(() => {
     if (refreshTrigger > 0) {
-      setComments([])
-      setPage(1)
       currentPageRef.current = 1
-      setHasMore(true)
+      hasMoreRef.current = true
+      lastTriggerTimeRef.current = 0
+      // 새 댓글 작성 시에는 기존 데이터 초기화
+      setComments([])
       loadComments(true)
     }
   }, [refreshTrigger])
 
-  // 무한 스크롤 설정
+  // 🔥 개선된 무한 스크롤 설정
   useEffect(() => {
     if (observerRef.current) {
       observerRef.current.disconnect()
@@ -112,11 +147,23 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadComments()
+        const entry = entries[0]
+        
+        if (entry.isIntersecting && hasMoreRef.current && !isLoadingRef.current) {
+          // 모바일에서는 debounce 적용, 데스크톱은 즉시 실행
+          if (isMobile.current) {
+            loadCommentsDebounced()
+          } else {
+            loadComments()
+          }
         }
       },
-      { threshold: 0.1 }
+      {
+        // 🔥 완화된 설정: 모바일 0.5, 데스크톱 0.3
+        threshold: isMobile.current ? 0.5 : 0.3,
+        // 🔥 모바일은 100px 전, 데스크톱은 50px 전
+        rootMargin: isMobile.current ? '0px 0px -100px 0px' : '0px 0px -50px 0px'
+      }
     )
 
     if (loadingRef.current) {
@@ -127,16 +174,19 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       if (observerRef.current) {
         observerRef.current.disconnect()
       }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
     }
-  }, [hasMore, isLoading])
+  }, [])
 
   // 초기 로드
   useEffect(() => {
     loadComments(true)
   }, [])
 
-  // 좋아요 토글 핸들러 (즉시 UI 업데이트)
-  const handleLikeToggle = (commentId: string, isLiked: boolean, newLikes: number) => {
+  // 좋아요 토글 핸들러
+  const handleLikeToggle = useCallback((commentId: string, isLiked: boolean, newLikes: number) => {
     setComments(prev =>
       prev.map(comment =>
         comment.id === commentId
@@ -144,13 +194,14 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
           : comment
       )
     )
-  }
+  }, [])
 
+  // 🔥 새로고침 - 기존 데이터 유지하면서 로딩
   const handleRefresh = () => {
-    setComments([])
-    setPage(1)
     currentPageRef.current = 1
-    setHasMore(true)
+    hasMoreRef.current = true
+    lastTriggerTimeRef.current = 0
+    // setComments([]) 제거 - 기존 데이터 유지
     loadComments(true)
   }
 
@@ -170,14 +221,6 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>새로고침</span>
           </button>
-          
-          {/* 개발 환경에서 성능 정보 표시 */}
-          {process.env.NODE_ENV === 'development' && showPerformanceInfo && lastLoadTime && (
-            <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
-              <Zap className="w-3 h-3" />
-              <span>{lastLoadTime}ms</span>
-            </div>
-          )}
         </div>
 
         <div className="flex items-center space-x-2">
