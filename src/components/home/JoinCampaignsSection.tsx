@@ -156,8 +156,8 @@ export default async function JoinCampaignsSection() {
                 온라인 캠페인 참여하기
               </h2>
 
-              <p className="text-md sm:text-lg lg:text-2xl font-medium opacity-90">
-                집에서도, 길에서도, 언제 어디서나 함께할 수 있는
+              <p className="text-md sm:text-lg lg:text-2xl font-medium opacity-90 break-keep text-center sm:text-start">
+                집에서도, 길에서도, 언제 어디서나 함께할 수 있는 &nbsp;
                 <br className='hidden sm:block' />
                 온라인 캠페인에 참여해보세요
               </p>

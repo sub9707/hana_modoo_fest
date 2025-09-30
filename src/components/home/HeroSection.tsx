@@ -89,7 +89,6 @@ export default function HeroSection() {
                 className="w-full h-auto rounded-2xl shadow-lg"
                 autoPlay
                 loop
-                muted
                 playsInline
                 style={{ aspectRatio: '16/9' }}
               >
