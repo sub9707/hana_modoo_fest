@@ -9,7 +9,7 @@ import CampaignSection from '@/components/home/CampaignSection'
 
 export const metadata: Metadata = {
   title: '모두하나대축제 2025 | 서울시 대표 가족축제',
-  description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장. 2025년 10월 18일 여의도공원에서 만나요.',
+  description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
   openGraph: {
     title: '모두하나대축제 2025 | 서울시 대표 가족축제',
     description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
