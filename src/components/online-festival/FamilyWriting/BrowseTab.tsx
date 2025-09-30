@@ -1,5 +1,5 @@
-import { WritingEntry, WritingTopic, User, SortType } from '@/types/writing'
 import WritingCard from './WritingCard'
+import { WritingEntry, User, SortType, WritingTopic } from '@/types/writing'
 
 interface BrowseTabProps {
   browseWritings: WritingEntry[]
@@ -10,6 +10,7 @@ interface BrowseTabProps {
   loading: boolean
   browseHasMore: boolean
   currentUser: User | null
+  likingWritings: Set<string> // 🚀 새로 추가
   setBrowseSort: (sort: SortType) => void
   setBrowseTopic: (topic: string) => void
   onLike: (writingId: string) => void
@@ -24,45 +25,64 @@ export default function BrowseTab({
   loading,
   browseHasMore,
   currentUser,
+  likingWritings, // 🚀 새로 추가
   setBrowseSort,
   setBrowseTopic,
   onLike
 }: BrowseTabProps) {
-  const topicOptions = ['all', ...writingTopics.map(topic => topic.title)]
+  const topics = [
+    { id: 'all', title: '전체' },
+    ...writingTopics.map(topic => ({ id: topic.title, title: topic.title }))
+  ]
+
+  const sorts: { id: SortType; title: string }[] = [
+    { id: 'latest', title: '최신순' },
+    { id: 'popular', title: '인기순' },
+    { id: 'oldest', title: '오래된순' }
+  ]
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* 필터링 */}
-      <div className="flex flex-wrap justify-center gap-4 mb-8">
-        <div className="flex flex-wrap justify-center gap-2">
-          {topicOptions.map((topic) => (
-            <button
-              key={topic}
-              onClick={() => setBrowseTopic(topic)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                browseTopic === topic
-                  ? 'bg-pink-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {topic === 'all' ? '전체' : topic}
-            </button>
-          ))}
+    <div className="space-y-6">
+      {/* 필터 */}
+      <div className="bg-white/60 rounded-2xl p-4 md:p-6 space-y-4">
+        {/* 주제 필터 */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">주제</label>
+          <div className="flex flex-wrap gap-2">
+            {topics.map((topic) => (
+              <button
+                key={topic.id}
+                onClick={() => setBrowseTopic(topic.id)}
+                className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  browseTopic === topic.id
+                    ? 'bg-pink-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {topic.title}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2">
-          {(['latest', 'popular', 'oldest'] as SortType[]).map((sort) => (
-            <button
-              key={sort}
-              onClick={() => setBrowseSort(sort)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                browseSort === sort
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {sort === 'latest' ? '최신순' : sort === 'popular' ? '인기순' : '오래된순'}
-            </button>
-          ))}
+
+        {/* 정렬 */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">정렬</label>
+          <div className="flex flex-wrap gap-2">
+            {sorts.map((sort) => (
+              <button
+                key={sort.id}
+                onClick={() => setBrowseSort(sort.id)}
+                className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  browseSort === sort.id
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {sort.title}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -74,7 +94,7 @@ export default function BrowseTab({
         <div className="text-sm md:text-base text-gray-600">총 작품수</div>
       </div>
 
-      {/* 작품 목록 - 스크롤 제거하고 전체 높이로 표시 */}
+      {/* 작품 목록 */}
       <div className="space-y-6">
         {browseWritings.map((entry) => (
           <WritingCard
@@ -82,6 +102,7 @@ export default function BrowseTab({
             entry={entry}
             currentUser={currentUser}
             onLike={onLike}
+            isLiking={likingWritings.has(entry.id)} // 🚀 새로 추가
           />
         ))}
         

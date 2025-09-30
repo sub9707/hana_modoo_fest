@@ -1,5 +1,5 @@
 // app/api/event/winners/recent/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import type { ApiResponse, RecentWinner } from '@/types/event'
 
@@ -7,21 +7,6 @@ const maskName = (name: string): string => {
   if (name.length <= 1) return name
   if (name.length === 2) return name[0] + '*'
   return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
-}
-
-const getTimeAgo = (wonAt: string): string => {
-  const now = new Date()
-  const wonTime = new Date(wonAt)
-  const diffMs = now.getTime() - wonTime.getTime()
-  
-  const diffMinutes = Math.floor(diffMs / (1000 * 60))
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
-  if (diffMinutes < 1) return '방금 전'
-  if (diffMinutes < 60) return `${diffMinutes}분 전`
-  if (diffHours < 24) return `${diffHours}시간 전`
-  return `${diffDays}일 전`
 }
 
 export async function GET() {
@@ -48,8 +33,7 @@ export async function GET() {
       prize_name: winner.prize_name,
       prize_icon: winner.prize_icon,
       prize_color: winner.prize_color,
-      won_at: winner.won_at,
-      time_ago: getTimeAgo(winner.won_at)
+      won_at: winner.won_at
     }))
 
     return NextResponse.json<ApiResponse<RecentWinner[]>>({

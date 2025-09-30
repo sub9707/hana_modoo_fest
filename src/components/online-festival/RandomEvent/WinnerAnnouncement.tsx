@@ -2,7 +2,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Trophy, Sparkles } from 'lucide-react'
 import type { RecentWinner } from '@/types/event'
 
 interface WinnerAnnouncementProps {
@@ -19,10 +18,10 @@ export default function WinnerAnnouncement({
 
   // 당첨자가 없을 때 표시할 기본 메시지들
   const defaultMessages = [
-    { text: '🎉 첫 번째 당첨자가 되어보세요!', icon: '🎯' },
-    { text: '🌟 행운의 주인공을 기다리고 있어요!', icon: '✨' },
-    { text: '🎁 특별한 선물이 여러분을 기다려요!', icon: '🎊' },
-    { text: '🍀 오늘의 운을 시험해보세요!', icon: '🎰' },
+    { text: '첫 번째 당첨자가 되어보세요!', icon: '🎯' },
+    { text: '행운의 주인공을 기다리고 있어요!', icon: '✨' },
+    { text: '특별한 선물이 여러분을 기다려요!', icon: '🎊' },
+    { text: '오늘의 운을 시험해보세요!', icon: '🎰' },
   ]
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function WinnerAnnouncement({
       setTimeout(() => {
         setCurrentIndex(prev => (prev + 1) % winners.length)
         setIsVisible(true)
-      }, 300) // 페이드아웃 시간
+      }, 300)
     }, 4000) // 4초마다 변경
 
     return () => clearInterval(interval)
@@ -63,11 +62,9 @@ export default function WinnerAnnouncement({
     <div className={`relative ${className}`}>
       <div className="bg-gradient-to-r from-festival-orange/10 via-festival-pink/10 to-festival-purple/10 rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
         <div className="flex items-center justify-center mb-4">
-          <div className="flex items-center space-x-2">
-            <h3 className="text-lg font-bold text-gray-900">
-              실시간 당첨 소식
-            </h3>
-          </div>
+          <h3 className="text-lg font-bold text-gray-900">
+            실시간 당첨 소식
+          </h3>
         </div>
 
         <div className="min-h-[80px] flex items-center justify-center">
@@ -88,7 +85,7 @@ export default function WinnerAnnouncement({
                     {currentWinner.prize_icon}
                   </span>
                   <div className="text-lg font-bold text-gray-900">
-                    당첨을 축하합니다! 🎉
+                    당첨을 축하합니다!
                   </div>
                 </div>
                 
@@ -104,10 +101,6 @@ export default function WinnerAnnouncement({
                     {currentWinner.prize_name}
                   </span>
                   <span className="text-gray-700 mx-2">당첨!</span>
-                </div>
-                
-                <div className="text-sm text-gray-500 mt-1">
-                  {currentWinner.time_ago}
                 </div>
               </div>
             ) : (

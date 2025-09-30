@@ -9,6 +9,7 @@ interface WritingCardProps {
   showRanking?: boolean
   rankingIndex?: number
   isMyWriting?: boolean
+  isLiking?: boolean // 🚀 새로 추가
 }
 
 export default function WritingCard({ 
@@ -17,8 +18,13 @@ export default function WritingCard({
   onLike, 
   showRanking = false, 
   rankingIndex, 
-  isMyWriting = false 
+  isMyWriting = false,
+  isLiking = false // 🚀 새로 추가
 }: WritingCardProps) {
+  // 🚀 is_liked가 undefined/null일 때 명시적으로 false로 처리
+  // API에서 0/1로 올 수도 있으므로 엄격한 Boolean 변환
+  const isLiked = entry.is_liked === true || entry.is_liked === 1
+  
   return (
     <div className={`bg-white/70 rounded-2xl p-4 md:p-6 hover:bg-white/80 transition-colors ${
       entry.is_featured ? 'ring-2 ring-pink-600/30' : ''
@@ -78,15 +84,25 @@ export default function WritingCard({
         ) : (
           <button
             onClick={() => onLike(entry.id)}
-            disabled={!currentUser}
-            className={`flex items-center space-x-2 px-3 md:px-4 py-2 rounded-full transition-colors touch-manipulation ${
-              entry.is_liked
+            disabled={!currentUser || isLiking}
+            className={`flex items-center space-x-2 px-3 md:px-4 py-2 rounded-full transition-all touch-manipulation ${
+              isLiked
                 ? 'bg-red-100 text-red-600'
                 : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 active:bg-red-100'
-            } ${!currentUser ? 'cursor-not-allowed opacity-50' : ''}`}
+            } ${!currentUser || isLiking ? 'cursor-not-allowed opacity-50' : ''}`}
           >
-            <Heart className={`w-4 h-4 ${entry.is_liked ? 'fill-current' : ''}`} />
-            <span className="text-sm font-medium">{entry.likes_count}</span>
+            {/* 🚀 로딩 중 애니메이션 */}
+            {isLiking ? (
+              <>
+                <div className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                <span className="text-sm font-medium">{entry.likes_count}</span>
+              </>
+            ) : (
+              <>
+                <Heart className={`w-4 h-4 transition-all ${isLiked ? 'fill-current scale-110' : ''}`} />
+                <span className="text-sm font-medium">{entry.likes_count}</span>
+              </>
+            )}
           </button>
         )}
         

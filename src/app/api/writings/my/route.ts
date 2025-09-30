@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     const offset = (page - 1) * limit
 
-    // 내 글 목록 조회
+    // 내 글 목록 조회 (내 글에는 is_liked가 필요 없음)
     const writings = await query(`
       SELECT 
         w.id,
@@ -34,18 +34,25 @@ export async function GET(request: NextRequest) {
               WHERE likes_count > 0
             ) ranked 
             WHERE rn <= 10
-          ) THEN true 
-          ELSE false 
+          ) THEN 1
+          ELSE 0
         END as is_featured,
         w.created_at,
         u.name as author_name,
-        true as is_mine
+        1 as is_mine
       FROM writings w
       JOIN users u ON w.user_id = u.id
       WHERE w.user_id = ?
       ORDER BY w.created_at DESC
       LIMIT ? OFFSET ?
     `, [user.id, limit, offset])
+
+    // 🚀 is_featured를 명시적으로 boolean으로 변환
+    const processedWritings = writings.map((writing: any) => ({
+      ...writing,
+      is_featured: Boolean(writing.is_featured),
+      is_mine: true
+    }))
 
     // 총 개수 조회
     const totalCountResult = await query(`
@@ -60,7 +67,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        writings,
+        writings: processedWritings,
         pagination: {
           page,
           limit,

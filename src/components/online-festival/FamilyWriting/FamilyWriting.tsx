@@ -50,6 +50,7 @@ export default function FamilyWriting() {
     myHasMore,
     totalWritings,
     loading,
+    likingWritings, // 🚀 새로 추가
     setBrowseSort,
     setBrowseTopic,
     setFeaturedTopic,
@@ -146,6 +147,7 @@ export default function FamilyWriting() {
           loading={loading}
           browseHasMore={browseHasMore}
           currentUser={currentUser}
+          likingWritings={likingWritings} // 🚀 새로 추가
           setBrowseSort={setBrowseSort}
           setBrowseTopic={setBrowseTopic}
           onLike={handleLike}
@@ -158,6 +160,7 @@ export default function FamilyWriting() {
           writingTopics={writingTopics}
           featuredTopic={featuredTopic}
           currentUser={currentUser}
+          likingWritings={likingWritings} // 🚀 새로 추가
           setFeaturedTopic={setFeaturedTopic}
           onLike={handleLike}
         />

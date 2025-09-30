@@ -4,10 +4,10 @@ export interface WritingEntry {
   title: string
   content: string
   likes_count: number
-  is_featured: boolean
+  is_featured: boolean | 0 | 1
   author_name: string
   created_at: string
-  is_liked?: boolean
+  is_liked?: boolean | 0 | 1 | "0" | "1" // 🚀 MySQL에서 문자열로 올 수도 있음
   is_mine?: boolean
 }
 

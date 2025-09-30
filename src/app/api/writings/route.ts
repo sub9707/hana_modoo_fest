@@ -25,28 +25,35 @@ export async function GET(request: NextRequest) {
         orderBy = 'w.created_at DESC'
     }
 
-    // 주제 필터 조건
-    let topicCondition = ''
-    const params: any[] = []
-    
-    if (topic !== 'all') {
-      topicCondition = 'WHERE w.topic = ?'
-      params.push(topic)
-    }
-
-    // 현재 사용자 확인 (좋아요 상태 체크용)
+    // 현재 사용자 확인
     const currentUser = await getCurrentUser()
     
-    const likesJoin = currentUser 
-      ? `LEFT JOIN writing_likes wl ON w.id = wl.writing_id AND wl.user_id = '${currentUser.id}'`
-      : ''
+    console.log('🔍 API writings - currentUser:', currentUser ? currentUser.id.substring(0, 8) : 'not logged in')
+
+    // 주제 필터 조건
+    let topicCondition = ''
+    const topicParams: any[] = []
+    if (topic !== 'all') {
+      topicCondition = 'WHERE w.topic = ?'
+      topicParams.push(topic)
+    }
+
+    // 🚀 서브쿼리로 is_liked 체크 (더 확실함)
+    let isLikedSelect = '0 as is_liked'
+    const userParams: any[] = []
     
-    const likesSelect = currentUser 
-      ? ', CASE WHEN wl.id IS NOT NULL THEN true ELSE false END as is_liked'
-      : ', false as is_liked'
+    if (currentUser) {
+      // IF 문으로 명확하게 0 또는 1 반환
+      isLikedSelect = `IF(
+        (SELECT COUNT(*) FROM writing_likes WHERE writing_id = w.id AND user_id = ?) > 0,
+        1,
+        0
+      ) as is_liked`
+      userParams.push(currentUser.id)
+    }
 
     // 글 목록 조회
-    const writings = await query(`
+    const writingsQuery = `
       SELECT 
         w.id,
         w.topic,
@@ -61,26 +68,51 @@ export async function GET(request: NextRequest) {
               WHERE likes_count > 0
             ) ranked 
             WHERE rn <= 10
-          ) THEN true 
-          ELSE false 
+          ) THEN 1
+          ELSE 0
         END as is_featured,
         w.created_at,
-        u.name as author_name
-        ${likesSelect}
+        u.name as author_name,
+        ${isLikedSelect}
       FROM writings w
       JOIN users u ON w.user_id = u.id
-      ${likesJoin}
       ${topicCondition}
       ORDER BY ${orderBy}
       LIMIT ? OFFSET ?
-    `, [...params, limit, offset])
+    `
+
+    // 🚀 파라미터 순서: userParams, topicParams, limit, offset
+    const queryParams = [...userParams, ...topicParams, limit, offset]
+    
+    console.log('🔍 API writings - query params:', queryParams)
+
+    const writings = await query(writingsQuery, queryParams)
+
+    // 🔍 디버깅: 첫 번째 글의 실제 좋아요 여부 확인
+    if (writings.length > 0 && currentUser) {
+      const checkLike = await query(
+        `SELECT COUNT(*) as count FROM writing_likes WHERE writing_id = ? AND user_id = ?`,
+        [writings[0].id, currentUser.id]
+      )
+      console.log('🔍 API writings - 첫 글 좋아요 실제 확인:', checkLike[0].count, '> 0 =', checkLike[0].count > 0)
+    }
+
+    // 🚀 is_liked를 명시적으로 boolean으로 변환
+    const processedWritings = writings.map((writing: any) => ({
+      ...writing,
+      is_featured: Boolean(writing.is_featured),
+      is_liked: Number(writing.is_liked) === 1 // 문자열 "1"도 숫자 1로 변환 후 체크
+    }))
+
+    console.log('🔍 API writings - 첫 글 원본 is_liked:', writings.length > 0 ? writings[0].is_liked : 'no data', 'type:', writings.length > 0 ? typeof writings[0].is_liked : 'no data')
+    console.log('🔍 API writings - 첫 글 처리 is_liked:', processedWritings.length > 0 ? processedWritings[0].is_liked : 'no data')
 
     // 총 개수 조회
     const totalCountResult = await query(`
       SELECT COUNT(*) as total
       FROM writings w
       ${topicCondition}
-    `, params)
+    `, topicParams)
 
     const totalCount = totalCountResult[0]?.total || 0
     const hasMore = (page * limit) < totalCount
@@ -88,7 +120,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        writings,
+        writings: processedWritings,
         pagination: {
           page,
           limit,
@@ -106,7 +138,6 @@ export async function GET(request: NextRequest) {
     )
   }
 }
-
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser()
