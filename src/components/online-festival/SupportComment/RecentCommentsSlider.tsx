@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Heart } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 
 interface RecentComment {
-  id: string // UUID 형태로 변경
+  id: string
   message: string
   likes: number
   author_name: string
@@ -24,7 +24,7 @@ export default function RecentCommentsSlider() {
     if (comments.length > 0) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % comments.length)
-      }, 3000) // 3초마다 변경
+      }, 3000)
 
       return () => clearInterval(interval)
     }
@@ -46,22 +46,18 @@ export default function RecentCommentsSlider() {
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8">
-        <div className="flex items-center justify-center h-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-        </div>
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 h-[200px] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
       </div>
     )
   }
 
   if (comments.length === 0) {
     return (
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8">
-        <div className="flex items-center justify-center h-20">
-          <div className="text-center">
-            <MessageCircle className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-            <p className="text-gray-600">아직 응원 메시지가 없습니다</p>
-          </div>
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 h-[200px] flex items-center justify-center">
+        <div className="text-center">
+          <MessageCircle className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+          <p className="text-gray-600">아직 응원 메시지가 없습니다</p>
         </div>
       </div>
     )
@@ -70,15 +66,15 @@ export default function RecentCommentsSlider() {
   const currentComment = comments[currentIndex]
 
   return (
-    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 relative overflow-hidden">
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 relative overflow-hidden h-[200px] flex flex-col">
+      <div className="flex items-center space-x-3 mb-4 flex-shrink-0">
+        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-white font-semibold text-sm">
             {currentComment.author_name[0]}
           </span>
         </div>
-        <div>
-          <div className="font-semibold text-gray-900">
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-gray-900 truncate">
             {currentComment.author_name}
           </div>
           <div className="text-sm text-gray-500">
@@ -87,12 +83,22 @@ export default function RecentCommentsSlider() {
         </div>
       </div>
 
-      <p className="text-gray-700 leading-relaxed mb-4 min-h-[3rem]">
-        {currentComment.message}
-      </p>
+      <div className="flex-1 mb-4 overflow-hidden">
+        <p 
+          className="text-gray-700 overflow-hidden"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            lineHeight: '1.5rem',
+            maxHeight: '4.5rem'
+          }}
+        >
+          {currentComment.message}
+        </p>
+      </div>
 
-      <div className="flex items-center justify-end">
-
+      <div className="flex items-center justify-end flex-shrink-0">
         <div className="flex space-x-1">
           {comments.map((_, index) => (
             <button
@@ -109,9 +115,8 @@ export default function RecentCommentsSlider() {
         </div>
       </div>
 
-      {/* 배경 장식 */}
-      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-pink-200/30 to-purple-200/30 rounded-full transform translate-x-8 -translate-y-8"></div>
-      <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full transform -translate-x-6 translate-y-6"></div>
+      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-pink-200/30 to-purple-200/30 rounded-full transform translate-x-8 -translate-y-8 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full transform -translate-x-6 translate-y-6 pointer-events-none"></div>
     </div>
   )
 }

@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
 
     // 현재 사용자 확인
     const currentUser = await getCurrentUser()
-    
-    console.log('🔍 API writings - currentUser:', currentUser ? currentUser.id.substring(0, 8) : 'not logged in')
 
     // 주제 필터 조건
     let topicCondition = ''
@@ -83,8 +81,6 @@ export async function GET(request: NextRequest) {
 
     // 🚀 파라미터 순서: userParams, topicParams, limit, offset
     const queryParams = [...userParams, ...topicParams, limit, offset]
-    
-    console.log('🔍 API writings - query params:', queryParams)
 
     const writings = await query(writingsQuery, queryParams)
 
@@ -94,7 +90,6 @@ export async function GET(request: NextRequest) {
         `SELECT COUNT(*) as count FROM writing_likes WHERE writing_id = ? AND user_id = ?`,
         [writings[0].id, currentUser.id]
       )
-      console.log('🔍 API writings - 첫 글 좋아요 실제 확인:', checkLike[0].count, '> 0 =', checkLike[0].count > 0)
     }
 
     // 🚀 is_liked를 명시적으로 boolean으로 변환
@@ -103,9 +98,6 @@ export async function GET(request: NextRequest) {
       is_featured: Boolean(writing.is_featured),
       is_liked: Number(writing.is_liked) === 1 // 문자열 "1"도 숫자 1로 변환 후 체크
     }))
-
-    console.log('🔍 API writings - 첫 글 원본 is_liked:', writings.length > 0 ? writings[0].is_liked : 'no data', 'type:', writings.length > 0 ? typeof writings[0].is_liked : 'no data')
-    console.log('🔍 API writings - 첫 글 처리 is_liked:', processedWritings.length > 0 ? processedWritings[0].is_liked : 'no data')
 
     // 총 개수 조회
     const totalCountResult = await query(`
