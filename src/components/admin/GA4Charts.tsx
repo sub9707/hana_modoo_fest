@@ -29,11 +29,19 @@ interface GA4ChartsProps {
   }>;
 }
 
+// Recharts 호환 타입 (인덱스 시그니처 포함)
 interface TrafficSourceData {
   name: string;
   value: number;
   percent: number;
   color: string;
+  [key: string]: string | number; // 인덱스 시그니처 추가
+}
+
+interface PageViewData {
+  page: string;
+  pageViews: number;
+  [key: string]: string | number;
 }
 
 interface ChartDailyData {
@@ -44,30 +52,36 @@ interface ChartDailyData {
   sessions: number;
   bounceRatePercent: number;
   sessionDurationMinutes: number;
-}
-
-interface TopPageData {
-  page: string;
-  pageTitle: string;
-  pageViews: number;
-  users: number;
-  newUsers: number;
-  averageTimeOnPage: number;
-  bounceRate: number;
-  pageShort: string;
+  [key: string]: string | number;
 }
 
 // 색상 팔레트
 const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280'];
 
-// 날짜 포맷팅 함수
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+// 날짜 포맷팅 함수 - YYYYMMDD 형식을 MM/DD로 변환
+const formatDate = (dateString: string): string => {
+  if (!dateString || dateString === 'NaN') return '';
+  
+  // YYYYMMDD 형식 처리
+  if (dateString.length === 8) {
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    return `${parseInt(month)}/${parseInt(day)}`;
+  }
+  
+  // 기존 Date 객체 처리
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  } catch {
+    return '';
+  }
 };
 
 // 숫자 포맷팅 함수
-const formatNumber = (value: number) => {
+const formatNumber = (value: number): string => {
   if (value >= 1000000) {
     return `${(value / 1000000).toFixed(1)}M`;
   }
@@ -77,28 +91,36 @@ const formatNumber = (value: number) => {
   return value.toString();
 };
 
+// 파이 차트 커스텀 라벨 (any 타입 사용하여 Recharts 타입 이슈 회피)
+const renderCustomLabel = (props: any): string => {
+  const { name, percent } = props;
+  return `${name} (${(percent * 100).toFixed(1)}%)`;
+};
+
 export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
   // 일별 데이터를 차트용으로 변환
-  const chartDailyData = dailyData.map(day => ({
-    ...day,
-    date: formatDate(day.date),
-    bounceRatePercent: Math.round(day.bounceRate * 100),
-    sessionDurationMinutes: Math.round(day.averageSessionDuration / 60)
-  }));
+  const chartDailyData: ChartDailyData[] = dailyData
+    .filter(day => day.date) // 유효한 날짜만 필터링
+    .map(day => ({
+      ...day,
+      date: formatDate(day.date),
+      bounceRatePercent: Math.round(day.bounceRate * 100),
+      sessionDurationMinutes: Math.round(day.averageSessionDuration / 60)
+    }));
 
-  // 상위 페이지 데이터 (Top 10)
-  const topPagesData = pageData.slice(0, 10).map(page => ({
-    ...page,
-    pageShort: page.page.length > 20 ? page.page.substring(0, 20) + '...' : page.page
-  }));
-
-// 트래픽 소스 데이터를 파이 차트용으로 변환 (백분율 미리 계산)
+  // 트래픽 소스 데이터를 파이 차트용으로 변환
   const totalUsers = topSources.reduce((sum, source) => sum + source.users, 0);
-  const trafficSourceData = topSources.slice(0, 6).map((source, index) => ({
+  const trafficSourceData: TrafficSourceData[] = topSources.slice(0, 6).map((source, index) => ({
     name: source.source === '(direct)' ? '직접 방문' : source.source,
     value: source.users,
     percent: totalUsers > 0 ? (source.users / totalUsers) * 100 : 0,
     color: COLORS[index % COLORS.length]
+  }));
+
+  // 페이지별 방문 데이터 (상위 15개, 막대그래프용)
+  const pageViewData: PageViewData[] = pageData.slice(0, 15).map(page => ({
+    page: page.page.length > 25 ? page.page.substring(0, 25) + '...' : page.page,
+    pageViews: page.pageViews
   }));
 
   return (
@@ -131,167 +153,68 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
                   formatNumber(Number(value)),
                   name === 'pageViews' ? '페이지뷰' :
                   name === 'users' ? '사용자' :
-                  name === 'newUsers' ? '신규 사용자' : String(name)
+                  name === 'newUsers' ? '신규 사용자' : name
                 ]}
               />
-              <Legend />
+              <Legend 
+                formatter={(value: string) => 
+                  value === 'pageViews' ? '페이지뷰' :
+                  value === 'users' ? '사용자' :
+                  value === 'newUsers' ? '신규 사용자' : value
+                }
+              />
               <Line 
                 type="monotone" 
                 dataKey="pageViews" 
                 stroke="#3B82F6" 
                 strokeWidth={2}
-                name="페이지뷰"
-                dot={{ fill: '#3B82F6', r: 4 }}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="users" 
-                stroke="#10B981" 
+                stroke="#F59E0B" 
                 strokeWidth={2}
-                name="사용자"
-                dot={{ fill: '#10B981', r: 4 }}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="newUsers" 
-                stroke="#F59E0B" 
+                stroke="#10B981" 
                 strokeWidth={2}
-                name="신규 사용자"
-                dot={{ fill: '#F59E0B', r: 4 }}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 인기 페이지 차트 */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">인기 페이지 Top 10</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topPagesData} layout="horizontal">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  type="number" 
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickFormatter={formatNumber}
-                />
-                <YAxis 
-                  type="category" 
-                  dataKey="pageShort" 
-                  stroke="#6b7280"
-                  fontSize={11}
-                  width={120}
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  formatter={(value: any) => [formatNumber(Number(value)), '페이지뷰']}
-                  labelFormatter={(label: any) => {
-                    const page = topPagesData.find(p => p.pageShort === String(label));
-                    return page?.page || String(label);
-                  }}
-                />
-                <Bar 
-                  dataKey="pageViews" 
-                  fill="#3B82F6"
-                  radius={[0, 4, 4, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 트래픽 소스 파이 차트 */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">트래픽 소스</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={trafficSourceData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {trafficSourceData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  formatter={(value: any) => [formatNumber(Number(value)), '사용자']}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          
-          {/* 커스텀 범례 (레이블 포함) */}
-          <div className="mt-4 space-y-2">
-            {trafficSourceData.map((source, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: source.color }}
-                  />
-                  <span className="text-sm text-gray-600">{source.name}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-900 font-medium">
-                    {formatNumber(source.value)}
-                  </span>
-                  <span className="text-gray-500">
-                    ({source.percent.toFixed(1)}%)
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* 세션 품질 지표 */}
+      {/* 페이지별 방문 통계 - 막대그래프 */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">세션 품질 지표</h3>
-        <div className="h-64">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">페이지별 방문 통계</h3>
+        <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartDailyData}>
+            <BarChart 
+              data={pageViewData}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis 
-                dataKey="date" 
+                type="number"
                 stroke="#6b7280"
                 fontSize={12}
+                tickFormatter={formatNumber}
               />
               <YAxis 
-                yAxisId="bounce"
-                orientation="left"
-                stroke="#EF4444"
-                fontSize={12}
-                domain={[0, 100]}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <YAxis 
-                yAxisId="duration"
-                orientation="right"
-                stroke="#8B5CF6"
-                fontSize={12}
-                tickFormatter={(value) => `${value}분`}
+                type="category"
+                dataKey="page" 
+                stroke="#6b7280"
+                fontSize={11}
+                width={140}
               />
               <Tooltip 
                 contentStyle={{
@@ -300,31 +223,48 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
                   borderRadius: '8px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                 }}
-                formatter={(value: any, name: any) => [
-                  String(name) === 'bounceRatePercent' ? `${Number(value)}%` : `${Number(value)}분`,
-                  String(name) === 'bounceRatePercent' ? '이탈률' : '평균 세션 시간'
-                ]}
+                formatter={(value: any) => [formatNumber(Number(value)), '페이지뷰']}
               />
-              <Legend />
-              <Line 
-                yAxisId="bounce"
-                type="monotone" 
-                dataKey="bounceRatePercent" 
-                stroke="#EF4444" 
-                strokeWidth={2}
-                name="이탈률 (%)"
-                dot={{ fill: '#EF4444', r: 4 }}
+              <Bar 
+                dataKey="pageViews" 
+                fill="#3B82F6"
+                radius={[0, 4, 4, 0]}
               />
-              <Line 
-                yAxisId="duration"
-                type="monotone" 
-                dataKey="sessionDurationMinutes" 
-                stroke="#8B5CF6" 
-                strokeWidth={2}
-                name="평균 세션 시간 (분)"
-                dot={{ fill: '#8B5CF6', r: 4 }}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 트래픽 소스 차트 */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">트래픽 소스</h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={trafficSourceData as any[]}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomLabel as any}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {trafficSourceData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+                formatter={(value: any) => [formatNumber(Number(value)), '사용자']}
               />
-            </LineChart>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </div>

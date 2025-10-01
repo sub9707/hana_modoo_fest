@@ -187,7 +187,7 @@ export function WinnersTab() {
   return (
     <div className="space-y-6">
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">총 당첨자 수</CardTitle>
@@ -206,28 +206,6 @@ export function WinnersTab() {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {prizeStats?.claimed_count?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">수령 대기</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {prizeStats?.unclaimed_count?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">총 상품 가치</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              {prizeStats?.total_value?.toLocaleString() || 0}원
             </div>
           </CardContent>
         </Card>
