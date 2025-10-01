@@ -590,3 +590,53 @@ export async function updateUserPassword(userId: string, newPassword: string): P
     throw new Error('비밀번호 변경에 실패했습니다.')
   }
 }
+
+/**
+ * 일별 가입 통계 조회
+ */
+export interface DailySignupData {
+  date: string;
+  signups: string;
+}
+
+export async function getDailySignupStats(days: number = 30): Promise<DailySignupData[]> {
+  try {
+    const results = await query(`
+      SELECT 
+        DATE(created_at) as date,
+        COUNT(*) as signups
+      FROM users
+      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+      GROUP BY DATE(created_at)
+      ORDER BY date ASC
+    `, [days]);
+
+    return results.map(row => ({
+      date: row.date,
+      signups: row.signups
+    }));
+  } catch (error) {
+    console.error('Error getting daily signup stats:', error);
+    throw new Error('일별 가입 통계 조회에 실패했습니다.');
+  }
+}
+
+/**
+ * 사용자 통계 조회 (확장)
+ */
+export async function getUserStatsExtended(): Promise<UserStats & { dailySignups: DailySignupData[] }> {
+  try {
+    const [basicStats, dailySignups] = await Promise.all([
+      getUserStats(),
+      getDailySignupStats(30)
+    ]);
+
+    return {
+      ...basicStats,
+      dailySignups
+    };
+  } catch (error) {
+    console.error('Error getting extended user stats:', error);
+    throw new Error('확장 사용자 통계 조회에 실패했습니다.');
+  }
+}

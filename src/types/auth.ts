@@ -358,3 +358,18 @@ export interface AuthContextState {
   updateUser: (userData: Partial<User>) => void
   refreshUser: () => Promise<void>
 }
+
+/**
+ * 일별 가입 데이터
+ */
+export interface DailySignupData {
+  date: string;
+  signups: number;
+}
+
+/**
+ * 확장된 사용자 통계 (일별 가입 데이터 포함)
+ */
+export interface ExtendedUserStats extends UserStats {
+  dailySignups: DailySignupData[];
+}

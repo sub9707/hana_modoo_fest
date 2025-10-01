@@ -5,8 +5,9 @@ import React from 'react'
 import { redirect } from 'next/navigation'
 import { requireAuth, requireRole } from '@/lib/mysql/server'
 import UserStats from '@/components/admin/UserManagement/UserStats'
+import UserSignupChart from '@/components/admin/UserManagement/UserSignUpChart'
 import UsersManagementClient from '@/components/admin/UserManagement/UserManagementClient'
-import { getAllUsers, getUserStats } from '@/lib/services/users-service'
+import { getAllUsers, getUserStatsExtended } from '@/lib/services/users-service'
 
 export default async function UsersPage() {
   try {
@@ -15,10 +16,12 @@ export default async function UsersPage() {
     await requireRole('admin') // 관리자만 접근 가능
     
     // 서버에서 데이터 가져오기
-    const [users, stats] = await Promise.all([
+    const [users, extendedStats] = await Promise.all([
       getAllUsers(),
-      getUserStats()
+      getUserStatsExtended()
     ])
+
+    const { dailySignups, ...basicStats } = extendedStats;
 
     return (
       <div className="space-y-6">
@@ -32,11 +35,14 @@ export default async function UsersPage() {
           </div>
         </div>
 
-        {/* 통계 카드 (서버 컴포넌트) */}
-        <UserStats stats={stats} />
+        {/* 통계 카드 */}
+        <UserStats stats={basicStats} />
+
+        {/* 일별 가입 추이 그래프 */}
+        <UserSignupChart data={dailySignups} />
 
         {/* 클라이언트 컴포넌트로 위임 */}
-        <UsersManagementClient initialUsers={users} initialStats={stats} />
+        <UsersManagementClient initialUsers={users} initialStats={basicStats} />
       </div>
     )
   } catch (error) {

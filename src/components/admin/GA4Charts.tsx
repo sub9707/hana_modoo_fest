@@ -33,9 +33,8 @@ interface GA4ChartsProps {
 interface TrafficSourceData {
   name: string;
   value: number;
-  percent: number;
   color: string;
-  [key: string]: string | number; // 인덱스 시그니처 추가
+  [key: string]: string | number;
 }
 
 interface PageViewData {
@@ -91,9 +90,11 @@ const formatNumber = (value: number): string => {
   return value.toString();
 };
 
-// 파이 차트 커스텀 라벨 (any 타입 사용하여 Recharts 타입 이슈 회피)
+// 파이 차트 커스텀 라벨
+// Recharts가 자동으로 계산한 percent는 0~1 사이의 값이므로 100을 곱해야 합니다
 const renderCustomLabel = (props: any): string => {
   const { name, percent } = props;
+  // percent는 Recharts가 자동으로 계산한 0~1 사이의 값
   return `${name} (${(percent * 100).toFixed(1)}%)`;
 };
 
@@ -109,11 +110,10 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
     }));
 
   // 트래픽 소스 데이터를 파이 차트용으로 변환
-  const totalUsers = topSources.reduce((sum, source) => sum + source.users, 0);
+  // percent 필드를 제거하고 value만 사용 (Recharts가 자동으로 비율 계산)
   const trafficSourceData: TrafficSourceData[] = topSources.slice(0, 6).map((source, index) => ({
     name: source.source === '(direct)' ? '직접 방문' : source.source,
     value: source.users,
-    percent: totalUsers > 0 ? (source.users / totalUsers) * 100 : 0,
     color: COLORS[index % COLORS.length]
   }));
 
@@ -168,33 +168,33 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
                 dataKey="pageViews" 
                 stroke="#3B82F6" 
                 strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                dot={{ fill: '#3B82F6', r: 4 }}
+                activeDot={{ r: 6 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="users" 
-                stroke="#F59E0B" 
+                stroke="#10B981" 
                 strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                dot={{ fill: '#10B981', r: 4 }}
+                activeDot={{ r: 6 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="newUsers" 
-                stroke="#10B981" 
+                stroke="#8B5CF6" 
                 strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                dot={{ fill: '#8B5CF6', r: 4 }}
+                activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* 페이지별 방문 통계 - 막대그래프 */}
+      {/* 페이지별 방문 통계 */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">페이지별 방문 통계</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">페이지별 방문 통계 (상위 15개)</h3>
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
@@ -210,8 +210,8 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
                 tickFormatter={formatNumber}
               />
               <YAxis 
-                type="category"
-                dataKey="page" 
+                type="category" 
+                dataKey="page"
                 stroke="#6b7280"
                 fontSize={11}
                 width={140}
@@ -228,14 +228,14 @@ export function GA4Charts({ dailyData, pageData, topSources }: GA4ChartsProps) {
               <Bar 
                 dataKey="pageViews" 
                 fill="#3B82F6"
-                radius={[0, 4, 4, 0]}
+                radius={[0, 8, 8, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* 트래픽 소스 차트 */}
+      {/* 트래픽 소스 */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">트래픽 소스</h3>
         <div className="h-80">

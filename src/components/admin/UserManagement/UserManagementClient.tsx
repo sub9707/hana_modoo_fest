@@ -268,7 +268,7 @@ export default function UsersManagementClient({
         <button 
           onClick={handleExportExcel}
           disabled={loading}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
         >
           <Download className="w-4 h-4 mr-2" />
           엑셀 다운로드
@@ -284,9 +284,6 @@ export default function UsersManagementClient({
         dateFilter={dateFilter}
         setDateFilter={setDateFilter}
       />
-
-      {/* 가입 추이 차트 */}
-      <ChartSection />
 
       {/* 회원 목록 테이블 */}
       <UserTable
