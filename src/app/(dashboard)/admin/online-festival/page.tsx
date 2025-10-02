@@ -8,7 +8,7 @@ import { RegistrationTab } from '@/components/admin/online-festival/Registration
 import { QuizTab } from '@/components/admin/online-festival/QuizTab'
 import { SupportCommentsTab } from '@/components/admin/online-festival/SupportCommentsTab'
 import { WinnersTab } from '@/components/admin/online-festival/WinnersTab'
-import { WritingsTab } from '@/components/admin/online-festival/WritingTab'
+import WritingTab from '@/components/admin/online-festival/WritingTab'
 
 export default function OnlineFestivalPage() {
   const [activeTab, setActiveTab] = useState('registration')
@@ -65,7 +65,7 @@ export default function OnlineFestivalPage() {
           </TabsContent>
 
           <TabsContent value="writings">
-            <WritingsTab />
+            <WritingTab />
           </TabsContent>
 
           <TabsContent value="winners">
