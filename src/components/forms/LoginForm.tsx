@@ -108,7 +108,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
 
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              사용자명
+              아이디
             </label>
             <div className="mt-1">
               <input
@@ -125,7 +125,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
                     : 'border-gray-300'}
                   ${isLoading || socialLoading !== null ? 'bg-gray-50 cursor-not-allowed' : ''}
                 `}
-                placeholder="사용자명을 입력하세요"
+                placeholder="아이디를 입력하세요"
               />
               {errors.username && (
                 <p className="mt-2 text-sm text-red-600">{errors.username.message}</p>
