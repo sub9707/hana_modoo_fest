@@ -214,5 +214,61 @@
     "zone": "모두 다 함께하는",
     "banner_title": "모두 다 함께하는 아로마 테라피 체험하기",
     "booth_activity": "아로마 입욕제 만들기"
+  },
+    {
+    "id": 28,
+    "organization": "서울시약사회",
+    "group": "모두 다 행복한",
+    "zone": "소녀들이 모두 다 행복한 소녀돌봄약국",
+    "banner_title": "약사에게 물어보세요",
+    "booth_activity": "봉사 약국운영, 건강상담, 소녀돌봄약국 홍보"
+  },
+  {
+    "id": 29,
+    "organization": "용산구가족센터",
+    "group": "모두 다 행복한",
+    "zone": "모두 다 행복한 다양한가족&캘리그라피 엽서 만들기",
+    "banner_title": "다양한가족 인식개선 캠페인",
+    "booth_activity": "캘리그라피 엽서 만들기"
+  },
+  {
+    "id": 30,
+    "organization": "정서순화예술놀이연구소",
+    "group": "모두 다 함께하는",
+    "zone": "모두 다 함께하는 마음살림 예술놀이",
+    "banner_title": "마음살림 예술놀이",
+    "booth_activity": "예술놀이"
+  },
+  {
+    "id": 31,
+    "organization": "서울시 (NGO)돌담길",
+    "group": "모두 다 행복한",
+    "zone": "모두 다 행복한 우리가족 캐리커쳐 그리기",
+    "banner_title": "우리가족 캐리커쳐 그리기",
+    "booth_activity": "캐리커처 그리기"
+  },
+  {
+    "id": 32,
+    "organization": "㈜송연돌봄컨설팅",
+    "group": "모두 다 행복한",
+    "zone": "모두 다 행복한 친환경 실천",
+    "banner_title": "송연돌봄과 친환경 세제 만들기",
+    "booth_activity": "친환경 세제 만들기"
+  },
+  {
+    "id": 33,
+    "organization": "한국두리모지원협의회",
+    "group": "모두 다 누리는",
+    "zone": "모두 다 누리는 기저귀, 조제분유 지원 사업",
+    "banner_title": "한부모(모자)가족 조제분유 차별 STOP!",
+    "booth_activity": "캠페인"
+  },
+  {
+    "id": 34,
+    "organization": "서울시여성단체협의회",
+    "group": "모두 다 행복한",
+    "zone": "모두 다 행복한 한부모가정을 위한 사랑의 바자회",
+    "banner_title": "사랑의 바자회",
+    "booth_activity": "바자회"
   }
 ]
