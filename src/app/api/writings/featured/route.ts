@@ -7,24 +7,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const topic = searchParams.get('topic') || 'all'
     
-    // 현재 사용자 확인
     const currentUser = await getCurrentUser()
     
-    // 주제별 우수 작품 조회 (좋아요 순 상위 10개, 좋아요 0개는 제외)
-    let topicCondition = 'WHERE w.likes_count > 0'
-    const topicParams: any[] = []
-    
-    if (topic !== 'all') {
-      topicCondition = 'WHERE w.likes_count > 0 AND w.topic = ?'
-      topicParams.push(topic)
-    }
-
-    // 🚀 서브쿼리로 is_liked 체크 (더 확실함)
+    // is_liked 서브쿼리
     let isLikedSelect = '0 as is_liked'
     const userParams: any[] = []
     
     if (currentUser) {
-      // IF 문으로 명확하게 0 또는 1 반환
       isLikedSelect = `IF(
         (SELECT COUNT(*) FROM writing_likes WHERE writing_id = w.id AND user_id = ?) > 0,
         1,
@@ -33,6 +22,53 @@ export async function GET(request: NextRequest) {
       userParams.push(currentUser.id)
     }
 
+    // 각 주제별 우수작품 ID를 먼저 조회
+    const featuredIdsQuery = `
+      SELECT id, topic
+      FROM (
+        SELECT 
+          id,
+          topic,
+          likes_count,
+          ROW_NUMBER() OVER (PARTITION BY topic ORDER BY likes_count DESC, created_at DESC) as rn
+        FROM writings
+        WHERE likes_count >= 1
+      ) ranked
+      WHERE rn <= 10
+    `
+    
+    const featuredIds = await query(featuredIdsQuery)
+    
+    if (featuredIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          writings: [],
+          stats: []
+        }
+      })
+    }
+
+    // 주제 필터링
+    let filteredIds = featuredIds
+    if (topic !== 'all') {
+      filteredIds = featuredIds.filter((item: any) => item.topic === topic)
+    }
+
+    if (filteredIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          writings: [],
+          stats: []
+        }
+      })
+    }
+
+    const idList = filteredIds.map((item: any) => item.id)
+    const placeholders = idList.map(() => '?').join(',')
+
+    // 우수작품 상세 정보 조회
     const writingsQuery = `
       SELECT 
         w.id,
@@ -46,29 +82,17 @@ export async function GET(request: NextRequest) {
         ${isLikedSelect}
       FROM writings w
       JOIN users u ON w.user_id = u.id
-      ${topicCondition}
+      WHERE w.id IN (${placeholders})
       ORDER BY w.likes_count DESC, w.created_at DESC
-      LIMIT 10
     `
 
-    // 🚀 파라미터 순서: userParams, topicParams
-    const queryParams = [...userParams, ...topicParams]
+    const writings = await query(writingsQuery, [...userParams, ...idList])
 
-    const writings = await query(writingsQuery, queryParams)
-
-    // 🔍 디버깅: 첫 번째 글의 실제 좋아요 여부 확인
-    if (writings.length > 0 && currentUser) {
-      const checkLike = await query(
-        `SELECT COUNT(*) as count FROM writing_likes WHERE writing_id = ? AND user_id = ?`,
-        [writings[0].id, currentUser.id]
-      )
-    }
-
-    // 🚀 is_liked를 명시적으로 boolean으로 변환
+    // is_liked를 명시적으로 boolean으로 변환
     const processedWritings = writings.map((writing: any) => ({
       ...writing,
       is_featured: true,
-      is_liked: Number(writing.is_liked) === 1 // 문자열 "1"도 숫자 1로 변환 후 체크
+      is_liked: Number(writing.is_liked) === 1
     }))
 
     // 각 주제별 통계
@@ -78,7 +102,7 @@ export async function GET(request: NextRequest) {
         COUNT(*) as count,
         MAX(likes_count) as max_likes
       FROM writings
-      WHERE likes_count > 0
+      WHERE likes_count >= 1
       GROUP BY topic
     `)
 

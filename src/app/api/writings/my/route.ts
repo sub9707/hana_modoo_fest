@@ -18,7 +18,23 @@ export async function GET(request: NextRequest) {
     
     const offset = (page - 1) * limit
 
-    // 내 글 목록 조회 (내 글에는 is_liked가 필요 없음)
+    // 우수작품 ID 목록 먼저 조회
+    const featuredIdsQuery = `
+      SELECT id
+      FROM (
+        SELECT 
+          id,
+          ROW_NUMBER() OVER (PARTITION BY topic ORDER BY likes_count DESC, created_at DESC) as rn
+        FROM writings
+        WHERE likes_count >= 1
+      ) ranked
+      WHERE rn <= 10
+    `
+    
+    const featuredIdsResult = await query(featuredIdsQuery)
+    const featuredIds = featuredIdsResult.map((row: any) => row.id)
+
+    // 내 글 목록 조회
     const writings = await query(`
       SELECT 
         w.id,
@@ -26,17 +42,6 @@ export async function GET(request: NextRequest) {
         w.title,
         w.content,
         w.likes_count,
-        CASE 
-          WHEN w.id IN (
-            SELECT id FROM (
-              SELECT id, ROW_NUMBER() OVER (ORDER BY likes_count DESC, created_at DESC) as rn
-              FROM writings 
-              WHERE likes_count > 0
-            ) ranked 
-            WHERE rn <= 10
-          ) THEN 1
-          ELSE 0
-        END as is_featured,
         w.created_at,
         u.name as author_name,
         1 as is_mine
@@ -47,10 +52,10 @@ export async function GET(request: NextRequest) {
       LIMIT ? OFFSET ?
     `, [user.id, limit, offset])
 
-    // 🚀 is_featured를 명시적으로 boolean으로 변환
+    // 우수작품 여부 판정
     const processedWritings = writings.map((writing: any) => ({
       ...writing,
-      is_featured: Boolean(writing.is_featured),
+      is_featured: featuredIds.includes(writing.id),
       is_mine: true
     }))
 

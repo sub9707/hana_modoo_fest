@@ -15,7 +15,6 @@ interface Writing {
   created_at: string
 }
 
-// GET: 가족주제글짓기 목록 조회
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser()
@@ -31,9 +30,24 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20')
     const search = searchParams.get('search') || ''
     const topic = searchParams.get('topic') || ''
-    const featured = searchParams.get('featured')
 
     const offset = (page - 1) * limit
+
+    // 우수작품 ID 목록 먼저 조회
+    const featuredIdsQuery = `
+      SELECT id
+      FROM (
+        SELECT 
+          id,
+          ROW_NUMBER() OVER (PARTITION BY topic ORDER BY likes_count DESC, created_at DESC) as rn
+        FROM writings
+        WHERE likes_count >= 1
+      ) ranked
+      WHERE rn <= 10
+    `
+    
+    const featuredIdsResult = await query(featuredIdsQuery)
+    const featuredIds = featuredIdsResult.map((row: any) => row.id)
 
     // 검색 조건 구성
     let whereClause = 'WHERE 1=1'
@@ -47,11 +61,6 @@ export async function GET(request: NextRequest) {
     if (topic) {
       whereClause += ' AND w.topic = ?'
       queryParams.push(topic)
-    }
-
-    if (featured !== null && featured !== undefined) {
-      whereClause += ' AND w.is_featured = ?'
-      queryParams.push(featured === 'true' ? 1 : 0)
     }
 
     // 총 개수 조회
@@ -75,23 +84,28 @@ export async function GET(request: NextRequest) {
         w.title,
         w.content,
         w.likes_count,
-        w.is_featured,
         w.created_at
       FROM writings w
       JOIN users u ON w.user_id = u.id
       ${whereClause}
-      ORDER BY w.is_featured DESC, w.created_at DESC
+      ORDER BY w.created_at DESC
       LIMIT ? OFFSET ?
     `
     
     const writings = await query(listQuery, [...queryParams, limit, offset])
+
+    // 우수작품 여부 판정
+    const processedWritings = writings.map((w: any) => ({
+      ...w,
+      is_featured: featuredIds.includes(w.id)
+    }))
 
     const totalPages = Math.ceil(total / limit)
 
     return NextResponse.json({
       success: true,
       data: {
-        items: writings,
+        items: processedWritings,
         total,
         page,
         totalPages
