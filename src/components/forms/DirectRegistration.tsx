@@ -477,6 +477,24 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 <p className="mt-1 text-sm text-red-600">{form.formState.errors.birthDate.message}</p>
                             )}
                         </div>
+
+                        {/* 🆕 만 14세 미만 법정대리인 동의 - 여기에 추가 */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <label className="flex items-start space-x-3 cursor-pointer">
+                                <input
+                                    {...form.register('parentalConsent')}
+                                    type="checkbox"
+                                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <span className="text-sm text-gray-700 flex-1">
+                                    만 14세 미만인 경우, 법정대리인(부모 또는 보호자)이
+                                    본 회원가입 및 개인정보 수집에 동의합니다.
+                                    <span className="block text-xs text-blue-600 mt-1">
+                                        ※ 만 14세 이상인 경우 체크하지 않으셔도 됩니다
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
 
                     {/* 회사명 */}

@@ -148,6 +148,7 @@ export interface DirectRegistrationData {
   agreedToTerms: boolean
   agreedToPrivacy: boolean
   agreedToMarketing?: boolean
+  parentalConsent?: boolean
 }
 
 export interface DuplicationCheckResponse {

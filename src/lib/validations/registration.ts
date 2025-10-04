@@ -241,8 +241,8 @@ export const directRegistrationSchema = z.object({
       const date = new Date(val)
       const now = new Date()
       const age = now.getFullYear() - date.getFullYear()
-      return age >= 14 && age <= 100
-    }, '만 14세 이상 100세 이하만 가입 가능합니다'),
+      return age >= 0 && age <= 100
+    }, '올바른 생년월일을 입력해주세요'),
   
   company: z.string().max(100, '회사명은 100자를 초과할 수 없습니다').optional(),
   
@@ -261,7 +261,9 @@ export const directRegistrationSchema = z.object({
   agreedToPrivacy: z.boolean()
     .refine(val => val === true, '개인정보처리방침에 동의해주세요'),
   
-  agreedToMarketing: z.boolean().optional()
+  agreedToMarketing: z.boolean().optional(),
+
+  parentalConsent: z.boolean().optional()
   
 }).refine(data => data.password === data.confirmPassword, {
   message: '비밀번호가 일치하지 않습니다',
