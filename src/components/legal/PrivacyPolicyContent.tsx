@@ -1,9 +1,25 @@
-import { Shield, Lock, Eye, Trash2, UserCheck, Phone, Mail } from 'lucide-react'
+import { Shield, Lock, Eye, Trash2, UserCheck, Phone, Mail, AlertTriangle } from 'lucide-react'
 
 // NextJS 15 Server Component로 구현
 export default function PrivacyPolicyContent() {
     return (
         <div className="space-y-8 text-gray-700 leading-relaxed">
+            <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4">
+                <div className="flex items-start">
+                    <AlertTriangle className="w-6 h-6 text-red-600 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                        <p className="text-red-900 font-bold mb-2">
+                            본 개인정보처리방침은 법무 검토 전 임시 버전입니다
+                        </p>
+                        <p className="text-red-800 text-sm">
+                            시행일: 2025년 9월 29일
+                            <br />
+                            본 방침은 법률 전문가의 검토를 거치지 않은 임시 버전이며, 
+                            추후 전문가 자문을 받아 수정될 수 있습니다. 변경 시 사전 공지하겠습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
             {/* 목차 */}
             <nav className="bg-orange-50 rounded-lg p-6 border border-orange-200">
                 <h2 className="text-xl font-bold text-orange-800 mb-4 flex items-center">

@@ -13,10 +13,10 @@ export default function Footer() {
             <div className="lg:col-span-1">
               <div className="mb-4 flex items-center justify-center sm:justify-start">
                 <div className="relative w-80 h-15 flex items-center justify-center">
-                  <Image src={'/icons/logo.png'} fill alt='logo'/>
+                  <Image src={'/icons/logo.png'} fill alt='logo' />
                 </div>
               </div>
-              
+
               <p className="text-center text-gray-600 mb-4 text-sm leading-relaxed">
                 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장
               </p>
@@ -46,11 +46,11 @@ export default function Footer() {
                         02-861-3020
                       </a>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <Mail className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                      <a 
-                        href="mailto:hanbumo1@seoul.go.kr" 
+                      <a
+                        href="mailto:hanbumo1@seoul.go.kr"
                         className="text-sm hover:text-purple-600 transition-colors"
                       >
                         hanbumo1@seoul.go.kr
@@ -63,26 +63,26 @@ export default function Footer() {
                 <div>
                   <h4 className="text-base font-semibold mb-3 text-gray-800">바로가기</h4>
                   <div className="grid grid-cols-2 gap-2">
-                    <Link 
-                      href="/register" 
+                    <Link
+                      href="/register"
                       className="text-sm hover:text-purple-600 transition-colors"
                     >
                       사전참가신청
                     </Link>
-                    <Link 
-                      href="/programs" 
+                    <Link
+                      href="/programs"
                       className="text-sm hover:text-purple-600 transition-colors"
                     >
                       행사프로그램
                     </Link>
-                    <Link 
-                      href="/online-festival" 
+                    <Link
+                      href="/online-festival"
                       className="text-sm hover:text-purple-600 transition-colors"
                     >
                       온라인축제
                     </Link>
-                    <Link 
-                      href="/location" 
+                    <Link
+                      href="/location"
                       className="text-sm hover:text-purple-600 transition-colors"
                     >
                       오시는길
@@ -99,29 +99,29 @@ export default function Footer() {
           <div className="flex flex-col space-y-4">
             {/* SNS 링크 */}
             <div className="flex justify-center space-x-4">
-              <a 
-                href="https://instagram.com/moduhana2025" 
-                target="_blank" 
+              <a
+                href="https://instagram.com/moduhana2025"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
                 aria-label="인스타그램"
               >
                 <Instagram className="w-5 h-5 text-purple-600" />
               </a>
-              
-              <a 
-                href="https://youtube.com/@moduhana2025" 
-                target="_blank" 
+
+              <a
+                href="https://youtube.com/@moduhana2025"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
                 aria-label="유튜브"
               >
                 <Youtube className="w-5 h-5 text-purple-600" />
               </a>
-              
-              <a 
-                href="https://seoul.go.kr" 
-                target="_blank" 
+
+              <a
+                href="https://seoul.go.kr"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
                 aria-label="홈페이지"
@@ -137,17 +137,23 @@ export default function Footer() {
                 <span className="hidden sm:block">|</span>
                 <span>주관: 서울특별시한부모가족지원센터</span>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-gray-500 mb-3">
-                <Link href="/privacy" className="hover:text-purple-600 transition-colors">
+                <Link
+                  href="/privacy-policy"
+                  className="flex items-center text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                >
                   개인정보처리방침
                 </Link>
-                <span className="hidden sm:block">|</span>
-                <Link href="/terms" className="hover:text-purple-600 transition-colors">
+                <span className="hidden sm:block text-gray-400">|</span>
+                <Link
+                  href="/terms-of-service"
+                  className="flex items-center text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                >
                   이용약관
                 </Link>
               </div>
-              
+
               <p className="text-xs text-gray-500">
                 © 2025 서울특별시한부모가족지원센터. All rights reserved.
               </p>

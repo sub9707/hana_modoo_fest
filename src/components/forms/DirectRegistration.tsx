@@ -548,34 +548,79 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                         약관 동의
                     </h3>
 
-                    <div className="space-y-3">
-                        <label className="flex items-start space-x-3">
+                    <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                        {/* 서비스 이용약관 */}
+                        <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded transition-colors">
                             <input
                                 {...form.register('agreedToTerms')}
                                 type="checkbox"
                                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <span className="text-sm text-gray-700">
-                                <span className="text-red-500">*</span> 이용약관에 동의합니다
+                            <span className="text-sm text-gray-700 flex-1">
+                                <span className="text-red-500 font-bold">* [필수]</span>{' '}
+                                <Link
+                                    className="text-blue-600 hover:text-blue-800 underline font-medium"
+                                    href="/terms-of-service"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    서비스 이용약관
+                                </Link>
+                                에 동의합니다
                             </span>
                         </label>
 
-                        <label className="flex items-start space-x-3">
+                        {/* 개인정보처리방침 */}
+                        <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded transition-colors">
                             <input
                                 {...form.register('agreedToPrivacy')}
                                 type="checkbox"
                                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
+                            <span className="text-sm text-gray-700 flex-1">
+                                <span className="text-red-500 font-bold">* [필수]</span>{' '}
+                                <Link
+                                    className="text-blue-600 hover:text-blue-800 underline font-medium"
+                                    href="/privacy-policy"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    개인정보처리방침
+                                </Link>
+                                에 동의합니다
+                            </span>
+                        </label>
+
+                        {/* 마케팅 수신 동의 */}
+                        <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded transition-colors">
+                            <input
+                                {...form.register('agreedToMarketing')}
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
                             <span className="text-sm text-gray-700">
-                                <span className="text-red-500">*</span> <Link className='text-blue-600' href={'/privacy-policy'} target="_blank"
-                                    rel="noopener noreferrer">개인정보처리방침</Link>에 동의합니다
+                                [선택] 마케팅 정보 수신에 동의합니다
                             </span>
                         </label>
                     </div>
 
+                    {/* 에러 메시지 */}
                     {(form.formState.errors.agreedToTerms || form.formState.errors.agreedToPrivacy) && (
-                        <p className="text-sm text-red-600">필수 약관에 동의해주세요</p>
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <p className="text-sm text-red-600 font-medium">
+                                필수 약관에 동의해주세요
+                            </p>
+                        </div>
                     )}
+
+                    {/* 안내 문구 */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-xs text-blue-800">
+                            약관 내용을 확인하시려면 파란색 링크를 클릭하세요. 새 창에서 전체 내용을 확인하실 수 있습니다.
+                        </p>
+                    </div>
                 </div>
 
                 {/* 에러 메시지 */}
