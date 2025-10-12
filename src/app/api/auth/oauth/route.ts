@@ -79,7 +79,6 @@ export async function GET(request: NextRequest) {
   return handleOAuthCallback(provider, config, request, code, state, redirect)
 }
 
-// OAuth 인증 시작
 function initiateOAuth(
   provider: 'naver' | 'kakao',
   config: OAuthConfig,
@@ -91,7 +90,6 @@ function initiateOAuth(
   // 서버 기준으로 프로덕션 URL 사용
   const redirectUri = getRedirectUri(request)
 
-
   const params = new URLSearchParams({
     client_id: config.clientId,
     redirect_uri: redirectUri,
@@ -99,12 +97,19 @@ function initiateOAuth(
     state: `${state}:${provider}:${encodeURIComponent(redirect)}`
   })
 
-  // 카카오만 scope 추가
-  if (provider === 'kakao') {
+  // 네이버와 카카오 모두 scope 추가
+  if (config.scope) {
     params.append('scope', config.scope)
   }
 
+  // 네이버 OAuth 기본 동작:
+  // - 첫 로그인: 동의 화면 표시 후 SocialRegistrationForm으로 이동
+  // - 이후 로그인: 자동 로그인 (동의 화면 없음)
+  // auth_type 파라미터를 추가하지 않음 = 기본 동작
+
   const authUrl = `${config.authUrl}?${params.toString()}`
+
+  console.log(`[OAuth] ${provider} auth URL:`, authUrl)
 
   return NextResponse.redirect(authUrl)
 }

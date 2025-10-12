@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, User, Loader2, Check, AlertCircle, Search, Phone, Calendar, UserCheck } from 'lucide-react'
+import { ArrowLeft, User, Loader2, AlertCircle, Search, Phone, Calendar, Shield, ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface SocialRegistrationProps {
   socialData: {
@@ -25,7 +26,7 @@ interface SocialRegistrationProps {
   onBack: () => void
 }
 
-// 모든 필드를 선택적으로 만든 고정 스키마
+// 약관 동의 포함한 스키마
 const socialUserInfoSchema = z.object({
   address: z.string().min(1, '주소를 입력해주세요'),
   addressDetail: z.string().optional(),
@@ -37,13 +38,28 @@ const socialUserInfoSchema = z.object({
     .optional(),
   gender: z.enum(['male', 'female', 'none'], { message: '성별을 선택해주세요' }).optional(),
   birthDate: z.string()
-    .min(1, '생년월일을 입력해주세요')
-    .regex(/^\d{4}-\d{2}-\d{2}$/, '올바른 날짜 형식이 아닙니다')
     .optional()
+    .refine((val) => {
+      // 빈 문자열이거나 undefined면 통과
+      if (!val || val === '') return true
+      // 값이 있으면 YYYY-MM-DD 형식 체크
+      return /^\d{4}-\d{2}-\d{2}$/.test(val)
+    }, {
+      message: '올바른 날짜 형식이 아닙니다 (YYYY-MM-DD)'
+    }),
+  // 약관 동의
+  agreedToTerms: z.boolean().refine(val => val === true, {
+    message: '서비스 이용약관에 동의해주세요'
+  }),
+  agreedToPrivacy: z.boolean().refine(val => val === true, {
+    message: '개인정보 처리방침에 동의해주세요'
+  }),
+  agreedToMarketing: z.boolean().optional(),
+  parentalConsent: z.boolean().optional()
 }).superRefine((data, ctx) => {
-  // 런타임에서 동적 검증 - socialData에 없는 정보만 필수로 체크
   const socialData = (window as any).__tempSocialData
 
+  // 이름 체크: 소셜에서 제공하지 않은 경우만 필수
   if (!socialData?.name && !data.name) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -52,6 +68,7 @@ const socialUserInfoSchema = z.object({
     })
   }
 
+  // 전화번호 체크: 소셜에서 제공하지 않은 경우만 필수
   if (!socialData?.mobile && !data.phone) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -60,6 +77,7 @@ const socialUserInfoSchema = z.object({
     })
   }
 
+  // 성별 체크: 소셜에서 제공하지 않은 경우만 필수
   if ((!socialData?.gender || socialData.gender === 'none') && !data.gender) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -68,6 +86,7 @@ const socialUserInfoSchema = z.object({
     })
   }
 
+  // 생년월일 체크: 소셜에서 제공하지 않은 경우만 필수
   if ((!socialData?.birthyear || !socialData?.birthday) && !data.birthDate) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -87,14 +106,12 @@ export default function SocialRegistration({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isKakaoLoaded, setIsKakaoLoaded] = useState(false)
-  const { login, refreshUser } = useAuth()
+  const { login } = useAuth()
   const router = useRouter()
 
-  // URL에서 원래 가려던 경로 추출
   const searchParams = new URLSearchParams(window.location.search)
   const originalRedirect = searchParams.get('redirect') || '/'
 
-  // 부족한 정보 체크
   const missingInfo = {
     name: !socialData?.name,
     phone: !socialData?.mobile,
@@ -112,108 +129,98 @@ export default function SocialRegistration({
       phone: socialData?.mobile?.replace(/-/g, '') || '',
       gender: socialData?.gender === 'M' ? 'male' : socialData?.gender === 'F' ? 'female' : 'none',
       birthDate: socialData?.birthyear && socialData?.birthday
-        ? `${socialData.birthyear}-${socialData.birthday}`
-        : ''
+        ? (() => {
+            // 네이버 birthday 형식 처리: "02-15" 또는 "0215"
+            const birthday = socialData.birthday.replace(/-/g, '') // 하이픈 제거
+            const month = birthday.substring(0, 2)
+            const day = birthday.substring(2, 4)
+            return `${socialData.birthyear}-${month}-${day}`
+          })()
+        : '',
+      agreedToTerms: false,
+      agreedToPrivacy: false,
+      agreedToMarketing: false,
+      parentalConsent: false
     }
   })
 
-  // 카카오 우편번호 API 스크립트 로드
   useEffect(() => {
-    const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_JS_KEY
-
-    if (!kakaoKey) {
-      console.warn('NEXT_PUBLIC_KAKAO_JS_KEY 환경변수가 설정되지 않았습니다.')
-      return
+    if (socialData) {
+      (window as any).__tempSocialData = socialData
     }
+  }, [socialData])
 
-    if (window.daum?.Postcode) {
-      setIsKakaoLoaded(true)
-      return
-    }
-
+  useEffect(() => {
     const script = document.createElement('script')
     script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
     script.async = true
-    script.onload = () => {
-      setIsKakaoLoaded(true)
-    }
-    script.onerror = () => {
-      console.error('카카오 우편번호 API 로드에 실패했습니다.')
-    }
-
-    document.head.appendChild(script)
+    script.onload = () => setIsKakaoLoaded(true)
+    document.body.appendChild(script)
 
     return () => {
-      const existingScript = document.querySelector('script[src*="postcode.v2.js"]')
-      if (existingScript) {
-        document.head.removeChild(existingScript)
-      }
+      document.body.removeChild(script)
     }
   }, [])
 
-  const handleSearchAddress = () => {
-    if (!window.daum?.Postcode) {
-      alert('우편번호 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+  const handleAddressSearch = () => {
+    if (!isKakaoLoaded || !(window as any).daum) {
+      alert('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
       return
     }
 
-    new window.daum.Postcode({
-      oncomplete: function (data) {
-        form.setValue('zipCode', data.zonecode)
-        form.setValue('address', data.roadAddress || data.jibunAddress)
-
-        const addressDetailInput = document.querySelector('input[name="addressDetail"]') as HTMLInputElement
-        if (addressDetailInput) {
-          addressDetailInput.focus()
-        }
-
-        form.trigger(['zipCode', 'address'])
-      },
-      width: 100,
-      height: 400
+    new (window as any).daum.Postcode({
+      oncomplete: function (data: any) {
+        form.setValue('address', data.address, { shouldValidate: true })
+        form.setValue('zipCode', data.zonecode, { shouldValidate: true })
+      }
     }).open()
   }
 
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/[^\d]/g, '')
-    if (numbers.length <= 3) return numbers
-    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`
-    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`
-  }
-
   const handleSubmit = async (data: SocialUserInfoFormData) => {
+    console.log('=== Form Submit Started ===')
+    console.log('Form Data:', data)
+    console.log('Form Errors:', form.formState.errors)
+    console.log('Social Data:', socialData)
+
     if (!socialData) {
-      setError('SNS 인증 정보가 없습니다.')
+      setError('SNS 인증 정보를 찾을 수 없습니다.')
       return
     }
 
-    setError(null)
     setIsLoading(true)
+    setError(null)
 
     try {
-      // 최종 데이터 준비
       const finalData = {
-        // SNS에서 받은 데이터 우선 사용
         name: socialData.name || data.name,
-        phone: socialData.mobile?.replace(/-/g, '') || data.phone?.replace(/-/g, ''),
+        phone: socialData.mobile?.replace(/-/g, '') || data.phone,
         gender: socialData.gender === 'M' ? 'male' : socialData.gender === 'F' ? 'female' : data.gender,
         email: socialData.email,
         profileImage: socialData.profileImage,
         signupMethod: socialData.provider,
         socialId: socialData.id,
-
-        // 생년월일 처리
         birthDate: socialData.birthyear && socialData.birthday
-          ? `${socialData.birthyear}-${socialData.birthday}`
+          ? (() => {
+              // 네이버 birthday 형식 처리: "02-15" 또는 "0215"
+              const birthday = socialData.birthday.replace(/-/g, '') // 하이픈 제거
+              const month = birthday.substring(0, 2)
+              const day = birthday.substring(2, 4)
+              return `${socialData.birthyear}-${month}-${day}`
+            })()
           : data.birthDate,
-
-        // 사용자가 입력한 주소 정보
         address: data.address,
         addressDetail: data.addressDetail,
         zipCode: data.zipCode,
+        // 약관 동의 정보
+        agreedToTerms: data.agreedToTerms,
+        agreedToPrivacy: data.agreedToPrivacy,
+        agreedToMarketing: data.agreedToMarketing || false,
+        parentalConsent: data.parentalConsent || false,
         autoGenerate: true
       }
 
+      console.log('=== Final Data to Send ===')
+      console.log(JSON.stringify(finalData, null, 2))
 
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -221,36 +228,32 @@ export default function SocialRegistration({
         body: JSON.stringify(finalData)
       })
 
+      console.log('=== API Response ===')
+      console.log('Status:', response.status)
+      console.log('Status Text:', response.statusText)
+
       const result = await response.json()
+      console.log('Result:', result)
 
       if (response.ok) {
-        console.log('Registration successful:', result)
-
+        console.log('✅ Registration successful')
         if (result.user && result.autoLogin) {
-          console.log('Auto-login successful, setting user in context')
-
-          // AuthContext에 사용자 정보 설정
+          console.log('✅ Auto-login successful, setting user in context')
           login(result.user)
-
-          // 성공 파라미터와 함께 페이지 이동
-          const finalRedirect = originalRedirect && originalRedirect !== '/my-page'
-            ? originalRedirect
-            : '/'
-
+          const finalRedirect = originalRedirect && originalRedirect !== '/my-page' ? originalRedirect : '/'
           const redirectUrl = new URL(finalRedirect, window.location.origin)
           redirectUrl.searchParams.set('signup_success', 'true')
-
           router.push(redirectUrl.pathname + redirectUrl.search)
         } else {
-          console.log('Auto-login failed, redirecting to login')
+          console.log('⚠️ Auto-login failed, redirecting to login')
           router.push('/login?message=가입완료. 로그인해주세요.')
         }
       } else {
-        console.error('Registration failed:', result)
+        console.error('❌ Registration failed:', result)
         setError(result.error || '회원가입에 실패했습니다.')
       }
     } catch (error) {
-      console.error('Social registration error:', error)
+      console.error('❌ Network error:', error)
       setError('네트워크 오류가 발생했습니다')
     } finally {
       setIsLoading(false)
@@ -259,20 +262,10 @@ export default function SocialRegistration({
 
   const getProviderInfo = () => {
     if (!socialData) return { name: '', color: '', bgColor: '' }
-
     const providerConfig = {
-      naver: {
-        name: '네이버',
-        color: 'text-[#03C75A]',
-        bgColor: 'bg-[#03C75A]'
-      },
-      kakao: {
-        name: '카카오',
-        color: 'text-[#FEE500]',
-        bgColor: 'bg-[#FEE500]'
-      }
+      naver: { name: '네이버', color: 'text-[#03C75A]', bgColor: 'bg-[#03C75A]' },
+      kakao: { name: '카카오', color: 'text-[#FEE500]', bgColor: 'bg-[#FEE500]' }
     }
-
     return providerConfig[socialData.provider]
   }
 
@@ -298,8 +291,8 @@ export default function SocialRegistration({
   }
 
   return (
-    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+    <div className="sm:bg-white py-8 px-6 sm:shadow-xl shadow-none rounded-xl border border-gray-100 font-paper max-w-2xl mx-auto">
+      <div className="sm:mx-auto sm:w-full">
         {/* 헤더 */}
         <div className="flex items-center mb-6">
           <button
@@ -315,7 +308,7 @@ export default function SocialRegistration({
             <p className="text-sm text-gray-600 mt-1">
               {Object.values(missingInfo).some(missing => missing)
                 ? '부족한 정보를 입력해주세요'
-                : '주소 정보를 입력해주세요'}
+                : '주소 정보와 약관 동의를 확인해주세요'}
             </p>
           </div>
         </div>
@@ -324,39 +317,23 @@ export default function SocialRegistration({
         <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
           <div className="flex items-center">
             {socialData.profileImage ? (
-              <div className="relative h-12 w-12 rounded-full overflow-hidden mr-3 bg-gray-200">
-                <Image
-                  src={socialData.profileImage}
-                  alt="프로필 이미지"
-                  fill
-                  className="object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    target.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
-                  }}
-                />
-                <div className="fallback-icon absolute inset-0 flex items-center justify-center bg-gray-300">
-                  <User className="h-6 w-6 text-gray-600" />
-                </div>
-              </div>
+              <Image
+                src={socialData.profileImage}
+                alt="프로필"
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+              <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
                 <User className="h-6 w-6 text-gray-600" />
               </div>
             )}
-            <div className="flex-1">
-              <div className="flex items-center">
-                <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white ${providerInfo.bgColor}`}>
-                  {providerInfo.name}
-                </span>
-              </div>
-              <p className="text-sm font-medium text-gray-900 mt-1">
-                {socialData.name || '이름 정보 없음'}
-              </p>
-              <div className="text-xs text-gray-600 space-y-0.5 mt-1">
-                {socialData.email && <p>📧 {socialData.email}</p>}
-                {socialData.mobile && <p>📱 {socialData.mobile}</p>}
+            <div className="ml-4 flex-1">
+              <p className="font-semibold text-gray-900">{socialData.name || '이름 없음'}</p>
+              <p className="text-sm text-gray-600">{socialData.email || '이메일 없음'}</p>
+              <div className="text-xs text-gray-500 mt-1">
+                {socialData.mobile && <p>📞 {socialData.mobile}</p>}
                 {socialData.gender && <p>👤 {socialData.gender === 'M' ? '남성' : socialData.gender === 'F' ? '여성' : '기타'}</p>}
                 {socialData.birthyear && <p>🗓️ {socialData.birthyear}년생</p>}
                 {socialData.birthday && <p>🎂 {socialData.birthday} (월-일)</p>}
@@ -368,25 +345,57 @@ export default function SocialRegistration({
           </div>
         </div>
 
-        {/* 오류 메시지 */}
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
 
-        {/* 입력 폼 */}
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        {/* 폼 에러 디버깅 (개발 환경) */}
+        {process.env.NODE_ENV === 'development' && Object.keys(form.formState.errors).length > 0 && (
+          <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+            <p className="font-bold mb-2">⚠️ 폼 검증 오류:</p>
+            <ul className="list-disc list-inside space-y-1">
+              {Object.entries(form.formState.errors).map(([key, error]) => (
+                <li key={key}>
+                  <strong>{key}:</strong> {error?.message?.toString() || '오류'}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs">현재 값: {JSON.stringify(form.getValues(), null, 2)}</p>
+          </div>
+        )}
 
-          {/* 부족한 개인정보 입력 섹션 */}
+        {/* 생년월일 디버깅 (개발 환경) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-xs">
+            <p className="font-bold mb-1">🔍 생년월일 디버깅:</p>
+            <p>네이버 birthyear: {socialData?.birthyear || 'null'}</p>
+            <p>네이버 birthday: {socialData?.birthday || 'null'}</p>
+            <p>폼 birthDate 값: {form.watch('birthDate') || 'empty'}</p>
+            <p>Missing birthDate: {missingInfo.birthDate ? 'YES' : 'NO'}</p>
+          </div>
+        )}
+
+        {/* 입력 폼 */}
+        <form 
+          onSubmit={form.handleSubmit(
+            handleSubmit,
+            (errors) => {
+              console.error('=== Form Validation Failed ===')
+              console.error('Errors:', errors)
+              setError('입력 정보를 확인해주세요.')
+            }
+          )} 
+          className="space-y-6"
+        >
+          {/* 부족한 개인정보 입력 */}
           {Object.values(missingInfo).some(missing => missing) && (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-6">
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h3 className="text-sm font-medium text-yellow-800 mb-3">
                 ⚠️ 추가 정보 입력 필요
               </h3>
               <div className="space-y-4">
-
-                {/* 이름 입력 */}
                 {missingInfo.name && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -398,69 +407,53 @@ export default function SocialRegistration({
                       type="text"
                       disabled={isLoading}
                       placeholder="실명을 입력해주세요"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                     {form.formState.errors.name && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {form.formState.errors.name.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-600">{form.formState.errors.name.message}</p>
                     )}
                   </div>
                 )}
 
-                {/* 전화번호 입력 */}
                 {missingInfo.phone && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       <Phone className="inline h-4 w-4 mr-1" />
-                      휴대폰 번호 <span className="text-red-500">*</span>
+                      전화번호 <span className="text-red-500">*</span>
                     </label>
                     <input
                       {...form.register('phone')}
                       type="tel"
                       disabled={isLoading}
-                      placeholder="010-0000-0000"
-                      onChange={(e) => {
-                        const formatted = formatPhone(e.target.value)
-                        e.target.value = formatted
-                        form.setValue('phone', formatted.replace(/-/g, ''))
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="01012345678"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                     {form.formState.errors.phone && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {form.formState.errors.phone.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-600">{form.formState.errors.phone.message}</p>
                     )}
                   </div>
                 )}
 
-                {/* 성별 선택 */}
                 {missingInfo.gender && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <UserCheck className="inline h-4 w-4 mr-1" />
                       성별 <span className="text-red-500">*</span>
                     </label>
                     <select
                       {...form.register('gender')}
                       disabled={isLoading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     >
-                      <option value="">선택해주세요</option>
+                      <option value="none">선택 안함</option>
                       <option value="male">남성</option>
                       <option value="female">여성</option>
-                      <option value="none">선택안함</option>
                     </select>
                     {form.formState.errors.gender && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {form.formState.errors.gender.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-600">{form.formState.errors.gender.message}</p>
                     )}
                   </div>
                 )}
 
-                {/* 생년월일 입력 */}
                 {missingInfo.birthDate && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -471,12 +464,10 @@ export default function SocialRegistration({
                       {...form.register('birthDate')}
                       type="date"
                       disabled={isLoading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                     {form.formState.errors.birthDate && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {form.formState.errors.birthDate.message}
-                      </p>
+                      <p className="mt-1 text-sm text-red-600">{form.formState.errors.birthDate.message}</p>
                     )}
                   </div>
                 )}
@@ -484,125 +475,234 @@ export default function SocialRegistration({
             </div>
           )}
 
-          {/* 우편번호 및 기본주소 */}
-          <div className="space-y-3">
-            <div>
-              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
-                우편번호 <span className="text-red-500">*</span>
-              </label>
-              <div className="mt-1 flex space-x-2">
+          {/* 주소 정보 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              주소 정보 <span className="text-red-500">*</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">우편번호</label>
                 <input
                   {...form.register('zipCode')}
                   type="text"
-                  disabled={isLoading}
-                  placeholder="12345"
                   readOnly
-                  className="flex-1 appearance-none block px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50"
+                  placeholder="우편번호"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
                 />
-                <button
-                  type="button"
-                  disabled={isLoading || !isKakaoLoaded}
-                  onClick={handleSearchAddress}
-                  className={`
-                    px-4 py-2 border text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors
-                    ${isLoading || !isKakaoLoaded
-                      ? 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
-                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
-                    }
-                  `}
-                  title={!isKakaoLoaded ? '우편번호 검색 서비스 로딩 중...' : '우편번호 검색'}
-                >
-                  <Search className="h-4 w-4" />
-                </button>
               </div>
-              {!isKakaoLoaded && (
-                <p className="mt-1 text-xs text-blue-600">
-                  📄 우편번호 검색 서비스를 준비하고 있습니다...
-                </p>
-              )}
-              {form.formState.errors.zipCode && (
-                <p className="mt-1 text-xs text-red-600">
-                  {form.formState.errors.zipCode.message}
-                </p>
-              )}
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">기본주소</label>
+                <div className="flex space-x-2">
+                  <input
+                    {...form.register('address')}
+                    type="text"
+                    readOnly
+                    placeholder="주소 검색 버튼을 클릭하세요"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddressSearch}
+                    disabled={isLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    <Search className="h-4 w-4" />
+                  </button>
+                </div>
+                {form.formState.errors.address && (
+                  <p className="mt-1 text-sm text-red-600">{form.formState.errors.address.message}</p>
+                )}
+              </div>
             </div>
 
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                기본주소 <span className="text-red-500">*</span>
-              </label>
-              <input
-                {...form.register('address')}
-                type="text"
-                disabled={isLoading}
-                placeholder="우편번호 검색 버튼을 클릭하세요"
-                readOnly
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50"
-              />
-              {form.formState.errors.address && (
-                <p className="mt-1 text-xs text-red-600">
-                  {form.formState.errors.address.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="addressDetail" className="block text-sm font-medium text-gray-700">
-                상세주소 (선택사항)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">상세주소</label>
               <input
                 {...form.register('addressDetail')}
                 type="text"
+                placeholder="상세주소를 입력해주세요"
                 disabled={isLoading}
-                placeholder="상세주소를 입력하세요 (동, 호수 등)"
-                className="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
+            </div>
+          </div>
+
+          {/* 약관 동의 섹션 */}
+          <div className="space-y-4 pt-6 border-t border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Shield className="h-5 w-5 mr-2" />
+              약관 동의
+            </h3>
+
+            {/* 전체 동의 */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-4">
+              <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={
+                    form.watch('agreedToTerms') && 
+                    form.watch('agreedToPrivacy')
+                  }
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    form.setValue('agreedToTerms', checked)
+                    form.setValue('agreedToPrivacy', checked)
+                    form.setValue('agreedToMarketing', checked)
+                  }}
+                  className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-base font-bold text-gray-900">
+                  전체 동의
+                </span>
+              </label>
+              <p className="text-xs text-gray-600 mt-2 ml-8">
+                서비스 이용약관, 개인정보 처리방침, 마케팅 정보 수신(선택)에 모두 동의합니다.
+              </p>
+            </div>
+
+            {/* 개별 약관 */}
+            <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="border-b border-gray-200 pb-3">
+                <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded">
+                  <input
+                    {...form.register('agreedToTerms')}
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm text-gray-900">
+                      <span className="text-red-500 font-bold">* [필수]</span>{' '}
+                      <Link
+                        className="text-blue-600 hover:text-blue-800 underline font-semibold"
+                        href="/terms-of-service"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        서비스 이용약관
+                      </Link>
+                      에 동의합니다
+                    </span>
+                    <div className="mt-2 text-xs text-gray-500 bg-white border border-gray-200 rounded p-2">
+                      <p className="font-medium text-gray-700 mb-1">주요 내용:</p>
+                      <ul className="space-y-0.5 list-disc list-inside">
+                        <li>서비스 이용 관련 권리와 의무</li>
+                        <li>금지 행위 및 이용 제한</li>
+                        <li>개인정보 보호 및 책임사항</li>
+                      </ul>
+                    </div>
+                  </div>
+                </label>
+                {form.formState.errors.agreedToTerms && (
+                  <p className="mt-1 text-sm text-red-600 ml-7 font-medium">
+                    ⚠️ {form.formState.errors.agreedToTerms.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="border-b border-gray-200 pb-3">
+                <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded">
+                  <input
+                    {...form.register('agreedToPrivacy')}
+                    type="checkbox"
+                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm text-gray-900">
+                      <span className="text-red-500 font-bold">* [필수]</span>{' '}
+                      <Link
+                        className="text-blue-600 hover:text-blue-800 underline font-semibold"
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        개인정보 처리방침
+                      </Link>
+                      에 동의합니다
+                    </span>
+                    <div className="mt-2 text-xs text-gray-500 bg-white border border-gray-200 rounded p-2">
+                      <p className="font-medium text-gray-700 mb-1">주요 내용:</p>
+                      <ul className="space-y-0.5 list-disc list-inside">
+                        <li><strong>수집목적:</strong> 회원가입, 본인확인, 서비스 제공</li>
+                        <li><strong>수집항목:</strong> 이름, 전화번호, 이메일, 주소 등</li>
+                        <li><strong>보유기간:</strong> 회원 탈퇴 시까지</li>
+                      </ul>
+                    </div>
+                  </div>
+                </label>
+                {form.formState.errors.agreedToPrivacy && (
+                  <p className="mt-1 text-sm text-red-600 ml-7 font-medium">
+                    ⚠️ {form.formState.errors.agreedToPrivacy.message}
+                  </p>
+                )}
+              </div>
+
+              <label className="flex items-start space-x-3 cursor-pointer hover:bg-white p-2 rounded">
+                <input
+                  {...form.register('agreedToMarketing')}
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-700">
+                  [선택] 마케팅 정보 수신에 동의합니다
+                </span>
+              </label>
+            </div>
+
+            {/* 만 14세 미만 법정대리인 동의 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  {...form.register('parentalConsent')}
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-700 flex-1">
+                  만 14세 미만인 경우, 법정대리인(부모 또는 보호자)이
+                  본 회원가입 및 개인정보 수집에 동의합니다.
+                  <span className="block text-xs text-blue-600 mt-1">
+                    ※ 만 14세 이상인 경우 체크하지 않으셔도 됩니다
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 
           {/* 제출 버튼 */}
-          <div className="pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-6">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              이전으로
+            </button>
             <button
               type="submit"
               disabled={isLoading}
-              className={`
-                w-full flex justify-center py-3 px-4 border border-transparent 
-                text-sm font-medium rounded-lg text-white transition-all duration-200
-                ${isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hover:shadow-lg'
-                }
-              `}
+              onClick={() => {
+                console.log('=== Submit Button Clicked ===')
+                console.log('Current Form Values:', form.getValues())
+                console.log('Form Is Valid:', form.formState.isValid)
+                console.log('Form Errors:', form.formState.errors)
+              }}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  가입 처리 중...
+                </>
               ) : (
-                <Check className="h-4 w-4 mr-2" />
+                '회원가입 완료'
               )}
-              {isLoading ? '가입 중...' : '간편 가입 완료'}
             </button>
           </div>
         </form>
-
-        {/* 안내사항 */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-700">
-            <strong>간편 가입:</strong> {providerInfo.name} 계정으로 간편하게 가입됩니다.
-            별도의 비밀번호 설정 없이 {providerInfo.name} 로그인만으로 이용하실 수 있습니다.
-          </p>
-          <p className="text-xs text-blue-600 mt-1">
-            💡 로그인 시에는 "{providerInfo.name}로 시작하기" 버튼을 사용하세요.
-          </p>
-        </div>
-
-        {process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_KAKAO_JS_KEY && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-xs text-yellow-700">
-              ⚠️ <strong>개발자 알림:</strong> NEXT_PUBLIC_KAKAO_JS_KEY 환경변수가 설정되지 않았습니다.
-              우편번호 검색 기능이 제한될 수 있습니다.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )

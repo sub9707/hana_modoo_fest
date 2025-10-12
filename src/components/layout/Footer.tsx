@@ -155,7 +155,7 @@ export default function Footer() {
               </div>
 
               <p className="text-xs text-gray-500">
-                © 2025 서울특별시한부모가족지원센터. All rights reserved.
+                © 2025 서울특별시한부모가족지원센터. All rights reserved. | 개발 및 운영: (주)하우두유두
               </p>
             </div>
           </div>
