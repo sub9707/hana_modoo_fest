@@ -40,23 +40,16 @@ function RegistrationLoading() {
 
 // 실제 컨텐츠 컴포넌트
 async function RegistrationContent() {
-  console.log('[RegistrationContent] 렌더링 시작')
-  
   // 서버에서 현재 사용자 정보 가져오기
   const user = await getCurrentUser()
-  
-  console.log('[RegistrationContent] 사용자 조회 결과:', user ? `${user.name}(${user.id})` : 'null')
-
   // 로그인하지 않은 사용자는 리다이렉트
   if (!user) {
-    console.log('[RegistrationContent] 로그인되지 않음 - 리다이렉트')
     redirect('/login?callbackUrl=/registration&message=' +
       encodeURIComponent('사전참가 신청은 로그인이 필요합니다.'))
   }
 
   // 사용자 정보 필수 필드 검증
   if (!user.phone || !user.name) {
-    console.log('[RegistrationContent] 프로필 정보 불완전 - 리다이렉트')
     redirect('/my-page?message=' +
       encodeURIComponent('프로필 정보를 먼저 입력해주세요.'))
   }
@@ -70,8 +63,6 @@ async function RegistrationContent() {
      WHERE r.user_id = ? AND r.status != 'cancelled'`,
     [user.id]
   )
-
-  console.log('[RegistrationContent] 기존 신청 조회:', existingRegistration ? '있음' : '없음')
 
   const registration = existingRegistration ? {
     id: existingRegistration.id,

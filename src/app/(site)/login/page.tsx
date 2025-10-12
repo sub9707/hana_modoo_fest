@@ -28,7 +28,6 @@ interface PageProps {
 }
 
 export default async function LoginPage({ searchParams }: PageProps) {
-  console.log('[LoginPage] 페이지 로드')
 
   // ✅ 서버에서 사용자 확인
   const user = await getCurrentUser()
@@ -38,7 +37,6 @@ export default async function LoginPage({ searchParams }: PageProps) {
   // ✅ 이미 로그인된 사용자는 리다이렉트
   if (user) {
     const redirectPath = params.callbackUrl || params.redirect || '/'
-    console.log('[LoginPage] 이미 로그인됨 - 리다이렉트:', redirectPath)
     redirect(redirectPath)
   }
 

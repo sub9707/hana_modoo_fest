@@ -1,7 +1,8 @@
+// src/components/online-festival/SupportComment/SupportComments.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Heart, Gift, Zap } from 'lucide-react'
+import { MessageCircle, Heart, Gift } from 'lucide-react'
 import RecentCommentsSlider from './RecentCommentsSlider'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
@@ -9,7 +10,6 @@ import CommentList from './CommentList'
 interface Stats {
   totalComments: number
   totalLikes: number
-  fromCache?: boolean
   processingTime?: number
 }
 
@@ -17,34 +17,20 @@ export default function SupportComments() {
   const [stats, setStats] = useState<Stats>({ totalComments: 0, totalLikes: 0 })
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
-  const [showStatsPerformance, setShowStatsPerformance] = useState(false)
 
   useEffect(() => {
     fetchStats()
   }, [refreshTrigger])
 
   const fetchStats = async () => {
-    const startTime = Date.now()
-    
     try {
       const response = await fetch('/api/support-comments/stats')
       if (response.ok) {
         const data = await response.json()
         setStats(data)
-        
-        // 개발 환경에서 성능 정보 표시
-        if (process.env.NODE_ENV === 'development') {
-          const loadTime = Date.now() - startTime
-          console.log(`통계 로딩 시간: ${loadTime}ms`, data.fromCache ? '(캐시)' : '(DB)')
-          if (data.processingTime) {
-            console.log(`서버 처리 시간: ${data.processingTime}ms`)
-          }
-          setShowStatsPerformance(true)
-          setTimeout(() => setShowStatsPerformance(false), 3000)
-        }
       }
     } catch (error) {
-      console.error('Error fetching stats:', error)
+      console.error('통계 로딩 실패:', error)
     } finally {
       setIsLoadingStats(false)
     }
@@ -55,40 +41,24 @@ export default function SupportComments() {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-purple-50/50 via-pink-50/50 to-purple-100/50">
-      <div className="p-1 sm:p-6 md:p-8 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12">
+      <div className="max-w-4xl mx-auto px-4 space-y-8">
         {/* 헤더 */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-4 shadow-lg">
-            <MessageCircle className="w-6 h-6 text-white" />
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center space-x-2">
+            <Gift className="w-8 h-8 text-purple-600" />
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              온라인 축제 응원하기
+            </h2>
           </div>
-          <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
-            따뜻한 응원 메시지
-          </h3>
-          <p className="text-gray-600 mb-3">
-            서로에게 따뜻한 응원의 메시지를 전해주세요
+          <p className="text-gray-600 text-lg">
+            여러분의 따뜻한 응원 메시지를 남겨주세요
           </p>
-          
-          {/* 이벤트 안내 */}
-          <div className="inline-flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full border border-amber-200">
-            <Gift className="w-4 h-4 text-amber-600" />
-            <span className="text-sm font-medium text-amber-700">
-              응원 댓글을 남기신 분들 가운데 추첨을 통해 100분께 선물을 드립니다
-            </span>
-          </div>
         </div>
 
-        {/* 통계 */}
-        <div className="grid grid-cols-2 gap-4 md:gap-6 mb-6">
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg relative">
-            {/* 개발 환경에서 성능 정보 표시 */}
-            {process.env.NODE_ENV === 'development' && showStatsPerformance && stats.fromCache && (
-              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
-                <Zap className="w-3 h-3" />
-                <span>캐시</span>
-              </div>
-            )}
-            
+        {/* 통계 카드 */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
             <div className="flex items-center justify-center mb-2">
               <MessageCircle className="w-5 h-5 text-purple-500 mr-2" />
               <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
@@ -98,15 +68,7 @@ export default function SupportComments() {
             <div className="text-sm md:text-base text-gray-600 font-medium">총 응원글</div>
           </div>
           
-          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg relative">
-            {/* 개발 환경에서 성능 정보 표시 */}
-            {process.env.NODE_ENV === 'development' && showStatsPerformance && stats.fromCache && (
-              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
-                <Zap className="w-3 h-3" />
-                <span>캐시</span>
-              </div>
-            )}
-            
+          <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg">
             <div className="flex items-center justify-center mb-2">
               <Heart className="w-5 h-5 text-pink-500 mr-2" />
               <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">

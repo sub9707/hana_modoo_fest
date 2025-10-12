@@ -360,8 +360,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // ✅ 보호된 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
-      console.log('[Middleware] 인증 필요 - 로그인 페이지로 리다이렉트:', pathname)
-
       const hadToken = !!sessionToken
 
       const loginUrl = createRedirectUrl(request, '/login', {

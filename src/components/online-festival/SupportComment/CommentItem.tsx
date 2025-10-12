@@ -1,6 +1,7 @@
+// src/components/online-festival/SupportComment/CommentItem.tsx
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Heart } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -22,17 +23,26 @@ interface CommentItemProps {
 function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
   const { user } = useAuth()
   const [isLiking, setIsLiking] = useState(false)
+  const previousStateRef = useRef<{ isLiked: boolean; likes: number } | null>(null)
 
   const handleLike = async () => {
     if (!user || isLiking) return
 
-    // 🚀 즉시 UI 업데이트 (낙관적 업데이트)
-    const newIsLiked = !comment.isLiked
-    const newLikes = comment.likes + (newIsLiked ? 1 : -1)
-    
-    // UI를 즉시 업데이트
-    onLikeToggle(comment.id, newIsLiked, newLikes)
     setIsLiking(true)
+
+    // 현재 상태 저장 (롤백용)
+    previousStateRef.current = {
+      isLiked: !!comment.isLiked,
+      likes: comment.likes
+    }
+
+
+    // 낙관적 업데이트
+    const optimisticIsLiked = !comment.isLiked
+    const optimisticLikes = comment.likes + (optimisticIsLiked ? 1 : -1)
+    
+    
+    onLikeToggle(comment.id, optimisticIsLiked, optimisticLikes)
 
     try {
       const response = await fetch(`/api/support-comments/${comment.id}/like`, {
@@ -41,116 +51,105 @@ function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
 
       const data = await response.json()
 
-      if (response.ok) {
-        // 서버 응답과 동기화 (이미 낙관적으로 업데이트했으므로 차이가 있을 때만)
-        if (data.isLiked !== newIsLiked || data.likes !== newLikes) {
-          onLikeToggle(comment.id, data.isLiked, data.likes)
-        }
-        
-        // 🔥 개발 환경에서 console.log만 사용 (UI 업데이트 제거)
-        if (process.env.NODE_ENV === 'development' && data.processingTime) {
-          console.log(`좋아요 처리: ${data.processingTime}ms`)
-        }
-        
+
+      if (response.ok && data.success) {
+        // 서버 값으로 동기화
+        onLikeToggle(comment.id, data.isLiked, data.likes)
       } else {
-        // 에러 시 원래 상태로 복원
-        onLikeToggle(comment.id, !!comment.isLiked, comment.likes)
-        console.error('Failed to toggle like:', data.error)
+        // 롤백
+        if (previousStateRef.current) {
+          onLikeToggle(
+            comment.id,
+            previousStateRef.current.isLiked,
+            previousStateRef.current.likes
+          )
+        }
         
-        // 사용자에게 에러 메시지 표시 (선택사항)
+        console.error('좋아요 실패:', data.error)
         if (data.error && data.error !== '좋아요 처리에 실패했습니다.') {
           alert(data.error)
         }
       }
     } catch (error) {
-      // 네트워크 에러 시 원래 상태로 복원
-      onLikeToggle(comment.id, !!comment.isLiked, comment.likes)
-      console.error('Error toggling like:', error)
+      // 네트워크 에러 롤백
+      if (previousStateRef.current) {
+        onLikeToggle(
+          comment.id,
+          previousStateRef.current.isLiked,
+          previousStateRef.current.likes
+        )
+      }
       
-      // 네트워크 에러 메시지
+      console.error('네트워크 에러:', error)
       alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsLiking(false)
+      previousStateRef.current = null
     }
   }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return '방금 전'
+    if (diffMins < 60) return `${diffMins}분 전`
+    if (diffHours < 24) return `${diffHours}시간 전`
+    if (diffDays < 7) return `${diffDays}일 전`
     
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-      return `${diffInMinutes}분 전`
-    } else if (diffInHours < 24) {
-      return `${diffInHours}시간 전`
-    } else {
-      return date.toLocaleDateString('ko-KR', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
   }
 
+  // 🔍 디버깅: 렌더링 시 isLiked 값 확인
+  const isLikedDisplay = comment.isLiked === true
+
   return (
-    <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-md p-6 hover:bg-white/80 transition-all duration-200 group">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-            {comment.author_name[0]}
+    <div className="group p-5 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/40 shadow-sm hover:shadow-lg hover:border-purple-200 transition-all duration-300">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-semibold text-gray-900">{comment.author_name}</span>
+            <span className="text-xs text-gray-400">{formatDate(comment.created_at)}</span>
           </div>
-          <div>
-            <div className="font-semibold text-gray-900">
-              {comment.author_name}
-            </div>
-            <div className="text-sm text-gray-500">
-              {formatDate(comment.created_at)}
-            </div>
-          </div>
+          <p className="text-gray-700 whitespace-pre-wrap break-words leading-relaxed">
+            {comment.message}
+          </p>
         </div>
-      </div>
 
-      <p className="text-gray-700 mb-4 leading-relaxed">
-        {comment.message}
-      </p>
-
-      <div className="flex items-center justify-between">
         <button
           onClick={handleLike}
           disabled={!user || isLiking}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200 transform ${
-            comment.isLiked
-              ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg scale-105'
-              : 'bg-gray-100 text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:scale-105'
-          } ${
-            isLiking 
-              ? 'opacity-75 cursor-not-allowed' 
-              : user 
-                ? 'cursor-pointer hover:shadow-md active:scale-95' 
-                : 'cursor-not-allowed opacity-50'
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`
+            flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-300 shrink-0
+            ${!user ? 'opacity-50 cursor-not-allowed' : ''}
+            ${isLiking ? 'scale-95 opacity-70' : ''}
+            ${isLikedDisplay
+              ? 'bg-pink-50 text-pink-600 hover:bg-pink-100' 
+              : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+            }
+          `}
+          title={!user ? '로그인이 필요합니다' : ''}
         >
           <Heart 
-            className={`w-4 h-4 transition-all duration-200 ${
-              comment.isLiked ? 'fill-current' : ''
-            } ${isLiking ? 'animate-pulse' : ''}`} 
+            className={`w-5 h-5 transition-all duration-300 ${
+              isLikedDisplay ? 'fill-current scale-110' : ''
+            } ${isLiking ? 'animate-pulse' : ''}`}
           />
-          <span className="font-medium">
-            {comment.likes.toLocaleString()}
+          <span className="text-xs font-semibold min-w-[2ch] text-center">
+            {comment.likes}
           </span>
-          {isLiking && <span className="text-xs">처리중...</span>}
         </button>
-
-        {!user && (
-          <div className="text-xs text-gray-400">
-            로그인 후 좋아요를 누를 수 있습니다
-          </div>
-        )}
       </div>
     </div>
   )
 }
 
-export default React.memo(CommentItem)
+export default CommentItem
