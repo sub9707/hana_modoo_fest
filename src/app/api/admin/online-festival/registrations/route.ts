@@ -64,6 +64,16 @@ export async function GET(request: NextRequest) {
     const countResult = await query(countQuery, queryParams)
     const total = countResult[0]?.total || 0
 
+    // 총 참가예정인원 계산 (신청자 + 동행자)
+    const totalParticipantsQuery = `
+      SELECT SUM(r.companions + 1) as totalParticipants
+      FROM registrations r
+      JOIN users u ON r.user_id = u.id
+      ${whereClause}
+    `
+    const totalParticipantsResult = await query(totalParticipantsQuery, queryParams)
+    const totalParticipants = totalParticipantsResult[0]?.totalParticipants || 0
+
     // 목록 조회
     const listQuery = `
       SELECT 
@@ -99,6 +109,7 @@ export async function GET(request: NextRequest) {
       data: {
         items: registrations,
         total,
+        totalParticipants,
         page,
         totalPages
       }

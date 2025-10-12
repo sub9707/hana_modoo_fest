@@ -46,6 +46,7 @@ interface Registration {
 interface RegistrationResponse {
   items: Registration[]
   total: number
+  totalParticipants: number
   page: number
   totalPages: number
 }
@@ -53,6 +54,7 @@ interface RegistrationResponse {
 export function RegistrationTab() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [totalCount, setTotalCount] = useState(0)
+  const [totalParticipants, setTotalParticipants] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
@@ -88,32 +90,35 @@ export function RegistrationTab() {
       })
 
       const response = await fetch(`/api/admin/online-festival/registrations?${params}`)
-      const data = await response.json()
-      const dataArr = data.data as RegistrationResponse
+      if (!response.ok) throw new Error('Failed to fetch')
 
-      setRegistrations(dataArr.items)
-      setTotalCount(dataArr.total)
-      setTotalPages(dataArr.totalPages)
-      setCurrentPage(dataArr.page)
+      const result = await response.json()
+      if (result.success) {
+        const data: RegistrationResponse = result.data
+        setRegistrations(data.items)
+        setTotalCount(data.total)
+        setTotalParticipants(data.totalParticipants)
+        setCurrentPage(data.page)
+        setTotalPages(data.totalPages)
+      }
     } catch (error) {
-      console.error('Failed to fetch registrations:', error)
+      console.error('Error fetching registrations:', error)
+      alert('데이터를 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
     }
   }
 
-  // 초기 데이터 로드
   useEffect(() => {
     fetchRegistrations()
   }, [])
 
-  // 검색 처리
+  // 검색 핸들러
   const handleSearch = () => {
-    setCurrentPage(1)
     fetchRegistrations(1, searchTerm)
   }
 
-  // 엔터키 검색 처리
+  // 엔터키 검색
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch()
@@ -122,31 +127,30 @@ export function RegistrationTab() {
 
   // 페이지 변경
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    fetchRegistrations(page, searchTerm)
+    if (page >= 1 && page <= totalPages) {
+      fetchRegistrations(page, searchTerm)
+    }
   }
 
-  // 삭제 처리
-  const handleDelete = async (id: string) => {
+  // 삭제 핸들러
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     setDeleting(id)
     try {
       const response = await fetch(`/api/admin/online-festival/registrations/${id}`, {
-        method: 'DELETE',
+        method: 'DELETE'
       })
 
-      const result = await response.json()
+      if (!response.ok) throw new Error('Failed to delete')
 
-      if (!response.ok) {
-        throw new Error(result.error || '삭제에 실패했습니다.')
-      }
-
-      alert(result.message)
+      alert('삭제되었습니다.')
       fetchRegistrations(currentPage, searchTerm)
     } catch (error) {
-      console.error('Delete error:', error)
-      alert(error instanceof Error ? error.message : '삭제 중 오류가 발생했습니다.')
+      console.error('Error deleting registration:', error)
+      alert('삭제에 실패했습니다.')
     } finally {
       setDeleting(null)
     }
@@ -156,10 +160,7 @@ export function RegistrationTab() {
   const handleExportExcel = async () => {
     try {
       const response = await fetch('/api/admin/online-festival/registrations/export')
-
-      if (!response.ok) {
-        throw new Error('엑셀 다운로드에 실패했습니다.')
-      }
+      if (!response.ok) throw new Error('Failed to export')
 
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
@@ -235,7 +236,7 @@ export function RegistrationTab() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {registrations.reduce((sum, r) => sum + r.companions + 1, 0).toLocaleString()}명
+              {totalParticipants.toLocaleString()}명
             </div>
           </CardContent>
         </Card>
@@ -331,31 +332,24 @@ export function RegistrationTab() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(registration.created_at).toLocaleDateString()}
+                    {new Date(registration.created_at).toLocaleDateString('ko-KR')}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
                       <Button
+                        variant="ghost"
                         size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleViewDetail(registration)
-                        }}
-                        className="text-blue-600 hover:text-blue-700"
+                        onClick={() => handleViewDetail(registration)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
+                        variant="ghost"
                         size="sm"
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDelete(registration.id)
-                        }}
+                        onClick={(e) => handleDelete(registration.id, e)}
                         disabled={deleting === registration.id}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </div>
                   </TableCell>
@@ -373,16 +367,16 @@ export function RegistrationTab() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  onClick={() => handlePageChange(currentPage - 1)}
                   className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                 />
               </PaginationItem>
-
+              
               {renderPaginationItems()}
-
+              
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  onClick={() => handlePageChange(currentPage + 1)}
                   className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                 />
               </PaginationItem>
@@ -391,12 +385,14 @@ export function RegistrationTab() {
         </div>
       )}
 
-      {/* 디테일 모달 */}
-      <RegistrationDetailModal
-        registration={selectedRegistration}
-        isOpen={showDetailModal}
-        onClose={handleCloseModal}
-      />
+      {/* 상세 모달 */}
+      {showDetailModal && selectedRegistration && (
+        <RegistrationDetailModal
+          registration={selectedRegistration}
+          isOpen={showDetailModal}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }
