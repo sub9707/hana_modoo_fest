@@ -100,7 +100,7 @@ export default function Footer() {
             {/* SNS 링크 */}
             <div className="flex justify-center space-x-4">
               <a
-                href="https://instagram.com/moduhana2025"
+                href="https://www.instagram.com/seoulhanbumo_official/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
@@ -110,7 +110,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://youtube.com/@moduhana2025"
+                href="https://youtube.com/@서울특별시한부모가족"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
@@ -120,7 +120,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://seoul.go.kr"
+                href="https://www.seoulhanbumo.or.kr/han/main/index.do"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"

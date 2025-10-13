@@ -14,7 +14,7 @@ export default function PrivacyPolicyContent() {
                         <p className="text-red-800 text-sm">
                             시행일: 2025년 9월 29일
                             <br />
-                            본 방침은 법률 전문가의 검토를 거치지 않은 임시 버전이며, 
+                            본 방침은 법률 전문가의 검토를 거치지 않은 임시 버전이며,
                             추후 전문가 자문을 받아 수정될 수 있습니다. 변경 시 사전 공지하겠습니다.
                         </p>
                     </div>
@@ -72,8 +72,7 @@ export default function PrivacyPolicyContent() {
                     <div className="bg-gray-50 rounded-lg p-4">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">다. 마케팅 및 광고 활용 (선택)</h3>
                         <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                            <li>신규 서비스 및 이벤트 정보 제공</li>
-                            <li>맞춤형 서비스 제공</li>
+                            <li>이벤트 정보 제공</li>
                             <li>통계작성 및 만족도 조사</li>
                         </ul>
                     </div>
@@ -109,38 +108,16 @@ export default function PrivacyPolicyContent() {
                             </div>
                         </div>
                     </div>
-
                     <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                             <Phone className="w-5 h-5 mr-2 text-yellow-600" />
-                            나. SNS 로그인 시 수집 항목
+                            나. SNS 로그인 (향후 적용 예정)
                         </h3>
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <h4 className="font-medium text-gray-700 mb-2">카카오 로그인</h4>
-                                <ul className="list-disc list-inside space-y-1 text-gray-600 ml-4">
-                                    <li>카카오 계정 정보 (ID)</li>
-                                    <li>프로필 정보 (닉네임, 프로필 사진)</li>
-                                    <li>카카오계정 이메일</li>
-                                    <li>성별, 연령대, 생일</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-medium text-gray-700 mb-2">네이버 로그인</h4>
-                                <ul className="list-disc list-inside space-y-1 text-gray-600 ml-4">
-                                    <li>네이버 아이디</li>
-                                    <li>프로필 정보 (이름, 닉네임)</li>
-                                    <li>이메일 주소</li>
-                                    <li>성별, 연령대, 생일</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="mt-3 p-3 bg-yellow-100 rounded-md">
-                            <p className="text-sm text-yellow-800">
-                                <strong>참고:</strong> SNS 로그인 시에는 해당 플랫폼에서 제공하는 정보만 수집되며,
-                                추가 정보는 서비스 이용을 위해 별도로 입력받습니다.
-                            </p>
-                        </div>
+                        <p className="text-gray-700">
+                            현재 서비스에서는 SNS 로그인 기능을 제공하지 않으며,
+                            추후 기능이 도입될 경우 수집되는 개인정보 항목 및 이용 목적을 별도로 안내하고
+                            동의를 받은 후 처리할 예정입니다.
+                        </p>
                     </div>
 
                     <div className="bg-gray-50 rounded-lg p-4">
@@ -165,7 +142,7 @@ export default function PrivacyPolicyContent() {
                     <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">원칙</h3>
                         <p className="text-gray-700">
-                            개인정보는 <strong>수집 및 이용목적이 달성된 후 90일 이내에 지체없이 파기</strong>합니다.
+                            개인정보는 <strong>이벤트 종료 및 경품 발송 완료 후 90일 이내에 지체없이 파기</strong>합니다.
                             단, 관련 법령에 따라 보존이 필요한 경우에는 해당 법령에서 정한 기간 동안 보관합니다.
                         </p>
                     </div>
@@ -208,9 +185,9 @@ export default function PrivacyPolicyContent() {
                                 </thead>
                                 <tbody className="divide-y divide-orange-200">
                                     <tr>
-                                        <td className="p-3">카카오</td>
-                                        <td className="p-3">소셜 로그인 서비스</td>
-                                        <td className="p-3">이용자 탈퇴시까지</td>
+                                        <td className="p-3">(주)하우두유두</td>
+                                        <td className="p-3">이벤트 페이지 개발 및 시스템 유지관리</td>
+                                        <td className="p-3">위탁계약 종료 시까지</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -293,7 +270,7 @@ export default function PrivacyPolicyContent() {
                 <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-3">개인정보보호책임자</h3>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-3">개인정보 처리 위탁업무 담당자</h3>
                             <div className="space-y-2 text-gray-700">
                                 <p><strong>성명:</strong> 신성익</p>
                                 <p><strong>소속:</strong> (주)하우두유두</p>

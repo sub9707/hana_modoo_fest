@@ -3,6 +3,8 @@ import { FileText, UserCheck, AlertTriangle, Shield } from 'lucide-react'
 export default function TermsOfServiceContent() {
   return (
     <div className="space-y-8 text-gray-700 leading-relaxed">
+
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">모두하나대축제 2025 이용약관</h1>
       {/* 면책 경고 배너 */}
       <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4">
         <div className="flex items-start">
@@ -14,7 +16,7 @@ export default function TermsOfServiceContent() {
             <p className="text-red-800 text-sm">
               시행일: 2025년 9월 29일
               <br />
-              본 약관은 법률 전문가의 검토를 거치지 않은 임시 버전이며, 
+              본 약관은 법률 전문가의 검토를 거치지 않은 임시 버전이며,
               추후 전문가 자문을 받아 수정될 수 있습니다. 변경 시 사전 공지하겠습니다.
             </p>
           </div>
@@ -39,14 +41,15 @@ export default function TermsOfServiceContent() {
         </ol>
       </nav>
 
+
       {/* 제1조: 목적 */}
       <section id="section1" className="border-l-4 border-blue-500 pl-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제1조 (목적)
         </h2>
         <p className="text-gray-700 mb-4">
-          본 약관은 서울특별시한부모가족지원센터(이하 "센터")가 운영하는 모두하나대축제 2025 웹사이트(이하 "사이트")에서 
-          제공하는 인터넷 관련 서비스(이하 "서비스")를 이용함에 있어 센터와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
+          본 약관은 서울특별시가 주최하고 서울특별시한부모가족지원센터(이하 ‘센터’) 가 주관하는
+          ‘모두하나대축제 2025’ 웹사이트(이하 “사이트”)의 이용에 관한 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
         </p>
       </section>
 
@@ -58,13 +61,13 @@ export default function TermsOfServiceContent() {
         <div className="space-y-3">
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-gray-700">
-              <strong>1. "서비스"</strong>란 모두하나대축제 2025의 사전참가 신청, 온라인 축제 참여, 소식 확인 등 
+              <strong>1. "서비스"</strong>란 모두하나대축제 2025의 사전참가 신청, 온라인 축제 참여, 소식 확인 등
               사이트를 통해 제공되는 모든 서비스를 의미합니다.
             </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="text-gray-700">
-              <strong>2. "회원"</strong>이란 사이트에 개인정보를 제공하여 회원가입을 한 자로서, 
+              <strong>2. "회원"</strong>이란 사이트에 개인정보를 제공하여 회원가입을 한 자로서,
               센터의 정보를 지속적으로 제공받으며 서비스를 계속적으로 이용할 수 있는 자를 말합니다.
             </p>
           </div>
@@ -86,7 +89,7 @@ export default function TermsOfServiceContent() {
             <strong>1.</strong> 본 약관은 서비스 화면에 게시하거나 기타의 방법으로 공지함으로써 효력이 발생합니다.
           </p>
           <p>
-            <strong>2.</strong> 센터는 필요한 경우 관련 법령을 위배하지 않는 범위에서 본 약관을 변경할 수 있으며, 
+            <strong>2.</strong> 센터는 필요한 경우 관련 법령을 위배하지 않는 범위에서 본 약관을 변경할 수 있으며,
             변경된 약관은 제1항과 같은 방법으로 공지함으로써 효력이 발생합니다.
           </p>
           <p>
@@ -103,31 +106,31 @@ export default function TermsOfServiceContent() {
         </h2>
         <div className="space-y-3 text-gray-700">
           <p>
-            <strong>1.</strong> 회원가입은 이용자가 약관의 내용에 동의를 하고 회원가입 신청을 한 후 
+            <strong>1.</strong> 회원가입은 이용자가 약관의 내용에 동의를 하고 회원가입 신청을 한 후
             센터가 이러한 신청에 대하여 승낙함으로써 체결됩니다.
           </p>
-          
+
           <p>
-            <strong>2.</strong> 본 서비스는 연령 제한 없이 누구나 이용 가능합니다. 
+            <strong>2.</strong> 본 서비스는 연령 제한 없이 누구나 이용 가능합니다.
             다만, 만 14세 미만 아동의 경우 법정대리인(부모 또는 보호자)의 동의를 받아야 회원가입이 가능합니다.
           </p>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-3">
             <p className="font-semibold text-blue-900 mb-2">가족 단위 참여 환영</p>
             <p className="text-sm text-blue-800">
-              본 행사는 다문화가정을 위한 축제로, 가족 모두의 참여를 환영합니다. 
-              만 14세 미만 아동도 법정대리인의 동의 하에 회원가입 및 참가신청이 가능하며, 
+              본 행사는 다문화가정을 위한 축제로, 가족 모두의 참여를 환영합니다.
+              만 14세 미만 아동도 법정대리인의 동의 하에 회원가입 및 참가신청이 가능하며,
               회원가입 시 법정대리인 동의 항목에 체크해주시기 바랍니다.
             </p>
           </div>
 
           <p>
-            <strong>3.</strong> 법정대리인의 동의는 회원가입 시 법정대리인 동의 항목에 체크함으로써 
+            <strong>3.</strong> 법정대리인의 동의는 회원가입 시 법정대리인 동의 항목에 체크함으로써
             이루어지며, 이는 법정대리인이 직접 동의한 것으로 간주합니다.
           </p>
 
           <p>
-            <strong>4.</strong> 센터는 다음 각 호에 해당하는 신청에 대하여는 승낙을 하지 않거나 
+            <strong>4.</strong> 센터는 다음 각 호에 해당하는 신청에 대하여는 승낙을 하지 않거나
             사후에 이용계약을 해지할 수 있습니다:
           </p>
           <ul className="list-disc list-inside ml-4 space-y-1">
@@ -138,7 +141,7 @@ export default function TermsOfServiceContent() {
           </ul>
 
           <p>
-            <strong>5.</strong> 법정대리인은 아동이 본인의 동의 없이 서비스를 이용하고 있음을 
+            <strong>5.</strong> 법정대리인은 아동이 본인의 동의 없이 서비스를 이용하고 있음을
             발견한 경우, 즉시 센터에 연락하여 계정 삭제를 요청할 수 있습니다.
           </p>
         </div>
@@ -154,7 +157,7 @@ export default function TermsOfServiceContent() {
             <strong>1.</strong> 회원은 개인정보관리화면을 통하여 언제든지 본인의 개인정보를 열람하고 수정할 수 있습니다.
           </p>
           <p>
-            <strong>2.</strong> 회원은 회원가입 신청 시 기재한 사항이 변경되었을 경우 온라인으로 수정을 하거나 
+            <strong>2.</strong> 회원은 회원가입 신청 시 기재한 사항이 변경되었을 경우 온라인으로 수정을 하거나
             전자우편 기타 방법으로 센터에 대하여 그 변경사항을 알려야 합니다.
           </p>
           <p>
@@ -254,7 +257,7 @@ export default function TermsOfServiceContent() {
             <strong>1.</strong> 센터는 행사 참여자에게 추첨을 통해 경품을 제공할 수 있습니다.
           </p>
           <p>
-            <strong>2.</strong> 경품의 가액이 5만원을 초과하는 경우, 
+            <strong>2.</strong> 경품의 가액이 5만원을 초과하는 경우,
             관련 세법에 따라 제세공과금이 발생할 수 있으며, 이는 당첨자가 부담합니다.
           </p>
           <p>
@@ -271,7 +274,7 @@ export default function TermsOfServiceContent() {
         </h2>
         <div className="space-y-3 text-gray-700">
           <p>
-            <strong>1.</strong> 센터는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 
+            <strong>1.</strong> 센터는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는
             서비스 제공에 관한 책임이 면제됩니다.
           </p>
           <p>
@@ -280,6 +283,7 @@ export default function TermsOfServiceContent() {
           <p>
             <strong>3.</strong> 센터는 회원이 서비스를 이용하여 기대하는 이익을 얻지 못하거나 상실한 것에 대하여 책임을 지지 않습니다.
           </p>
+          <p>단, 센터의 고의 또는 중대한 과실에 의한 손해에 대해서는 관련 법령에 따라 책임을 집니다.</p>
         </div>
       </section>
 
@@ -290,11 +294,15 @@ export default function TermsOfServiceContent() {
         </h2>
         <div className="space-y-3 text-gray-700">
           <p>
-            <strong>1.</strong> 센터는 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 보상처리하기 위하여 
-            피해보상처리기구를 설치·운영합니다.
+            <strong>1.</strong> 센터는 이용자가 제기하는 정당한 의견이나 불만을 반영하고 그 피해를 보상처리하기 위하여
+            피해보상처리기구를 설치·운영할 수 있습니다.
           </p>
           <p>
             <strong>2.</strong> 본 약관에 명시되지 않은 사항은 관계법령 및 상관례에 따릅니다.
+          </p>
+          <p>
+            <strong>3.</strong> 이용자는 개인정보 침해 및 서비스 이용 관련 분쟁 발생 시
+            개인정보분쟁조정위원회 또는 한국인터넷진흥원(KISA) 등에 분쟁조정을 신청할 수 있습니다.
           </p>
         </div>
       </section>
