@@ -351,9 +351,9 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
                 <div className="mt-2 text-xs text-gray-500 bg-gray-50 rounded p-2">
                   <p><strong>수집·이용 목적:</strong> 축제 참가신청 접수, 본인확인, 행사 안내</p>
                   <p><strong>수집 항목:</strong> 이름, 성별, 생년월일, 휴대폰번호, 주소</p>
-                  <p><strong>보유 기간:</strong> 참가신청 목적 달성 후 3년간 보관</p>
+                  <p><strong>보유 기간:</strong> 참가신청 목적 달성 후 90일간 보관</p>
                   <p className="text-red-600 mt-1">
-                    * 동의를 거부할 권리가 있으나, 거부 시 축제 참가신청이 제한됩니다.
+                    * 동의를 거부할 권리가 있으나, 거부 시 축제 사전참가신청이 제한됩니다.
                   </p>
                 </div>
               </label>

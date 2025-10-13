@@ -351,32 +351,6 @@ export default function SocialRegistration({
           </div>
         )}
 
-        {/* 폼 에러 디버깅 (개발 환경) */}
-        {process.env.NODE_ENV === 'development' && Object.keys(form.formState.errors).length > 0 && (
-          <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
-            <p className="font-bold mb-2">⚠️ 폼 검증 오류:</p>
-            <ul className="list-disc list-inside space-y-1">
-              {Object.entries(form.formState.errors).map(([key, error]) => (
-                <li key={key}>
-                  <strong>{key}:</strong> {error?.message?.toString() || '오류'}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-2 text-xs">현재 값: {JSON.stringify(form.getValues(), null, 2)}</p>
-          </div>
-        )}
-
-        {/* 생년월일 디버깅 (개발 환경) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-xs">
-            <p className="font-bold mb-1">🔍 생년월일 디버깅:</p>
-            <p>네이버 birthyear: {socialData?.birthyear || 'null'}</p>
-            <p>네이버 birthday: {socialData?.birthday || 'null'}</p>
-            <p>폼 birthDate 값: {form.watch('birthDate') || 'empty'}</p>
-            <p>Missing birthDate: {missingInfo.birthDate ? 'YES' : 'NO'}</p>
-          </div>
-        )}
-
         {/* 입력 폼 */}
         <form 
           onSubmit={form.handleSubmit(

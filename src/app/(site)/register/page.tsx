@@ -137,7 +137,7 @@ export default function RegisterPage() {
               </div>
               <div className="text-left">
                 <h3 className="text-lg font-semibold text-gray-900">네이버 계정으로 가입</h3>
-                <p className="text-sm text-gray-600">네이버 로그인으로 간편 가입 (개발 환경)</p>
+                <p className="text-sm text-gray-600">네이버 로그인으로 간편 가입</p>
               </div>
             </div>
           </button>
@@ -190,7 +190,7 @@ export default function RegisterPage() {
   // 기존 사용자 안내 화면
   if (isExistingUser) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-paper">
         <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-6">
@@ -208,7 +208,7 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <button
                 onClick={() => router.push('/login')}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full px-6 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors"
               >
                 로그인 페이지로 이동
               </button>

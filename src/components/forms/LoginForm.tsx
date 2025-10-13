@@ -204,7 +204,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
           </div>
 
           {/* 소셜 로그인 섹션 (네이버 검수 완료 후 활성화) */}
-          {/* <div className="mt-6">
+          <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
@@ -219,19 +219,19 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
                 type="button"
                 onClick={() => handleSocialLogin('naver')}
                 disabled={isLoading || socialLoading !== null}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-[#03C75A] hover:bg-[#02B350] text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium bg-[#03C75A] hover:bg-[#02B350] text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {socialLoading === 'naver' ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    <Image src="/naver-logo.svg" alt="Naver" width={20} height={20} />
+                    <Image src="/images/common/naver-logo.png" alt="Naver" width={20} height={20} />
                     <span>네이버로 로그인</span>
                   </>
                 )}
               </button>
             </div>
-          </div> */}
+          </div>
 
           <div className="text-center border-t border-gray-200 pt-6">
             <p className="text-sm text-gray-600">
