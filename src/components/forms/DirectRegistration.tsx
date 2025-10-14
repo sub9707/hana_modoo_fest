@@ -1,13 +1,13 @@
 // src/components/forms/DirectRegistrationForm.tsx
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     User, Phone, Lock, Eye, EyeOff, Building, MapPin,
-    Check, X, Loader2, AlertTriangle, Shield
+    Check, X, Loader2, AlertTriangle, Shield, Mail, Clock, CheckCircle
 } from 'lucide-react'
 import { directRegistrationSchema, type DirectRegistrationData } from '@/lib/validations/registration'
 import { AddressSearchResult, type DuplicationCheckResponse } from '@/types/registration'
@@ -17,6 +17,14 @@ import Link from 'next/link'
 
 interface DirectRegistrationFormProps {
     onBack: () => void
+}
+
+interface EmailVerificationState {
+    isSent: boolean
+    isVerified: boolean
+    isChecking: boolean
+    timeLeft: number
+    message: string
 }
 
 export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) {
@@ -42,6 +50,15 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
         message: string
     }>({ isChecking: false, isChecked: false, available: false, message: '' })
 
+    // 이메일 인증 상태
+    const [emailVerification, setEmailVerification] = useState<EmailVerificationState>({
+        isSent: false,
+        isVerified: false,
+        isChecking: false,
+        timeLeft: 0,
+        message: ''
+    })
+
     const form = useForm<DirectRegistrationData>({
         resolver: zodResolver(directRegistrationSchema),
         defaultValues: {
@@ -50,6 +67,8 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             password: '',
             confirmPassword: '',
             phone: '',
+            email: '',
+            emailCode: '',
             gender: 'none',
             birthDate: '',
             company: '',
@@ -58,10 +77,31 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             zipCode: '',
             agreedToTerms: false,
             agreedToPrivacy: false,
-            agreedToMarketing: false
+            agreedToMarketing: false,
+            parentalConsent: false
         },
         mode: 'onChange'
     })
+
+    // 이메일 인증 타이머
+    useEffect(() => {
+        if (emailVerification.timeLeft > 0) {
+            const timer = setTimeout(() => {
+                setEmailVerification(prev => ({
+                    ...prev,
+                    timeLeft: prev.timeLeft - 1
+                }))
+            }, 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [emailVerification.timeLeft])
+
+    // 시간 포맷팅 함수
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins}:${secs.toString().padStart(2, '0')}`
+    }
 
     // 사용자명 중복 체크 함수
     const checkUsername = useCallback(async () => {
@@ -163,6 +203,114 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
         }
     }, [form])
 
+    // 이메일 인증번호 발송
+    const handleSendEmailVerification = async () => {
+        const email = form.getValues('email')
+
+        if (!email) {
+            setEmailVerification(prev => ({
+                ...prev,
+                message: '이메일을 입력해주세요'
+            }))
+            return
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            setEmailVerification(prev => ({
+                ...prev,
+                message: '올바른 이메일 형식이 아닙니다'
+            }))
+            return
+        }
+
+        setEmailVerification(prev => ({ ...prev, isChecking: true, message: '' }))
+
+        try {
+            const response = await fetch('/api/auth/send-email-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+
+            const result = await response.json()
+
+            if (result.success) {
+                setEmailVerification({
+                    isSent: true,
+                    isVerified: false,
+                    isChecking: false,
+                    timeLeft: result.expiresIn || 300,
+                    message: '인증번호가 이메일로 전송되었습니다'
+                })
+            } else {
+                setEmailVerification({
+                    isSent: false,
+                    isVerified: false,
+                    isChecking: false,
+                    timeLeft: 0,
+                    message: result.error || '인증번호 전송에 실패했습니다'
+                })
+            }
+        } catch (error) {
+            setEmailVerification({
+                isSent: false,
+                isVerified: false,
+                isChecking: false,
+                timeLeft: 0,
+                message: '네트워크 오류가 발생했습니다'
+            })
+        }
+    }
+
+    // 이메일 인증번호 확인
+    const handleVerifyEmailCode = async () => {
+        const email = form.getValues('email')
+        const code = form.getValues('emailCode')
+
+        if (!code || code.length !== 6) {
+            setEmailVerification(prev => ({
+                ...prev,
+                message: '6자리 인증번호를 입력해주세요'
+            }))
+            return
+        }
+
+        setEmailVerification(prev => ({ ...prev, isChecking: true, message: '' }))
+
+        try {
+            const response = await fetch('/api/auth/verify-email-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            })
+
+            const result = await response.json()
+
+            if (result.success) {
+                setEmailVerification({
+                    isSent: true,
+                    isVerified: true,
+                    isChecking: false,
+                    timeLeft: 0,
+                    message: '이메일 인증이 완료되었습니다'
+                })
+            } else {
+                setEmailVerification(prev => ({
+                    ...prev,
+                    isChecking: false,
+                    message: result.error || '인증번호가 일치하지 않습니다'
+                }))
+            }
+        } catch (error) {
+            setEmailVerification(prev => ({
+                ...prev,
+                isChecking: false,
+                message: '네트워크 오류가 발생했습니다'
+            }))
+        }
+    }
+
     // 전화번호 포맷팅
     const formatPhone = (value: string) => {
         const numbers = value.replace(/[^\d]/g, '')
@@ -185,6 +333,12 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             return
         }
 
+        // 이메일 인증 확인
+        if (!emailVerification.isVerified) {
+            setSubmitError('이메일 인증을 완료해주세요')
+            return
+        }
+
         setIsSubmitting(true)
 
         try {
@@ -197,7 +351,6 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
             const result = await response.json()
 
             if (result.success) {
-
                 // AuthContext에 사용자 정보 설정
                 if (result.user) {
                     login(result.user)
@@ -290,7 +443,6 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 <input
                                     {...form.register('username', {
                                         onChange: () => {
-                                            // 입력이 변경되면 중복 체크 상태 초기화
                                             setUsernameCheck({ isChecking: false, isChecked: false, available: false, message: '' })
                                         }
                                     })}
@@ -401,7 +553,6 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                             const value = e.target.value.replace(/[^\d]/g, '')
                                             e.target.value = formatPhone(value)
                                             form.setValue('phone', value)
-                                            // 입력이 변경되면 중복 체크 상태 초기화
                                             setPhoneCheck({ isChecking: false, isChecked: false, available: false, message: '' })
                                         }
                                     })}
@@ -438,6 +589,99 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 {phoneCheck.message}
                             </p>
                         )}
+                    </div>
+
+                    {/* 이메일 (필수) */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            이메일 <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-xs text-gray-600 mb-2">
+                            비밀번호 찾기 및 변경 시 필요합니다
+                        </p>
+
+                        <div className="space-y-3">
+                            <div className="flex gap-2">
+                                <input
+                                    {...form.register('email')}
+                                    type="email"
+                                    placeholder="example@email.com"
+                                    disabled={emailVerification.isVerified}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleSendEmailVerification}
+                                    disabled={emailVerification.isChecking || emailVerification.isVerified}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap"
+                                >
+                                    {emailVerification.isChecking ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : emailVerification.isVerified ? (
+                                        <CheckCircle className="h-4 w-4" />
+                                    ) : emailVerification.isSent ? (
+                                        '재전송'
+                                    ) : (
+                                        '인증번호'
+                                    )}
+                                </button>
+                            </div>
+
+                            {form.formState.errors.email && (
+                                <p className="text-sm text-red-600">{form.formState.errors.email.message}</p>
+                            )}
+
+                            {emailVerification.isSent && !emailVerification.isVerified && (
+                                <div className="flex gap-2">
+                                    <div className="relative flex-1">
+                                        <input
+                                            {...form.register('emailCode')}
+                                            type="text"
+                                            placeholder="6자리 인증번호 입력"
+                                            maxLength={6}
+                                            onChange={(e) => {
+                                                const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                                                form.setValue('emailCode', value)
+                                            }}
+                                            className="w-full px-3 py-2 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                        {emailVerification.timeLeft > 0 && (
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <Clock className="h-4 w-4 text-orange-500 mr-1" />
+                                                <span className="text-sm text-orange-600 font-medium">
+                                                    {formatTime(emailVerification.timeLeft)}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleVerifyEmailCode}
+                                        disabled={emailVerification.isChecking}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 whitespace-nowrap"
+                                    >
+                                        {emailVerification.isChecking ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            '확인'
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+
+                            {emailVerification.message && (
+                                <p className={`text-sm ${
+                                    emailVerification.isVerified
+                                        ? 'text-green-600'
+                                        : emailVerification.isSent
+                                            ? 'text-blue-600'
+                                            : 'text-red-600'
+                                }`}>
+                                    {emailVerification.isVerified && <Check className="inline h-4 w-4 mr-1" />}
+                                    {emailVerification.message}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -477,24 +721,24 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                 <p className="mt-1 text-sm text-red-600">{form.formState.errors.birthDate.message}</p>
                             )}
                         </div>
+                    </div>
 
-                        {/* 🆕 만 14세 미만 법정대리인 동의 - 여기에 추가 */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <label className="flex items-start space-x-3 cursor-pointer">
-                                <input
-                                    {...form.register('parentalConsent')}
-                                    type="checkbox"
-                                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <span className="text-sm text-gray-700 flex-1">
-                                    만 14세 미만인 경우, 법정대리인(부모 또는 보호자)이
-                                    본 회원가입 및 개인정보 수집에 동의합니다.
-                                    <span className="block text-xs text-blue-600 mt-1">
-                                        ※ 만 14세 이상인 경우 체크하지 않으셔도 됩니다
-                                    </span>
+                    {/* 만 14세 미만 법정대리인 동의 */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <label className="flex items-start space-x-3 cursor-pointer">
+                            <input
+                                {...form.register('parentalConsent')}
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <span className="text-sm text-gray-700 flex-1">
+                                만 14세 미만인 경우, 법정대리인(부모 또는 보호자)이
+                                본 회원가입 및 개인정보 수집에 동의합니다.
+                                <span className="block text-xs text-blue-600 mt-1">
+                                    ※ 만 14세 이상인 경우 체크하지 않으셔도 됩니다
                                 </span>
-                            </label>
-                        </div>
+                            </span>
+                        </label>
                     </div>
 
                     {/* 회사명 */}
@@ -659,7 +903,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                     </button>
                     <button
                         type="submit"
-                        disabled={isSubmitting || !usernameCheck.available || !phoneCheck.available}
+                        disabled={isSubmitting || !usernameCheck.available || !phoneCheck.available || !emailVerification.isVerified}
                         className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                     >
                         {isSubmitting ? (

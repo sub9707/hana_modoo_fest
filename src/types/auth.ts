@@ -373,3 +373,39 @@ export interface DailySignupData {
 export interface ExtendedUserStats extends UserStats {
   dailySignups: DailySignupData[];
 }
+
+/**
+ * 이메일 인증 요청 타입
+ */
+export interface EmailVerificationRequest {
+  email: string
+}
+
+/**
+ * 이메일 인증 코드 확인 요청 타입
+ */
+export interface EmailVerificationCodeRequest {
+  email: string
+  code: string
+}
+
+/**
+ * 이메일 인증 응답 타입
+ */
+export interface EmailVerificationResponse {
+  success: boolean
+  message?: string
+  error?: string
+  expiresIn?: number
+  available?: boolean
+}
+
+/**
+ * 비밀번호 재설정 (이메일 인증) 요청 타입
+ */
+export interface ResetPasswordWithEmailRequest {
+  email: string
+  emailVerificationCode: string
+  newPassword: string
+  confirmPassword: string
+}

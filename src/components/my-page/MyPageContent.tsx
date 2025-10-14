@@ -1,3 +1,6 @@
+// src/components/my-page/MyPageContent.tsx
+'use client'
+
 import Link from 'next/link'
 import { User } from '@/types/auth'
 import { 
@@ -20,8 +23,11 @@ import {
   Trash2,
   RefreshCw,
   Building,
-  Activity
+  Activity,
+  AlertTriangle
 } from 'lucide-react'
+import { useState } from 'react'
+import EmailRegistration from '@/components/my-page/EmailRegistration'
 
 interface MyPageContentProps {
   user: User & {
@@ -32,7 +38,7 @@ interface MyPageContentProps {
 }
 
 export function MyPageContent({ user }: MyPageContentProps) {
-
+  const [isEmailRegistered, setIsEmailRegistered] = useState(!!user.email)
 
   // 가입 방법별 배지 색상
   const getSignupMethodBadgeColor = (method: string) => {
@@ -62,6 +68,16 @@ export function MyPageContent({ user }: MyPageContentProps) {
     }
   }
 
+  // 이메일 등록 완료 시 호출
+  const handleEmailRegistered = () => {
+    setIsEmailRegistered(true)
+    // 페이지 새로고침으로 최신 사용자 정보 반영
+    window.location.reload()
+  }
+
+  // 일반 가입자이고 이메일이 없는 경우에만 이메일 등록 섹션 표시
+  const shouldShowEmailRegistration = user.signup_method === 'phone' && !isEmailRegistered
+
   return (
     <div className="p-6 space-y-8 font-paper">
       {/* 헤더 */}
@@ -77,6 +93,38 @@ export function MyPageContent({ user }: MyPageContentProps) {
           </Link>
         </div>
       </div>
+
+      {/* 이메일 등록 안내 (일반 가입자이고 이메일이 없는 경우) */}
+      {shouldShowEmailRegistration && (
+        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-300 rounded-lg p-6 shadow-sm">
+          <div className="flex items-start space-x-4">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-8 w-8 text-orange-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-orange-900 mb-2">
+                이메일 등록을 권장합니다
+              </h3>
+              <ul className="text-sm text-orange-800 space-y-1 mb-3">
+                <li>• 비밀번호를 잊어버린 경우 이메일로 재설정할 수 있습니다</li>
+                <li>• 계정 보안을 위한 추가 인증 수단으로 사용됩니다</li>
+                <li>• <strong className="text-orange-900">최초 1회만 등록 가능</strong>하므로 신중하게 입력해주세요</li>
+              </ul>
+              <p className="text-xs text-orange-700 bg-orange-100 p-2 rounded border border-orange-200">
+                ⚠️ 한 번 등록한 이메일은 수정할 수 없습니다. 정확한 이메일을 입력해주세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이메일 등록 섹션 (일반 가입자이고 이메일이 없는 경우) */}
+      {shouldShowEmailRegistration && (
+        <EmailRegistration 
+          currentEmail={user.email}
+          onSuccess={handleEmailRegistered}
+        />
+      )}
 
       {/* 프로필 섹션 */}
       <section className="bg-white rounded-lg shadow-md p-6">
@@ -123,15 +171,28 @@ export function MyPageContent({ user }: MyPageContentProps) {
                 </div>
               </div>
 
-              {user.email && (
+              {user.email ? (
+                <div className="flex items-center space-x-3">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">이메일</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  {user.signup_method === 'phone' && (
+                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                      등록완료
+                    </span>
+                  )}
+                </div>
+              ) : user.signup_method !== 'phone' ? (
                 <div className="flex items-center space-x-3">
                   <Mail className="h-5 w-5 text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">이메일</p>
-                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-sm text-gray-500">SNS에서 제공되지 않음</p>
                   </div>
                 </div>
-              )}
+              ) : null}
 
               <div className="flex items-center space-x-3">
                 <Calendar className="h-5 w-5 text-gray-400" />
@@ -170,9 +231,9 @@ export function MyPageContent({ user }: MyPageContentProps) {
           </div>
         </div>
         <div className='border border-gray-100 mt-5'/>
-          <div className='mt-6 text-sm text-gray-500 text-center'>
-            본 페이지는 회원 정보 열람용입니다. <br/>정보 수정을 위해서는 02-861-3020으로 연락바랍니다.
-          </div>
+        <div className='mt-6 text-sm text-gray-500 text-center'>
+          본 페이지는 회원 정보 열람용입니다. <br/>정보 수정을 위해서는 02-861-3020으로 연락바랍니다.
+        </div>
       </section>
     </div>
   )
