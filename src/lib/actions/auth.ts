@@ -1,7 +1,7 @@
 // src/lib/actions/auth.ts
 'use server'
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createHash, randomBytes } from 'crypto'
 import { query, queryOne } from '@/lib/mysql/connection'
@@ -15,6 +15,37 @@ const hashPassword = (password: string, salt: string): string => {
 // 세션 토큰 생성
 const generateSessionToken = (): string => {
     return randomBytes(32).toString('hex')
+}
+
+// Server Action에서 IP 추출
+const getClientIpFromHeaders = async (): Promise<string> => {
+    const headersList = await headers()
+
+    // x-forwarded-for 헤더 확인
+    const forwarded = headersList.get('x-forwarded-for')
+    if (forwarded) {
+        return forwarded.split(',')[0].trim()
+    }
+
+    // x-real-ip 헤더 확인
+    const realIp = headersList.get('x-real-ip')
+    if (realIp) {
+        return realIp.trim()
+    }
+
+    // x-client-ip 헤더 확인
+    const clientIp = headersList.get('x-client-ip')
+    if (clientIp) {
+        return clientIp.trim()
+    }
+
+    // CF-Connecting-IP (Cloudflare)
+    const cfIp = headersList.get('cf-connecting-ip')
+    if (cfIp) {
+        return cfIp.trim()
+    }
+
+    return '127.0.0.1'
 }
 
 // 로그인 액션
@@ -32,6 +63,10 @@ export async function loginAction(formData: FormData) {
     }
 
     try {
+
+        // 클라이언트 IP 추출
+        const clientIp = await getClientIpFromHeaders()
+
         // 사용자 조회
         const user = await queryOne(
             'SELECT * FROM users WHERE username = ?',
@@ -59,16 +94,18 @@ export async function loginAction(formData: FormData) {
             [user.id]
         )
 
-        // 세션 토큰 생성 및 저장
+        // 세션 토큰 생성 및 저장 (IP 추가)
         const sessionToken = generateSessionToken()
         await query(
             `UPDATE users SET 
              session_token = ?, 
              session_expires_at = DATE_ADD(NOW(), INTERVAL 7 DAY), 
-             last_login_at = NOW()
+             last_login_at = NOW(),
+             last_login_ip = ?
              WHERE id = ?`,
             [
                 sessionToken,
+                clientIp,
                 user.id
             ]
         )

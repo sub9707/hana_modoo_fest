@@ -1,5 +1,6 @@
 // app/api/auth/oauth/route.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { getClientIp } from '@/lib/utils/ip'
 
 // OAuth 설정 타입 정의
 interface OAuthConfig {
@@ -171,7 +172,7 @@ async function handleOAuthCallback(
           kakao: '카카오'
         }
         const existingMethod = methodNames[existingEmailUser.signup_method] || '다른 방법'
-        
+
         return NextResponse.redirect(new URL(
           `/register?message=해당%20이메일로%20이미%20${encodeURIComponent(existingMethod)}%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
           request.url
@@ -183,9 +184,9 @@ async function handleOAuthCallback(
     if (userResponse.userData.mobile) {
       // 전화번호 정규화 (하이픈 제거)
       const normalizedPhone = userResponse.userData.mobile.replace(/-/g, '')
-      
+
       console.log(`Checking phone duplication for: ${normalizedPhone}`)
-      
+
       const existingPhoneUser = await queryOne(
         'SELECT id, signup_method FROM users WHERE phone = ?',
         [normalizedPhone]
@@ -198,7 +199,7 @@ async function handleOAuthCallback(
           kakao: '카카오'
         }
         const existingMethod = methodNames[existingPhoneUser.signup_method] || '다른 방법'
-        
+
         return NextResponse.redirect(new URL(
           `/register?message=해당%20전화번호로%20이미%20${encodeURIComponent(existingMethod)}%20가입된%20계정이%20있습니다.%20기존%20방법으로%20로그인해주세요`,
           request.url
@@ -360,17 +361,20 @@ async function handleExistingUserLogin(
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 7)
 
+    const clientIp = getClientIp(request)
+
     // 사용자 정보 업데이트
     await query(
-      `UPDATE users SET 
-       session_token = ?, 
-       session_expires_at = ?, 
-       last_login_at = ?
-       WHERE id = ?`,
+      `UPDATE users 
+   SET session_token = ?,
+       session_expires_at = ?,
+       last_login_at = NOW(),
+       last_login_ip = ?
+   WHERE id = ?`,
       [
         sessionToken,
         expiresAt.toISOString().slice(0, 19).replace('T', ' '),
-        new Date().toISOString().slice(0, 19).replace('T', ' '),
+        clientIp,
         user.id
       ]
     )
