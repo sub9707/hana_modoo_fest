@@ -409,3 +409,31 @@ export interface ResetPasswordWithEmailRequest {
   newPassword: string
   confirmPassword: string
 }
+
+/**
+ * 이메일 인증 기반 비밀번호 변경 요청 타입
+ */
+export interface EmailBasedPasswordChangeRequest {
+  email: string
+  verificationCode: string
+  newPassword: string
+  confirmPassword: string
+}
+
+/**
+ * 이메일 인증 기반 비밀번호 변경 응답 타입
+ */
+export interface EmailBasedPasswordChangeResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+/**
+ * 이메일 인증 상태 타입
+ */
+export interface EmailVerificationStatus {
+  email: string
+  isVerified: boolean
+  expiresAt?: string
+}

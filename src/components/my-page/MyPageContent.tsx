@@ -84,6 +84,16 @@ export function MyPageContent({ user }: MyPageContentProps) {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">마이페이지</h1>
         <div className="flex space-x-3">
+          {/* 비밀번호 변경 버튼 추가 (전화번호 가입자만) */}
+          {user.signup_method === 'phone' && (
+            <Link
+              href="/my-page/change-password-options"
+              className="inline-flex items-center px-3 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              비밀번호 변경
+            </Link>
+          )}
           <Link
             href="/my-page/delete-account"
             className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"

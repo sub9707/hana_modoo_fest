@@ -1,6 +1,6 @@
 // src/app/api/auth/verify-email-code/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { query, queryOne } from '@/lib/mysql/connection'
+import { queryOne } from '@/lib/mysql/connection'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,17 +50,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // 인증 완료 처리
-    await query(
-      `UPDATE email_verifications 
-       SET is_verified = 1, verified_at = NOW() 
-       WHERE id = ?`,
-      [verification.id]
-    )
-
+    // 인증번호 확인만 하고 is_verified는 업데이트하지 않음
+    // 실제 비밀번호 변경이 완료되었을 때 업데이트됨
     return NextResponse.json({
       success: true,
-      message: '이메일 인증이 완료되었습니다'
+      message: '인증번호가 확인되었습니다'
     })
 
   } catch (error) {

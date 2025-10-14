@@ -21,7 +21,7 @@ function getClientIp(request: NextRequest): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json()
+    const { email, skipDuplicateCheck } = await request.json()
     const clientIp = getClientIp(request)
 
     if (!email) {
@@ -40,17 +40,19 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // 이메일 중복 확인
-    const existingUser = await queryOne(
-      'SELECT id FROM users WHERE email = ?',
-      [email]
-    )
+    // 이메일 중복 확인 (비밀번호 변경 시에는 건너뜀)
+    if (!skipDuplicateCheck) {
+      const existingUser = await queryOne(
+        'SELECT id FROM users WHERE email = ?',
+        [email]
+      )
 
-    if (existingUser) {
-      return NextResponse.json({
-        success: false,
-        error: '이미 사용 중인 이메일입니다'
-      }, { status: 409 })
+      if (existingUser) {
+        return NextResponse.json({
+          success: false,
+          error: '이미 사용 중인 이메일입니다'
+        }, { status: 409 })
+      }
     }
 
     // 인증 시도 제한 확인 (5분 내 5회 이상 요청 차단)
