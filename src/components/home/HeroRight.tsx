@@ -1,7 +1,7 @@
+// src/components/home/HeroRight.tsx
 'use client';
 
 import Image from "next/image";
-import Carousel from "../common/Carousel";
 import VideoPlayer from "../common/VideoPlayer";
 
 interface HeroRightProps {
@@ -11,7 +11,6 @@ interface HeroRightProps {
 export default function HeroRight({ animationStage }: HeroRightProps) {
   return (
     <div className="relative hidden sm:hidden md:flex items-center justify-center flex-1">
-        {/* 비디오 플레이어 */}
         <div 
             className={`max-w-2xl h-100 mb-30 transition-all duration-500 ease-out ${
                 animationStage >= 7 
@@ -22,7 +21,6 @@ export default function HeroRight({ animationStage }: HeroRightProps) {
           <VideoPlayer src="/videos/main/home_video.mp4"/>
         </div>
         
-        {/* 캐릭터 이미지 */}
         <div 
             className={`w-130 h-70 absolute bottom-20 -right-40 z-10 transition-all duration-500 ease-out ${
                 animationStage >= 8 
