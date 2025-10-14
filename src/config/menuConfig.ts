@@ -3,7 +3,7 @@ import {
   BarChart3, 
   Users, 
   Bell, 
-  Image, 
+  Settings,
   UserCheck
 } from 'lucide-react';
 import { MenuItem } from '@/types/admin';
@@ -32,5 +32,17 @@ export const menuItems: MenuItem[] = [
     title: '회원 관리',
     icon: UserCheck,
     path: '/admin/users'
+  },
+  {
+    id: 'settings',
+    title: '기타 설정',
+    icon: Settings,
+    submenu: [
+      {
+        id: 'settings/weather-banner',
+        title: '날씨 배너 설정',
+        path: '/admin/settings/weather-banner'
+      }
+    ]
   }
 ];

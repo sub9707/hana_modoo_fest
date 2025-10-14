@@ -69,51 +69,171 @@ export async function sendEmail(params: BrevoEmailParams): Promise<BrevoResponse
 }
 
 export async function sendVerificationEmail(email: string, code: string): Promise<BrevoResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const heroImageUrl = `${baseUrl}/images/main/main_hero.webp`
+
   const htmlContent = `
     <!DOCTYPE html>
-    <html>
+    <html lang="ko">
     <head>
       <meta charset="UTF-8">
-      <style>
-        body { font-family: 'Noto Sans KR', sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-        .content { background: white; padding: 30px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px; }
-        .code-box { background: #f5f5f5; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
-        .code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 5px; }
-        .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 20px 0; }
-      </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>이메일 인증</title>
     </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>이메일 인증</h1>
-        </div>
-        <div class="content">
-          <p>안녕하세요,</p>
-          <p>모두하나대축제 이메일 인증을 위한 인증번호입니다.</p>
-          
-          <div class="code-box">
-            <div class="code">${code}</div>
-            <p style="margin: 10px 0 0 0; color: #666;">위 인증번호를 입력해주세요</p>
-          </div>
-          
-          <div class="warning">
-            <strong>⚠️ 주의사항</strong>
-            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-              <li>인증번호는 <strong>5분간</strong> 유효합니다</li>
-              <li>본인이 요청하지 않았다면 이 메일을 무시하세요</li>
-              <li>인증번호는 타인에게 절대 알려주지 마세요</li>
-            </ul>
-          </div>
-          
-          <p style="margin-top: 20px;">감사합니다.<br>모두하나대축제 팀</p>
-        </div>
-        <div class="footer">
-          <p>본 메일은 발신 전용입니다. 문의사항이 있으시면 고객센터를 이용해주세요.</p>
-        </div>
-      </div>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', Arial, sans-serif; background-color: #f5f5f5;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f5f5f5; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <!-- Main Container -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+              
+              <!-- Hero Section -->
+<tr>
+  <td style="padding: 0; position: relative; height: 180px; background: linear-gradient(135deg, #ff9a3c 0%, #ff4e8b 100%);">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 50px 20px;">
+          <h1 style="margin: 0; font-size: 32px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">
+            모두하나대축제
+          </h1>
+          <p style="margin: 8px 0 0 0; font-size: 16px; color: rgba(255, 255, 255, 0.95);">
+            2025 모두하나대축제에 여러분을 환영합니다.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+
+              
+              <!-- Content Section -->
+              <tr>
+                <td style="padding: 40px 32px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <!-- Message -->
+                    <tr>
+                      <td style="padding-bottom: 32px;">
+                        <p style="margin: 0; font-size: 15px; color: #555555; line-height: 1.7;">
+                          모두하나대축제 이메일 인증을 위한 인증번호를 보내드립니다.<br>
+                          아래 인증번호를 입력하여 인증을 완료해주세요.
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Verification Code Box -->
+                    <tr>
+                      <td style="padding: 32px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8f9ff; border: 3px solid #667eea; border-radius: 12px;">
+                          <tr>
+                            <td style="padding: 32px 24px; text-align: center;">
+                              <p style="margin: 0 0 12px 0; font-size: 14px; color: #666666; font-weight: 500;">인증번호</p>
+                              <p style="margin: 8px 0; font-size: 42px; font-weight: bold; color: #667eea; letter-spacing: 8px; font-family: 'Courier New', monospace;">${code}</p>
+                              <p style="margin: 12px 0 0 0; font-size: 13px; color: #888888;">위 6자리 숫자를 입력해주세요</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    
+                    <!-- Information Box -->
+                    <tr>
+                      <td style="padding: 24px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #fff8e1; border-left: 4px solid #ffc107; border-radius: 8px;">
+                          <tr>
+                            <td style="padding: 20px;">
+                              <p style="margin: 0 0 12px 0; font-size: 15px; font-weight: bold; color: #856404;">안내사항</p>
+                              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                  <td style="padding: 6px 0; font-size: 14px; color: #856404; line-height: 1.6;">
+                                    • 인증번호는 발송 시점으로부터 <strong>5분간</strong> 유효합니다
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="padding: 6px 0; font-size: 14px; color: #856404; line-height: 1.6;">
+                                    • 시간이 만료된 경우 인증번호를 다시 요청해주세요
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style="padding: 6px 0; font-size: 14px; color: #856404; line-height: 1.6;">
+                                    • 인증번호가 도착하지 않으면 스팸함을 확인해주세요
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    
+                    <!-- Security Notice -->
+                    <tr>
+                      <td style="padding: 24px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #ffe6e6; border-left: 4px solid #dc3545; border-radius: 8px;">
+                          <tr>
+                            <td style="padding: 20px;">
+                              <p style="margin: 0 0 8px 0; font-size: 15px; font-weight: bold; color: #721c24;">보안 주의사항</p>
+                              <p style="margin: 0; font-size: 14px; color: #721c24; line-height: 1.6;">
+                                본인이 요청하지 않은 인증번호라면 즉시 무시하고 삭제해주세요.
+                                인증번호는 타인에게 절대 알려주지 마시고, 의심스러운 경우 고객센터로 문의해주세요.
+                              </p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    
+                    <!-- Divider -->
+                    <tr>
+                      <td style="padding: 24px 0;">
+                        <div style="height: 1px; background-color: #e0e0e0;"></div>
+                      </td>
+                    </tr>
+                    
+                    <!-- Closing -->
+                    <tr>
+                      <td>
+                        <p style="margin: 0; font-size: 15px; color: #666666; line-height: 1.7;">
+                          감사합니다.<br>
+                          <strong style="color: #667eea;">모두하나대축제 팀</strong>
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Timestamp -->
+                    <tr>
+                      <td style="padding-top: 16px;">
+                        <p style="margin: 0; font-size: 12px; color: #999999;">
+                          발송시간: ${new Date().toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Seoul'
+  })}
+                        </p>
+                      </td>
+                    </tr>
+                    
+                  </table>
+                </td>
+              </tr>
+              
+              <!-- Footer Section -->
+              <tr>
+                <td style="padding: 24px 32px; background-color: #f8f9fa; border-top: 1px solid #e0e0e0; text-align: center;">
+                  <p style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #667eea;">모두하나대축제 2025</p>
+                  <p style="margin: 0; font-size: 13px; color: #6c757d; line-height: 1.6;">
+                    본 메일은 발신 전용입니다.<br>
+                    문의사항이 있으시면 웹사이트의 고객센터를 이용해주세요.
+                  </p>
+                </td>
+              </tr>
+              
+            </table>
+          </td>
+        </tr>
+      </table>
     </body>
     </html>
   `
@@ -121,6 +241,32 @@ export async function sendVerificationEmail(email: string, code: string): Promis
   return sendEmail({
     to: email,
     subject: '[모두하나대축제] 이메일 인증번호',
-    htmlContent
+    htmlContent,
+    textContent: `
+모두하나대축제 이메일 인증
+
+인증번호: ${code}
+
+안내사항:
+- 인증번호는 5분간 유효합니다
+- 시간이 만료된 경우 인증번호를 다시 요청해주세요
+- 인증번호가 도착하지 않으면 스팸함을 확인해주세요
+
+보안 주의사항:
+본인이 요청하지 않은 인증번호라면 즉시 무시하고 삭제해주세요.
+인증번호는 타인에게 절대 알려주지 마세요.
+
+감사합니다.
+모두하나대축제 팀
+
+발송시간: ${new Date().toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Seoul'
+    })}
+    `.trim()
   })
 }
