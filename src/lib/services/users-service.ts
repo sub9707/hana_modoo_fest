@@ -1,7 +1,7 @@
 // libs/users-service.ts
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { User, Role } from '@/types/auth'
-import crypto from 'crypto'
+import crypto, { createHash } from 'crypto'
 
 export interface CreateUserData {
   name: string
@@ -161,9 +161,9 @@ export async function createUser(userData: CreateUserData): Promise<User> {
       throw new Error('이미 사용 중인 사용자명입니다.')
     }
 
-    // 비밀번호 해싱
-    const salt = crypto.randomBytes(32).toString('hex')
-    const passwordHash = crypto.pbkdf2Sync(userData.password, salt, 10000, 64, 'sha512').toString('hex')
+    // 비밀번호 해싱 (SHA256 방식으로 통일)
+    const salt = crypto.randomBytes(16).toString('hex')
+    const passwordHash = createHash('sha256').update(userData.password + salt).digest('hex') 
 
     const userId = crypto.randomUUID()
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -573,8 +573,8 @@ export async function updateUserPassword(userId: string, newPassword: string): P
     }
 
     // 새 비밀번호 해싱
-    const salt = crypto.randomBytes(32).toString('hex')
-    const passwordHash = crypto.pbkdf2Sync(newPassword, salt, 10000, 64, 'sha512').toString('hex')
+    const salt = crypto.randomBytes(16).toString('hex')
+    const passwordHash = createHash('sha256').update(newPassword + salt).digest('hex')
     const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
     // 비밀번호 업데이트
