@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
 import { query, queryOne } from '@/lib/mysql/connection'
 import { sendVerificationEmail } from '@/lib/email/brevo'
+import { isAllowedEmail } from '@/lib/email/email-whitelist-checker'
 
 function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
@@ -37,6 +38,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: false,
         error: '올바른 이메일 형식이 아닙니다'
+      }, { status: 400 })
+    }
+
+    // 화이트리스트 검증
+    const emailValidation = await isAllowedEmail(email)
+    
+    if (!emailValidation.isAllowed) {
+      return NextResponse.json({
+        success: false,
+        error: '사용할 수 없는 이메일 도메인입니다'
       }, { status: 400 })
     }
 
@@ -99,7 +110,7 @@ export async function POST(request: NextRequest) {
     const code = generateVerificationCode()
     const verificationId = uuidv4()
 
-    // DB에 인증 정보 저장 (MySQL의 DATE_ADD 사용)
+    // DB에 인증 정보 저장
     await query(
       `INSERT INTO email_verifications (id, email, code, expires_at, ip_address, created_at)
        VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE), ?, NOW())`,
@@ -110,7 +121,6 @@ export async function POST(request: NextRequest) {
     const emailResult = await sendVerificationEmail(email, code)
 
     if (!emailResult.success) {
-      // 이메일 발송 실패 시 DB 레코드 삭제
       await query('DELETE FROM email_verifications WHERE id = ?', [verificationId])
       
       return NextResponse.json({
@@ -139,7 +149,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: '인증번호가 이메일로 전송되었습니다',
-      expiresIn: 300 // 5분 (초 단위)
+      expiresIn: 300
     })
 
   } catch (error) {
