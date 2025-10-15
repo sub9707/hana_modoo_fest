@@ -106,24 +106,23 @@ export async function POST(request: NextRequest) {
 
     // 사용자 생성
     const userId = uuidv4()
-    const now_str = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
     console.log('=== Inserting User ===')
     console.log('Email to insert:', data.email)
 
+    // NOW() 함수를 사용하여 MySQL 서버의 현재 시간으로 설정
     await query(
       `INSERT INTO users (
         id, name, username, email, password_hash, password_salt, 
         gender, birth_date, phone, company, address, address_detail, zip_code,
         role, session_token, session_expires_at, last_login_at, last_activity_at,
         created_at, updated_at, signup_method
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), NOW(), NOW(), NOW(), NOW(), ?)`,
       [
         userId, data.name, data.username, data.email, passwordHash, salt,
         data.gender, data.birthDate, data.phone, 
         data.company || null, data.address || null, data.addressDetail || null, data.zipCode || null,
-        'user', sessionToken, expiresAt.toISOString().slice(0, 19).replace('T', ' '),
-        now_str, now_str, now_str, now_str, 'phone'
+        'user', sessionToken, 'phone'
       ]
     )
 

@@ -436,7 +436,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                     {/* 사용자명 */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            사용자명 <span className="text-red-500">*</span>
+                            로그인 ID <span className="text-red-500">*</span>
                         </label>
                         <div className="flex gap-2">
                             <div className="flex-1 relative">
@@ -447,7 +447,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                                         }
                                     })}
                                     type="text"
-                                    placeholder="user123"
+                                    placeholder="ID 입력"
                                     className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
