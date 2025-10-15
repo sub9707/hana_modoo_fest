@@ -5,6 +5,9 @@ import NewsHero from '@/components/news/NewsHero'
 import { NewsService } from '@/lib/services/news-service'
 import NewsListSkeleton from '@/components/news/NewsListSkeleton'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: '공지/소식 | 모두하나대축제 2025',
   description: '모두하나대축제 2025의 최신 소식과 공지사항을 확인하세요.',
