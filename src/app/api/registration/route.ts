@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query, queryOne } from '@/lib/mysql/connection'
 import type { RegistrationFormData } from '@/types/registration'
+import { getFormattedDeadline, isRegistrationClosed } from '@/lib/utils/registration-deadline'
 
 // 신청번호 생성 함수 - 순차적 인덱스 기반
 async function generateRegistrationNumber(): Promise<string> {
@@ -36,7 +37,6 @@ async function generateRegistrationNumber(): Promise<string> {
   }
 }
 
-// GET: 현재 사용자의 참가신청 조회
 export async function GET() {
   try {
     const user = await getCurrentUser()
@@ -58,13 +58,11 @@ export async function GET() {
 
     if (!registration) {
       return NextResponse.json(
-        { exists: false },
-        { status: 200 }
+        { registration: null }
       )
     }
 
     return NextResponse.json({
-      exists: true,
       registration: {
         id: registration.id,
         registration_number: registration.registration_number,
@@ -94,7 +92,6 @@ export async function GET() {
   }
 }
 
-// POST: 새로운 참가신청 등록
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser()
@@ -106,9 +103,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (isRegistrationClosed()) {
+      return NextResponse.json(
+        { 
+          error: '사전 접수가 마감되었습니다.',
+          deadline: getFormattedDeadline(),
+          closed: true
+        },
+        { status: 403 }
+      )
+    }
+
     const data: RegistrationFormData = await request.json()
 
-    // 입력 데이터 검증
     if (!data.participant_type || !data.address || !data.zip_code) {
       return NextResponse.json(
         { error: '필수 입력 항목이 누락되었습니다.' },
@@ -123,7 +130,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 이미 신청한 사용자인지 확인 (활성 신청만)
     const existingRegistration = await queryOne(
       'SELECT id, status FROM registrations WHERE user_id = ? AND status != "cancelled"',
       [user.id]
@@ -136,18 +142,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 트랜잭션으로 신청번호 생성 및 등록 처리
     const registrationNumber = await generateRegistrationNumber()
     const registrationId = crypto.randomUUID()
 
-    // 취소된 신청이 있는지 확인
     const cancelledRegistration = await queryOne(
       'SELECT id FROM registrations WHERE user_id = ? AND status = "cancelled"',
       [user.id]
     )
 
     if (cancelledRegistration) {
-      // 기존 레코드 업데이트
       await query(
         `UPDATE registrations SET
           registration_number = ?,
@@ -178,7 +181,6 @@ export async function POST(request: NextRequest) {
         ]
       )
 
-      // 업데이트된 신청 정보 조회
       const updatedRegistration = await queryOne(
         `SELECT r.*, u.name as user_name, u.phone as user_phone 
          FROM registrations r 
@@ -216,7 +218,6 @@ export async function POST(request: NextRequest) {
         }
       })
     } else {
-      // 새로운 레코드 삽입
       await query(
         `INSERT INTO registrations (
           id, user_id, registration_number, participant_type, companions, companion_details,
@@ -240,7 +241,6 @@ export async function POST(request: NextRequest) {
         ]
       )
 
-      // 등록된 신청 정보 조회
       const newRegistration = await queryOne(
         `SELECT r.*, u.name as user_name, u.phone as user_phone 
          FROM registrations r 
@@ -288,7 +288,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE: 참가신청 취소
 export async function DELETE() {
   try {
     const user = await getCurrentUser()
@@ -300,7 +299,6 @@ export async function DELETE() {
       )
     }
 
-    // 현재 참가신청 조회
     const registration = await queryOne(
       'SELECT id, status FROM registrations WHERE user_id = ? AND status != "cancelled"',
       [user.id]
@@ -313,7 +311,6 @@ export async function DELETE() {
       )
     }
 
-    // 참가신청 상태를 취소로 변경
     await query(
       'UPDATE registrations SET status = "cancelled", updated_at = NOW() WHERE id = ?',
       [registration.id]

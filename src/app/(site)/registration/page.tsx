@@ -5,8 +5,10 @@ import { getCurrentUser } from '@/lib/mysql/server'
 import RegistrationHero from '@/components/registration/RegistrationHero'
 import RegistrationForm from '@/components/forms/RegistrationForm'
 import ExistingRegistration from '@/components/registration/ExisitingRegistration'
+import RegistrationClosed from '@/components/registration/RegistrationClosed'
 import type { Registration } from '@/types/registration'
 import { Loader2 } from 'lucide-react'
+import { isRegistrationClosed } from '@/lib/utils/registration-deadline'
 
 export const metadata: Metadata = {
   title: '사전참가 신청',
@@ -17,11 +19,9 @@ export const metadata: Metadata = {
   }
 }
 
-// ✅ NextJS 15: 캐시 무효화 설정 추가
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-// 로딩 컴포넌트
 function RegistrationLoading() {
   return (
     <div className="min-h-screen bg-gray-50 font-paper">
@@ -38,23 +38,19 @@ function RegistrationLoading() {
   )
 }
 
-// 실제 컨텐츠 컴포넌트
 async function RegistrationContent() {
-  // 서버에서 현재 사용자 정보 가져오기
   const user = await getCurrentUser()
-  // 로그인하지 않은 사용자는 리다이렉트
+
   if (!user) {
     redirect('/login?callbackUrl=/registration&message=' +
       encodeURIComponent('사전참가 신청은 로그인이 필요합니다.'))
   }
 
-  // 사용자 정보 필수 필드 검증
   if (!user.phone || !user.name) {
     redirect('/my-page?message=' +
       encodeURIComponent('프로필 정보를 먼저 입력해주세요.'))
   }
 
-  // 기존 참가신청 조회 (서버사이드에서 직접 DB 조회)
   const { queryOne } = await import('@/lib/mysql/connection')
   const existingRegistration = await queryOne(
     `SELECT r.*, u.name as user_name, u.phone as user_phone 
@@ -84,49 +80,54 @@ async function RegistrationContent() {
     user_phone: existingRegistration.user_phone
   } as Registration & { user_name: string; user_phone: string } : null
 
+  const isClosed = isRegistrationClosed()
+
   return (
     <>
       <RegistrationHero />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {registration ? (
-            <>
-              <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
-                <h2 className="text-2xl font-bold mb-2">참가신청 완료</h2>
-                <p className="opacity-90">
-                  이미 사전참가 신청을 완료하셨습니다.
-                </p>
-              </div>
+        {isClosed && !registration ? (
+          <RegistrationClosed />
+        ) : (
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {registration ? (
+              <>
+                <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
+                  <h2 className="text-2xl font-bold mb-2">참가신청 완료</h2>
+                  <p className="opacity-90">
+                    이미 사전참가 신청을 완료하셨습니다.
+                  </p>
+                </div>
 
-              <div className="p-6">
-                <ExistingRegistration
-                  user={user}
-                  registration={registration}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
-                <h2 className="text-2xl font-bold mb-2">사전참가 신청서</h2>
-                <p className="opacity-90">
-                  축제 당일 원활한 참여를 위해 사전신청을 해주세요.
-                </p>
-              </div>
+                <div className="p-6">
+                  <ExistingRegistration
+                    user={user}
+                    registration={registration}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white p-6">
+                  <h2 className="text-2xl font-bold mb-2">사전참가 신청서</h2>
+                  <p className="opacity-90">
+                    축제 당일 원활한 참여를 위해 사전신청을 해주세요.
+                  </p>
+                </div>
 
-              <div className="p-6">
-                <RegistrationForm user={user} />
-              </div>
-            </>
-          )}
-        </div>
+                <div className="p-6">
+                  <RegistrationForm user={user} />
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </>
   )
 }
 
-// 메인 페이지 컴포넌트
 export default function RegistrationPage() {
   return (
     <div className="min-h-screen bg-gray-50 font-paper">
