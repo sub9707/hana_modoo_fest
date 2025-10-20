@@ -139,97 +139,52 @@ export class NewsService {
     }
   }
 
-  /**
-   * 뉴스 상세 조회 (조회수 증가 포함)
-   */
-  static async getNewsById(id: string): Promise<NewsItem | null> {
-    try {
-      return await transaction(async (connection) => {
-        // 뉴스 기본 정보 조회
-        const newsSql = `
-          SELECT * FROM news_items 
-          WHERE id = ?
-        `
-        
-        const [newsRows] = await connection.execute(newsSql, [id])
-        const newsData = newsRows as any[]
-        
-        if (!newsData || newsData.length === 0) {
-          return null
-        }
-
-        const newsItem = newsData[0]
-
-        // 첨부파일 조회
-        const attachmentsSql = `
-          SELECT * FROM news_attachments 
-          WHERE news_id = ? 
-          ORDER BY display_order ASC
-        `
-        const [attachmentRows] = await connection.execute(attachmentsSql, [id])
-        const attachments = (attachmentRows as any[]).map((attachment: any) => ({
-          id: attachment.id,
-          newsId: attachment.news_id,
-          originalFilename: attachment.original_filename,
-          storedFilename: attachment.stored_filename,
-          filePath: attachment.file_path,
-          fileSize: attachment.file_size,
-          mimeType: attachment.mime_type,
-          fileExtension: attachment.file_extension,
-          displayOrder: attachment.display_order,
-          createdAt: attachment.created_at
-        }))
-
-        // 에디터 이미지 조회
-        const imagesSql = `
-          SELECT * FROM news_editor_images 
-          WHERE news_id = ? 
-          ORDER BY created_at ASC
-        `
-        const [imageRows] = await connection.execute(imagesSql, [id])
-        const editorImages = (imageRows as any[]).map((image: any) => ({
-          id: image.id,
-          newsId: image.news_id,
-          originalFilename: image.original_filename,
-          storedFilename: image.stored_filename,
-          filePath: image.file_path,
-          fileSize: image.file_size,
-          width: image.width,
-          height: image.height,
-          altText: image.alt_text,
-          createdAt: image.created_at
-        }))
-
-        // 조회수 증가
-        const updateViewsSql = `
-          UPDATE news_items 
-          SET views = views + 1, updated_at = NOW() 
-          WHERE id = ?
-        `
-        await connection.execute(updateViewsSql, [id])
-
-        // 결과 반환
-        return {
-          id: newsItem.id,
-          title: newsItem.title,
-          category: newsItem.category,
-          date: newsItem.date,
-          summary: newsItem.summary,
-          content: newsItem.content,
-          contentType: newsItem.content_type,
-          views: newsItem.views + 1, // 증가된 조회수 반영
-          important: Boolean(newsItem.important),
-          createdAt: newsItem.created_at,
-          updatedAt: newsItem.updated_at,
-          attachments,
-          editorImages
-        }
-      })
-    } catch (error) {
-      console.error('Error fetching news detail:', error)
-      throw new Error('뉴스 상세 정보를 불러오는데 실패했습니다.')
+/**
+ * 뉴스 상세 조회 (최적화 버전)
+ */
+static async getNewsById(id: string): Promise<NewsItem | null> {
+  try {
+    // 단일 JOIN 쿼리로 통합
+    const sql = `
+      SELECT 
+        n.*,
+        COUNT(DISTINCT a.id) as attachment_count,
+        COUNT(DISTINCT ei.id) as image_count
+      FROM news_items n
+      LEFT JOIN news_attachments a ON n.id = a.news_id
+      LEFT JOIN news_editor_images ei ON n.id = ei.news_id
+      WHERE n.id = ?
+      GROUP BY n.id
+    `
+    
+    const newsData = await queryOne(sql, [id])
+    
+    if (!newsData) {
+      return null
     }
+
+    // 조회수 증가는 비동기로 처리 (응답 속도 향상)
+    query('UPDATE news_items SET views = views + 1 WHERE id = ?', [id])
+      .catch(err => console.error('Failed to increment views:', err))
+
+    return {
+      id: newsData.id,
+      title: newsData.title,
+      category: newsData.category,
+      date: newsData.date,
+      summary: newsData.summary,
+      content: newsData.content,
+      contentType: newsData.content_type,
+      views: newsData.views + 1,
+      important: Boolean(newsData.important),
+      createdAt: newsData.created_at,
+      updatedAt: newsData.updated_at,
+    }
+  } catch (error) {
+    console.error('Error fetching news detail:', error)
+    throw new Error('뉴스 상세 정보를 불러오는데 실패했습니다.')
   }
+}
 
   /**
    * 카테고리 목록 및 개수 조회
