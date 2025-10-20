@@ -14,7 +14,7 @@ export async function createNewsItem(formData: FormData) {
     const data: NewsFormData = {
       title: formData.get('title') as string,
       category: formData.get('category') as string,
-      summary: formData.get('summary') as string || undefined,
+      summary: formData.get('summary') as string || null,
       content: formData.get('content') as string,
       content_type: formData.get('content_type') as 'text' | 'html' | 'markdown',
       important: formData.get('important') === 'true'
@@ -51,7 +51,7 @@ export async function updateNewsItem(id: string, formData: FormData) {
     const data: NewsFormData = {
       title: formData.get('title') as string,
       category: formData.get('category') as string,
-      summary: formData.get('summary') as string || undefined,
+      summary: formData.get('summary') as string || null,
       content: formData.get('content') as string,
       content_type: formData.get('content_type') as 'text' | 'html' | 'markdown',
       important: formData.get('important') === 'true'

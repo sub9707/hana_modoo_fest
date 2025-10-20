@@ -58,7 +58,7 @@ export interface NewsSearchParams {
 export interface NewsFormData {
   title: string;
   category: string;
-  summary?: string;
+  summary?: string | null;
   content: string;
   content_type: 'text' | 'html' | 'markdown';
   important: boolean;
