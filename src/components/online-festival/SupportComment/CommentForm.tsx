@@ -1,80 +1,73 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { MessageSquare, Clock } from 'lucide-react'
 
-export default function CommentForm({ onCommentSubmitted }: { onCommentSubmitted: () => void }) {
+interface CommentFormProps {
+  onCommentSubmitted: () => void
+}
+
+export default function CommentForm({ onCommentSubmitted }: CommentFormProps) {
+  const { user } = useAuth()
   const [message, setMessage] = useState('')
-  const [remainingTime, setRemainingTime] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [remainingTime, setRemainingTime] = useState(0)
 
-  // 1. 페이지 로드 시 localStorage에서 쿨타임 확인 (즉시 표시)
-  useEffect(() => {
-    const checkLocalCooltime = () => {
-      const lastCommentTime = localStorage.getItem('lastCommentTime')
-      if (lastCommentTime) {
-        const elapsed = Math.floor((Date.now() - parseInt(lastCommentTime)) / 1000)
-        const remaining = Math.max(0, 30 - elapsed)
-        setRemainingTime(remaining)
-      }
-    }
+  // 종료 상태
+  const EVENT_ENDED = true
 
-    checkLocalCooltime()
-  }, [])
-
-  // 2. 쿨타임 타이머
   useEffect(() => {
     if (remainingTime > 0) {
-      const timer = setInterval(() => {
-        setRemainingTime(prev => {
-          const newTime = prev - 1
-          if (newTime <= 0) {
-            localStorage.removeItem('lastCommentTime')
-            return 0
-          }
-          return newTime
-        })
+      const timer = setTimeout(() => {
+        setRemainingTime(remainingTime - 1)
       }, 1000)
-
-      return () => clearInterval(timer)
+      return () => clearTimeout(timer)
     }
   }, [remainingTime])
 
-  // 3. 댓글 제출 (서버에서 최종 검증)
   const handleSubmit = async () => {
-    if (!message.trim() || isSubmitting || remainingTime > 0) return
+    // 이벤트 종료시 작성 불가
+    if (EVENT_ENDED) {
+      setError('응원댓글 이벤트가 종료되었습니다.')
+      return
+    }
+
+    if (!user) {
+      setError('로그인이 필요합니다.')
+      return
+    }
+
+    if (!message.trim()) {
+      setError('응원 메시지를 입력해주세요.')
+      return
+    }
+
+    if (message.length > 200) {
+      setError('응원 메시지는 200자를 초과할 수 없습니다.')
+      return
+    }
 
     setIsSubmitting(true)
-    setError('')
+    setError(null)
 
     try {
       const response = await fetch('/api/support-comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message.trim() })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message }),
       })
 
       const data = await response.json()
 
-      if (response.ok) {
-        // 성공: localStorage에 시간 저장 + 쿨타임 시작
-        localStorage.setItem('lastCommentTime', Date.now().toString())
-        setRemainingTime(30)
+      if (data.success) {
         setMessage('')
+        setRemainingTime(10)
         onCommentSubmitted()
       } else {
-        // 실패: 서버 쿨타임 에러 처리
-        if (response.status === 429) {
-          // 서버에서 정확한 남은 시간을 알려줌
-          const match = data.error.match(/(\d+)초/)
-          if (match) {
-            const serverRemainingTime = parseInt(match[1])
-            setRemainingTime(serverRemainingTime)
-            // localStorage도 서버 시간에 맞춰 업데이트
-            const serverLastCommentTime = Date.now() - (30 - serverRemainingTime) * 1000
-            localStorage.setItem('lastCommentTime', serverLastCommentTime.toString())
-          }
-        }
         setError(data.error || '댓글 작성에 실패했습니다.')
       }
     } catch (error) {
@@ -86,13 +79,29 @@ export default function CommentForm({ onCommentSubmitted }: { onCommentSubmitted
 
   return (
     <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6">
+      {/* 이벤트 종료 안내 */}
+      {EVENT_ENDED && (
+        <div className="mb-4 p-4 bg-gray-100 border border-gray-300 rounded-xl">
+          <div className="flex items-start space-x-3">
+            <Clock className="w-5 h-5 text-gray-600 mt-0.5" />
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-1">이벤트 종료 안내</h4>
+              <p className="text-sm text-gray-600">
+                응원댓글 이벤트가 종료되었습니다. 작성된 댓글은 계속 조회하실 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="따뜻한 응원 메시지를 남겨주세요..."
-        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+        placeholder={EVENT_ENDED ? "이벤트가 종료되어 댓글 작성이 불가능합니다." : "따뜻한 응원 메시지를 남겨주세요..."}
+        className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         rows={4}
         maxLength={200}
+        disabled={EVENT_ENDED || !user}
       />
       
       <div className="flex justify-between items-center mt-4">
@@ -102,18 +111,20 @@ export default function CommentForm({ onCommentSubmitted }: { onCommentSubmitted
         
         <button
           onClick={handleSubmit}
-          disabled={isSubmitting || remainingTime > 0 || !message.trim()}
+          disabled={EVENT_ENDED || isSubmitting || remainingTime > 0 || !message.trim() || !user}
           className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-            isSubmitting || remainingTime > 0 || !message.trim()
+            EVENT_ENDED || isSubmitting || remainingTime > 0 || !message.trim() || !user
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg'
           }`}
         >
-          {remainingTime > 0 
-            ? `${remainingTime}초 후 작성 가능`
-            : isSubmitting 
-              ? '작성 중...' 
-              : '응원글 등록'
+          {EVENT_ENDED 
+            ? '이벤트 종료'
+            : remainingTime > 0 
+              ? `${remainingTime}초 후 작성 가능`
+              : isSubmitting 
+                ? '작성 중...' 
+                : '응원글 등록'
           }
         </button>
       </div>

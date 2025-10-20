@@ -1,9 +1,9 @@
-// src/components/online-festival/Quiz/QuizEvent.tsx
 'use client'
 
+import { useState } from 'react'
 import { useQuiz } from '@/hooks/useQuiz'
 import { useAuth } from '@/contexts/AuthContext'
-import { useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 import styles from './QuizEvent.module.css'
 import { QuizCard } from './QuizCard'
 import { ResultScreen } from './ResultScreen'
@@ -14,6 +14,9 @@ export default function QuizEvent() {
   const { user, isLoading } = useAuth()
   const quiz = useQuiz()
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+
+  // 이벤트 종료 상태
+  const EVENT_ENDED = true
 
   // 결과 등록 핸들러
   const handleRegisterResult = async () => {
@@ -50,24 +53,47 @@ export default function QuizEvent() {
   }
 
   return (
-    <div className="min-h-screen p-8 md:p-12 relative">
+    <div className="p-1 py-4 sm:p-8 md:p-12">
       {/* 헤더 */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
           <span className="text-2xl">🧩</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 to-yellow-300 bg-clip-text text-transparent mb-4">
-          모두하나 퀴즈 이벤트
-        </h1>
-        <div className="max-w-2xl mx-auto space-y-2">
-          <p className="text-md sm:text-lg text-gray-600">
-            가족과 관련된 다양한 퀴즈를 풀어보세요!
-          </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          퀴즈 이벤트
+        </h2>
+        <p className="text-md sm:text-lg text-gray-600 mb-2">
+          {EVENT_ENDED 
+            ? '퀴즈 이벤트가 종료되었습니다. 참여해주신 모든 분들께 감사드립니다.'
+            : '가족 관련 퀴즈를 풀고 만점을 달성하여 경품 추첨에 참여하세요!'
+          }
+        </p>
+        {!EVENT_ENDED && (
           <p className="text-sm text-gray-500">
             아래 퀴즈는 여러번 풀 수 있고, 만점 시 추첨을 통해 100명에게 경품을 제공합니다.
           </p>
-        </div>
+        )}
       </div>
+
+      {/* 이벤트 종료 안내 배너 */}
+      {EVENT_ENDED && (
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 rounded-xl p-6">
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-bold text-orange-900 mb-2 text-lg">퀴즈 이벤트 종료</h3>
+                <p className="text-orange-800 text-sm mb-2">
+                  모두하나대축제 2025 퀴즈 이벤트가 종료되었습니다.
+                </p>
+                <p className="text-orange-700 text-sm">
+                  당첨자 발표는 별도로 안내드릴 예정입니다. 많은 관심과 참여 감사드립니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 성공 메시지 */}
       {showSuccessMessage && (
@@ -100,32 +126,53 @@ export default function QuizEvent() {
       )}
 
       {/* 메인 콘텐츠 */}
-      {!quiz.isCompleted ? (
-        <QuizCard
-          quiz={quiz.currentQuizData}
-          selectedAnswer={quiz.selectedAnswer}
-          showResult={quiz.showResult}
-          isCorrect={quiz.isCorrect}
-          currentIndex={quiz.currentQuiz}
-          totalQuizzes={quiz.totalQuizzes}
-          progress={quiz.progress}
-          shakeCard={quiz.shakeCard}
-          onAnswerSelect={quiz.handleAnswerSelect}
-          onSubmit={quiz.handleAnswerSubmit}
-          onNext={quiz.handleNextQuiz}
-          isLastQuiz={quiz.currentQuiz === quiz.totalQuizzes - 1}
-        />
+      {EVENT_ENDED ? (
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center border border-white/20 shadow-lg">
+            <div className="text-6xl mb-6">🎯</div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              퀴즈 이벤트가 종료되었습니다
+            </h3>
+            <p className="text-gray-600 mb-6">
+              많은 분들의 참여 감사드립니다. 당첨자 발표는 별도 안내 예정입니다.
+            </p>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-6">
+              <p className="text-green-800 font-medium">
+                참여해주신 모든 분들께 진심으로 감사드립니다.
+              </p>
+            </div>
+          </div>
+        </div>
       ) : (
-        <ResultScreen
-          score={quiz.score}
-          totalQuizzes={quiz.totalQuizzes}
-          isPerfectScore={quiz.isPerfectScore}
-          canShowRegisterButton={quiz.canShowRegisterButton}
-          isRegistering={quiz.isRegistering}
-          completionTime={quiz.getCompletionTime()}
-          onReset={quiz.resetQuiz}
-          onRegister={handleRegisterResult}
-        />
+        <>
+          {!quiz.isCompleted ? (
+            <QuizCard
+              quiz={quiz.currentQuizData}
+              selectedAnswer={quiz.selectedAnswer}
+              showResult={quiz.showResult}
+              isCorrect={quiz.isCorrect}
+              currentIndex={quiz.currentQuiz}
+              totalQuizzes={quiz.totalQuizzes}
+              progress={quiz.progress}
+              shakeCard={quiz.shakeCard}
+              onAnswerSelect={quiz.handleAnswerSelect}
+              onSubmit={quiz.handleAnswerSubmit}
+              onNext={quiz.handleNextQuiz}
+              isLastQuiz={quiz.currentQuiz === quiz.totalQuizzes - 1}
+            />
+          ) : (
+            <ResultScreen
+              score={quiz.score}
+              totalQuizzes={quiz.totalQuizzes}
+              isPerfectScore={quiz.isPerfectScore}
+              canShowRegisterButton={quiz.canShowRegisterButton}
+              isRegistering={quiz.isRegistering}
+              completionTime={quiz.getCompletionTime()}
+              onReset={quiz.resetQuiz}
+              onRegister={handleRegisterResult}
+            />
+          )}
+        </>
       )}
     </div>
   )
