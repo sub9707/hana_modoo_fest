@@ -34,21 +34,12 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   const currentPageRef = useRef(1)
   const isLoadingRef = useRef(false)
   const hasMoreRef = useRef(true)
-  const lastTriggerTimeRef = useRef(0)
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const lastLoadTimeRef = useRef(0)
   
   const scrollPositionRef = useRef<{
     scrollTop: number
     scrollHeight: number
   } | null>(null)
-  
-  const isMobile = useRef(false)
-  
-  useEffect(() => {
-    isMobile.current = 
-      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-      (window.innerWidth <= 768 && 'ontouchstart' in window)
-  }, [])
 
   const saveScrollPosition = useCallback(() => {
     if (containerRef.current) {
@@ -75,49 +66,15 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     }
   }, [])
 
-  // 로딩 완료 후 자동 다음 페이지 체크
-  const checkAndLoadMore = useCallback(() => {
-    if (!loadingRef.current || !hasMoreRef.current || isLoadingRef.current) {
-      return
-    }
-
-    // loadingRef가 화면에 보이는지 확인
-    const rect = loadingRef.current.getBoundingClientRect()
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight
-    const isVisible = rect.top < windowHeight && rect.bottom > 0
-
-    if (isVisible) {
-      // 화면에 보이면 다음 페이지 로드
-      if (isMobile.current) {
-        loadCommentsDebounced()
-      } else {
-        loadComments()
-      }
-    }
-  }, [])
-
-  const loadCommentsDebounced = useCallback((isRefresh = false) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-
-    const debounceDelay = isMobile.current ? 300 : 100
-
-    debounceTimerRef.current = setTimeout(() => {
-      loadComments(isRefresh)
-    }, debounceDelay)
-  }, [])
-
   const loadComments = useCallback(async (isRefresh = false) => {
     if (isLoadingRef.current || (!isRefresh && !hasMoreRef.current)) return
     
+    // 최소 간격 체크 (500ms)
     const now = Date.now()
-    const throttleDelay = isMobile.current ? 600 : 300
-    
-    if (!isRefresh && now - lastTriggerTimeRef.current < throttleDelay) {
+    if (!isRefresh && now - lastLoadTimeRef.current < 500) {
       return
     }
-    lastTriggerTimeRef.current = now
+    lastLoadTimeRef.current = now
 
     if (!isRefresh) {
       saveScrollPosition()
@@ -168,36 +125,34 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
         )
       }
 
-      // 로딩 완료 후 loadingRef가 여전히 화면에 보이면 다음 페이지 자동 로드
-      requestAnimationFrame(() => {
-        checkAndLoadMore()
-      })
-
     } catch (error) {
       setError(error instanceof Error ? error.message : '댓글을 불러오는데 실패했습니다.')
     } finally {
       isLoadingRef.current = false
       setIsLoading(false)
     }
-  }, [sortBy, saveScrollPosition, restoreScrollPosition, checkAndLoadMore])
+  }, [sortBy, saveScrollPosition, restoreScrollPosition])
 
+  // 정렬 변경시 초기화
   useEffect(() => {
     currentPageRef.current = 1
     hasMoreRef.current = true
-    lastTriggerTimeRef.current = 0
+    lastLoadTimeRef.current = 0
     loadComments(true)
   }, [sortBy, loadComments])
 
+  // 새로고침 트리거
   useEffect(() => {
     if (refreshTrigger > 0) {
       currentPageRef.current = 1
       hasMoreRef.current = true
-      lastTriggerTimeRef.current = 0
+      lastLoadTimeRef.current = 0
       setComments([])
       loadComments(true)
     }
   }, [refreshTrigger, loadComments])
 
+  // IntersectionObserver 설정
   useEffect(() => {
     if (observerRef.current) {
       observerRef.current.disconnect()
@@ -208,16 +163,14 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
         const entry = entries[0]
         
         if (entry.isIntersecting && hasMoreRef.current && !isLoadingRef.current) {
-          if (isMobile.current) {
-            loadCommentsDebounced()
-          } else {
-            loadComments()
-          }
+          loadComments()
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: isMobile.current ? '0px 0px 400px 0px' : '0px 0px 300px 0px'
+        // 요소의 50%가 보일 때 트리거
+        threshold: 0.5,
+        // 하단 100px 전에 미리 로딩 시작
+        rootMargin: '0px 0px 100px 0px'
       }
     )
 
@@ -229,12 +182,10 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
       if (observerRef.current) {
         observerRef.current.disconnect()
       }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
     }
-  }, [loadComments, loadCommentsDebounced])
+  }, [loadComments])
 
+  // 초기 로드
   useEffect(() => {
     loadComments(true)
   }, [])
@@ -254,7 +205,7 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
   const handleRefresh = useCallback(() => {
     currentPageRef.current = 1
     hasMoreRef.current = true
-    lastTriggerTimeRef.current = 0
+    lastLoadTimeRef.current = 0
     loadComments(true)
   }, [loadComments])
 
