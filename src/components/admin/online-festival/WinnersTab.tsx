@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Download, Search, RefreshCw, Gift, Trophy, CheckCircle, Settings } from 'lucide-react'
+import { Download, Search, RefreshCw, Gift, Trophy, CheckCircle, Settings, Users, Award, XCircle } from 'lucide-react'
 import { Button } from '@/components/admin/online-festival/ui/button'
 import { Input } from '@/components/admin/online-festival/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/admin/online-festival/ui/card'
@@ -60,9 +60,23 @@ interface PrizeStats {
   }>
 }
 
+interface RouletteStats {
+  total_participations: number
+  unique_participants: number
+  total_winners: number
+  prize_winners: number
+  consolation_count: number
+  daily_stats: Array<{
+    participation_date: string
+    participations: number
+    winners: number
+  }>
+}
+
 export function WinnersTab() {
   const [winners, setWinners] = useState<Winner[]>([])
   const [prizeStats, setPrizeStats] = useState<PrizeStats | null>(null)
+  const [rouletteStats, setRouletteStats] = useState<RouletteStats | null>(null)
   const [totalCount, setTotalCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -110,6 +124,19 @@ export function WinnersTab() {
       }
     } catch (error) {
       console.error('Failed to fetch prize stats:', error)
+    }
+  }
+
+  // 룰렛 이벤트 참여 통계 조회
+  const fetchRouletteStats = async () => {
+    try {
+      const response = await fetch('/api/admin/event/roulette/stats')
+      const data = await response.json()
+      if (data.success) {
+        setRouletteStats(data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch roulette stats:', error)
     }
   }
 
@@ -179,15 +206,119 @@ export function WinnersTab() {
     fetchWinners(page, searchTerm, prizeFilter, claimFilter)
   }
 
+  const renderPaginationItems = () => {
+    const items: React.ReactNode[] = []
+    const maxVisible = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+
+    if (endPage - startPage + 1 < maxVisible) {
+      startPage = Math.max(1, endPage - maxVisible + 1)
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => handlePageChange(i)}
+            isActive={currentPage === i}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+    return items
+  }
+
   useEffect(() => {
     fetchWinners()
     fetchPrizeStats()
+    fetchRouletteStats()
   }, [])
 
   return (
     <div className="space-y-6">
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      {/* 룰렛 이벤트 참여 통계 카드 (신규 추가) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+              <Users className="w-4 h-4 mr-2 text-blue-600" />
+              총 참여 수
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {rouletteStats?.total_participations?.toLocaleString() || 0}회
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              고유 참여자: {rouletteStats?.unique_participants?.toLocaleString() || 0}명
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+              <Award className="w-4 h-4 mr-2 text-green-600" />
+              당첨자 수
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {rouletteStats?.prize_winners?.toLocaleString() || 0}명
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              상품 당첨자 (꽝 제외)
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
+              <XCircle className="w-4 h-4 mr-2 text-orange-600" />
+              꽝 당첨자 수
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {rouletteStats?.consolation_count?.toLocaleString() || 0}명
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              꽝 또는 미당첨
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      
+      {/* 상품별 당첨 통계 카드 */}
+      {prizeStats?.prize_breakdown && prizeStats.prize_breakdown.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">상품별 당첨 통계</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {prizeStats.prize_breakdown.map((prize, index) => (
+              <Card key={index} className="border-l-4" style={{ borderLeftColor: '#3B82F6' }}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">{prize.prize_name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold text-gray-900">{prize.count}명</div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    총 {(prize.count * prize.value).toLocaleString()}원
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 기존 통계 카드 */}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">총 당첨자 수</CardTitle>
@@ -209,26 +340,14 @@ export function WinnersTab() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* 상품 확률 설정 */}
-      <PrizeProbabilityManager onUpdate={fetchPrizeStats} />
+      <PrizeProbabilityManager onUpdate={() => {
+        fetchPrizeStats()
+        fetchRouletteStats()
+      }} />
 
-      {/* 상품별 통계 카드 */}
-      {prizeStats?.prize_breakdown && prizeStats.prize_breakdown.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {prizeStats.prize_breakdown.map((prize, index) => (
-            <Card key={index} className="border-l-4" style={{ borderLeftColor: '#3B82F6' }}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">{prize.prize_name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl font-bold text-gray-900">{prize.count}명</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
 
       {/* 검색 및 액션 바 */}
       <div className="flex justify-between items-center">
@@ -253,16 +372,6 @@ export function WinnersTab() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={claimFilter} onValueChange={handleClaimFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="수령 상태" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="true">수령 완료</SelectItem>
-              <SelectItem value="false">수령 대기</SelectItem>
-            </SelectContent>
-          </Select>
           <Button 
             onClick={handleSearch}
             variant="outline"
@@ -275,6 +384,7 @@ export function WinnersTab() {
             onClick={() => {
               fetchWinners(currentPage, searchTerm, prizeFilter, claimFilter)
               fetchPrizeStats()
+              fetchRouletteStats()
             }}
             variant="outline"
             disabled={loading}
@@ -304,9 +414,6 @@ export function WinnersTab() {
               <TableHead>상품</TableHead>
               <TableHead>상품 가치</TableHead>
               <TableHead>당첨일시</TableHead>
-              <TableHead>수령 상태</TableHead>
-              <TableHead>수령일시</TableHead>
-              <TableHead>액션</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -341,28 +448,6 @@ export function WinnersTab() {
                   <TableCell>
                     {new Date(winner.won_at).toLocaleString()}
                   </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={winner.is_claimed ? 'default' : 'secondary'}
-                      className={winner.is_claimed ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600'}
-                    >
-                      {winner.is_claimed ? '수령 완료' : '수령 대기'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {winner.claimed_at ? new Date(winner.claimed_at).toLocaleString() : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => handleToggleClaimed(winner.id, winner.is_claimed)}
-                      size="sm"
-                      variant={winner.is_claimed ? "outline" : "default"}
-                      className={!winner.is_claimed ? 'bg-green-600 hover:bg-green-700 text-white' : ''}
-                    >
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      {winner.is_claimed ? '대기로 변경' : '수령 완료'}
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -380,32 +465,7 @@ export function WinnersTab() {
                     className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                   />
                 </PaginationItem>
-                
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum: number
-                  if (totalPages <= 5) {
-                    pageNum = i + 1
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i
-                  } else {
-                    pageNum = currentPage - 2 + i
-                  }
-                  
-                  return (
-                    <PaginationItem key={pageNum}>
-                      <PaginationLink
-                        onClick={() => handlePageChange(pageNum)}
-                        isActive={currentPage === pageNum}
-                        className="cursor-pointer"
-                      >
-                        {pageNum}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                })}
-
+                {renderPaginationItems()}
                 <PaginationItem>
                   <PaginationNext 
                     onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
