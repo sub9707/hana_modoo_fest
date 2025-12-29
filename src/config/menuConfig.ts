@@ -1,20 +1,13 @@
 // config/menuConfig.ts
-import { 
-  BarChart3, 
-  Users, 
-  Bell, 
+import {
+  Users,
+  Bell,
   Settings,
   UserCheck
 } from 'lucide-react';
 import { MenuItem } from '@/types/admin';
 
 export const menuItems: MenuItem[] = [
-  {
-    id: 'dashboard',
-    title: 'GA4 통계',
-    icon: BarChart3,
-    path: '/admin/dashboard'
-  },
   {
     id: 'online-festival',
     title: '온라인 축제',

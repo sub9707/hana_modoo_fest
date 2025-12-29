@@ -46,7 +46,7 @@ export default function RandomEvent() {
     loadInitialData()
   }, [user])
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -62,7 +62,7 @@ export default function RandomEvent() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user])
 
   const loadPrizes = async () => {
     try {

@@ -5,8 +5,6 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
 import ScrollToTop from '@/components/common/ScrollToTop'
-import { GA4Script } from '@/components/admin/Analytics/GA4Script'
-import { PageViewTracker } from '@/components/admin/Analytics/PageViewTracker'
 
 export const metadata: Metadata = {
     title: {
@@ -54,8 +52,6 @@ export default function SiteLayout({
 }) {
     return (
         <>
-            <GA4Script />
-            <PageViewTracker />
             <div className="flex min-h-screen flex-col">
                 <Header />
 

@@ -87,34 +87,8 @@ export default function KakaoMap({
           }}
           yAnchor={2.3}
         >
-          <div 
-            style={{
-              background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
-              color: 'white',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              fontWeight: 'bold',
-              fontSize: '14px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              position: 'relative',
-              whiteSpace: 'nowrap',
-              border: '2px solid white',
-            }}
-          >
+          <div className="map-label">
             🎪 모두하나대축제
-            <div 
-              style={{
-                position: 'absolute',
-                bottom: '-8px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '0',
-                height: '0',
-                borderLeft: '8px solid transparent',
-                borderRight: '8px solid transparent',
-                borderTop: '8px solid #f7931e',
-              }}
-            />
           </div>
         </CustomOverlayMap>
         <ZoomControl position={"RIGHT"} />

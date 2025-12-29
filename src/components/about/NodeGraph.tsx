@@ -260,10 +260,20 @@ const NodeGraph: React.FC = () => {
         });
     }, [isDragging, draggedNode, connections, svgBounds]);
 
-    // 애니메이션 루프
     useEffect(() => {
+        let lastUpdate = Date.now();
+        const targetFPS = 30;
+        const frameInterval = 1000 / targetFPS;
+
         const animate = () => {
-            updatePhysics();
+            const now = Date.now();
+            const elapsed = now - lastUpdate;
+
+            if (elapsed >= frameInterval) {
+                updatePhysics();
+                lastUpdate = now - (elapsed % frameInterval);
+            }
+
             animationRef.current = requestAnimationFrame(animate);
         };
 
@@ -518,15 +528,10 @@ const NodeGraph: React.FC = () => {
                                     x="0"
                                     y="5"
                                     textAnchor="middle"
-                                    className={`text-lg sm:text-4xl font-bold fill-white select-none transition-all duration-200 cursor-grab active:cursor-grabbing ${draggedNode && draggedNode.id === node.id
+                                    className={`text-lg sm:text-4xl font-bold fill-white select-none transition-all duration-200 cursor-grab active:cursor-grabbing node-text ${draggedNode && draggedNode.id === node.id
                                             ? 'drop-shadow-2xl scale-110'
                                             : 'drop-shadow-lg'
                                         }`}
-                                    style={{
-                                        fontFamily: "'Noto Sans KR', sans-serif",
-                                        userSelect: 'none',
-                                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                                    }}
                                     onMouseDown={(e) => handleMouseDown(e, node)}
                                     onTouchStart={(e) => handleTouchStart(e, node)}
                                 >

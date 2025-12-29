@@ -13,7 +13,7 @@ export default function Footer() {
             <div className="lg:col-span-1">
               <div className="mb-4 flex items-center justify-center sm:justify-start">
                 <div className="relative w-80 h-15 flex items-center justify-center">
-                  <Image src={'/icons/logo.png'} fill alt='logo' />
+                  <Image src={'/icons/logo.png'} fill alt='모두하나대축제 로고' />
                 </div>
               </div>
 

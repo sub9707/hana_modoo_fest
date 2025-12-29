@@ -54,13 +54,11 @@ export default function FestivalHero() {
               모두하나 대축제
             </h2>
           </div>
-          {/* 이미지 에셋 좌 */}
           <div className="absolute -left-15 sm:-left-90 -bottom-5 sm:bottom-0 w-30 h-20 sm:w-90 sm:h-70">
-            <Image src={'/images/about/about_left.webp'} fill alt="" />
+            <Image src={'/images/about/about_left.webp'} fill alt="축제 히어로 섹션 좌측 캐릭터 일러스트" />
           </div>
-          {/* 이미지 에셋 우 */}
           <div className="absolute -right-20 sm:-right-[38%] -bottom-5 sm:-bottom-10 w-30 h-30 sm:w-110 sm:h-110">
-            <Image src={'/images/about/about_right.webp'} fill alt="" />
+            <Image src={'/images/about/about_right.webp'} fill alt="축제 히어로 섹션 우측 캐릭터 일러스트" />
           </div>
         </div>
 

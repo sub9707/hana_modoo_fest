@@ -41,7 +41,7 @@ function CoreValuesCarousel() {
               <Image
                 src={item.image}
                 fill
-                alt={item.title}
+                alt={`${item.title} - ${item.subtitle}`}
                 className="object-cover w-full h-full"
               />
               {/* 오버레이 + 설명 */}

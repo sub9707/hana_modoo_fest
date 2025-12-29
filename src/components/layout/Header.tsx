@@ -10,8 +10,6 @@ import LogoutButton from '../auth/LogoutButton'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
 import HeaderCTAButton from './HeaderCTAButton'
-// ✅ GA4 트래킹 훅 추가
-import { useGA4Tracking } from '@/hooks/useGA4Tracking'
 
 const navigation = [
   { name: '축제 소개', href: '/about' },
@@ -28,9 +26,6 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const { user, isLoading: isLoadingAuth, error } = useAuth()
   const pathname = usePathname()
-
-  // ✅ GA4 트래킹 훅 사용
-  const { trackButtonClick, trackEvent } = useGA4Tracking()
 
   useEffect(() => {
     if (error) {
@@ -50,27 +45,6 @@ export default function Header() {
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
-
-    // ✅ 모바일 메뉴 토글 트래킹
-    trackButtonClick(
-      isMobileMenuOpen ? 'mobile_menu_close' : 'mobile_menu_open',
-      'header'
-    )
-  }
-
-  // ✅ 네비게이션 클릭 트래킹 함수
-  const handleNavClick = (navName: string, href: string, isMobile: boolean = false) => {
-    trackEvent('click', 'navigation', `${isMobile ? 'mobile_' : 'desktop_'}nav_${navName.replace(/\s+/g, '_').toLowerCase()}`)
-
-    // 모바일 메뉴는 닫기
-    if (isMobile) {
-      setIsMobileMenuOpen(false)
-    }
-  }
-
-  // ✅ 로고 클릭 트래킹
-  const handleLogoClick = () => {
-    trackButtonClick('logo', 'header')
   }
 
   // 사용자 이름 표시 함수
@@ -98,21 +72,18 @@ export default function Header() {
       >
         <div className="container mx-auto px-4 lg:px-8 sm:px-6">
           <div className="flex justify-between items-center h-16 lg:h-20">
-            {/* ✅ 로고 클릭 트래킹 추가 */}
             <div className="flex items-center">
               <Link
                 href="/"
-                onClick={handleLogoClick}
                 className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
                 aria-label="모두하나대축제 홈페이지로 이동"
               >
                 <div className="relative mt-2 w-35 sm:w-50 h-7 sm:h-10 lg:w-80 lg:h-15 flex">
-                  <Image src={'/icons/logo.png'} fill alt='logo' />
+                  <Image src={'/icons/logo.png'} fill alt='모두하나대축제 로고' priority />
                 </div>
               </Link>
             </div>
 
-            {/* ✅ 데스크톱 네비게이션 트래킹 추가 */}
             <nav className="hidden md:hidden lg:flex items-center space-x-1" role="navigation" aria-label="주요 메뉴">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
@@ -121,7 +92,6 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => handleNavClick(item.name, item.href, false)}
                     className={cn(
                       "px-3 py-2 text-md font-medium rounded-md transition-colors relative",
                       isActive
@@ -140,7 +110,6 @@ export default function Header() {
             </nav>
 
             <div className='flex items-center gap-6'>
-              {/* ✅ CTA 버튼 그룹 - HeaderCTAButton에서 트래킹 처리 */}
               <div className='flex items-center gap-4 ml-6 sm:ml-0'>
                 <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
 
@@ -150,10 +119,8 @@ export default function Header() {
                     <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
                   ) : user ? (
                     <>
-                      {/* ✅ 마이페이지 링크 트래킹 */}
                       <Link
                         href="/my-page"
-                        onClick={() => trackButtonClick('mypage_access', 'header')}
                         className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
                       >
                         <User className="h-4 w-4" />
@@ -186,7 +153,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ✅ 모바일 메뉴 트래킹 추가 */}
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="px-4 py-2 space-y-1">
@@ -196,7 +162,7 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => handleNavClick(item.name, item.href, true)}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
                       "block px-3 py-2 text-base font-medium rounded-md transition-colors",
                       isActive
@@ -219,10 +185,7 @@ export default function Header() {
                   <>
                     <Link
                       href="/my-page"
-                      onClick={() => {
-                        trackButtonClick('mypage_access', 'mobile_menu')
-                        setIsMobileMenuOpen(false)
-                      }}
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
                     >
                       <User className="h-4 w-4" />
@@ -235,10 +198,7 @@ export default function Header() {
                 ) : (
                   <Link
                     href='/login'
-                    onClick={() => {
-                      trackButtonClick('login_cta', 'mobile_menu')
-                      setIsMobileMenuOpen(false)
-                    }}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
                   >
                     로그인/회원가입

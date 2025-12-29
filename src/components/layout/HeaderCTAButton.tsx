@@ -1,7 +1,6 @@
 'use client'
 
 import Link from "next/link"
-import { useGA4Tracking } from '@/hooks/useGA4Tracking'
 import { useRouter, usePathname } from "next/navigation"
 import { useState, useTransition } from "react"
 import { Loader2 } from "lucide-react"
@@ -13,7 +12,6 @@ interface HeaderCTAButtonProps {
 }
 
 function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps) {
-  const { trackButtonClick } = useGA4Tracking()
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = useTransition()
@@ -22,22 +20,14 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    // 이미 클릭되었거나 현재 페이지면 무시
     if (isClicked || pathname === href) return
 
-    // 클릭 상태 설정
     setIsClicked(true)
 
-    // GA4 트래킹
-    const buttonName = title.replace(/\s+/g, '_').toLowerCase()
-    trackButtonClick(`${buttonName}_cta`, 'header')
-
-    // Next.js 15 useTransition 활용한 페이지 전환
     startTransition(() => {
       router.push(href)
     })
 
-    // 5초 후 클릭 상태 해제 (페이지 전환 실패 대비)
     setTimeout(() => {
       setIsClicked(false)
     }, 5000)

@@ -82,10 +82,8 @@ export default function OnlineFestivalTabs() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* 탭 네비게이션 */}
       <div className="mb-8">
-        {/* 데스크톱 탭 */}
-        <div className="hidden md:flex bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg">
+        <div className="hidden md:flex bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg" role="tablist" aria-label="온라인 축제 메뉴">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -95,6 +93,9 @@ export default function OnlineFestivalTabs() {
                   ? 'bg-white shadow-md transform scale-[1.02]'
                   : 'hover:bg-white/50'
               }`}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`panel-${tab.id}`}
             >
               <div className="text-center">
                 <div className={`text-2xl mb-2 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
@@ -198,7 +199,6 @@ export default function OnlineFestivalTabs() {
         </div>
       </div>
 
-      {/* 탭 콘텐츠 */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
@@ -207,6 +207,9 @@ export default function OnlineFestivalTabs() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
           className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden"
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
         >
           {renderTabContent()}
         </motion.div>

@@ -24,9 +24,12 @@ export default function Introduction() {
             <div className="absolute bottom-1/3 sm:bottom-0 right-0 sm:right-1/6 w-40 h-30 sm:w-90 sm:h-60 z-0">
                 <Image
                     src={"/images/main/main_2.webp"}
-                    alt="festival_character_2"
+                    alt="축제 캐릭터 일러스트"
                     fill
                     className="object-contain"
+                    loading="lazy"
+                    sizes="(max-width: 640px) 160px, 360px"
+                    quality={85}
                 />
             </div>
         </section>

@@ -8,23 +8,21 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+  weight: ['400', '700'],
+  preload: true,
 })
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
   variable: '--font-noto-sans-kr',
   display: 'swap',
+  weight: ['400', '700'],
+  preload: true,
 })
 
 export const metadata: Metadata = {
   title: '모두하나대축제 2025',
   description: '가족과 함께하는 특별한 축제',
-  verification: {
-    google: '_cI5ZIBfaJdYeR_VdYAxv6htziH9akh2S1JZaXWT-0E',
-    other: {
-      'naver-site-verification': '1471d6b4b4ff9f6ec82d54b4ed4f0af70a262871',
-    },
-  },
   icons: {
     icon: '/favicon.ico',
   }
@@ -40,6 +38,9 @@ export default function RootLayout({
       lang="ko"
       className={`${inter.variable} ${notoSansKR.variable} ${paperlogy.variable}`}
     >
+      <head>
+        <link rel="preconnect" href="https://dapi.kakao.com" />
+      </head>
       <body className="min-h-screen bg-background font-noto-sans antialiased">
         <Providers>{children}</Providers>
       </body>
