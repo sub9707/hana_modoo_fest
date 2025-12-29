@@ -7,7 +7,11 @@ import HeroCTAButton from "./HeroCTAButton";
 
 // VideoPlayer를 lazy load
 const VideoPlayer = dynamic(() => import("../common/VideoPlayer"), {
-  loading: () => <div className="w-full aspect-video rounded-2xl bg-gray-200 animate-pulse" />,
+  loading: () => (
+    <div className="w-full aspect-video rounded-2xl bg-gray-200 animate-pulse">
+      <div className="w-full h-full" />
+    </div>
+  ),
   ssr: false
 });
 

@@ -77,20 +77,20 @@ function VideoPlayer({ src, isMobile = false }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full cursor-pointer"
+      className="relative w-full cursor-pointer aspect-video"
       onClick={() => !fullscreen && toggleMute()}
       onMouseEnter={() => !fullscreen && setHovered(true)}
       onMouseLeave={() => !fullscreen && setHovered(false)}
     >
       <video
         ref={videoRef}
-        className="w-full h-full aspect-auto rounded-2xl"
+        className="w-full h-full object-cover rounded-2xl"
         autoPlay
         loop
         muted={muted}
         playsInline
         controls={fullscreen}
-        preload="none"
+        preload="metadata"
         poster="/images/video-poster.jpg"
       >
         <source src={src} type="video/mp4" />
