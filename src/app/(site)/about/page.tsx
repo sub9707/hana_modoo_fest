@@ -6,6 +6,7 @@ import CoreValues from '@/components/about/CoreValues'
 import FestivalPrograms from '@/components/about/FestivalPrograms'
 import FestivalJoinGuide from '@/components/about/FestivalJoinGuide';
 import JoinFestival from '@/components/about/JoinFestival';
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '축제 소개',
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   return (
-    <div className="min-h-screen font-paper">
+    <PageLayout variant="white">
       {/* 히어로 섹션 */}
       <FestivalHero />
 
@@ -51,8 +52,6 @@ export default async function AboutPage() {
 
       {/* 참여유도 섹션 */}
       <JoinFestival />
-
-
-    </div>
+    </PageLayout>
   )
 }

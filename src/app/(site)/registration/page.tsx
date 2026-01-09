@@ -9,6 +9,7 @@ import RegistrationClosed from '@/components/registration/RegistrationClosed'
 import type { Registration } from '@/types/registration'
 import { Loader2 } from 'lucide-react'
 import { isRegistrationClosed } from '@/lib/utils/registration-deadline'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '사전참가 신청',
@@ -24,7 +25,7 @@ export const revalidate = 0
 
 function RegistrationLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 font-paper">
+    <PageLayout variant="gray">
       <RegistrationHero />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden p-12">
@@ -34,7 +35,7 @@ function RegistrationLoading() {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }
 
@@ -80,7 +81,8 @@ async function RegistrationContent() {
     user_phone: existingRegistration.user_phone
   } as Registration & { user_name: string; user_phone: string } : null
 
-  const isClosed = isRegistrationClosed()
+  // 테스트 앱: 마감 체크 제거 - 항상 접수 가능
+  const isClosed = false
 
   return (
     <>
@@ -130,10 +132,10 @@ async function RegistrationContent() {
 
 export default function RegistrationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 font-paper">
+    <PageLayout variant="gray">
       <Suspense fallback={<RegistrationLoading />}>
         <RegistrationContent />
       </Suspense>
-    </div>
+    </PageLayout>
   )
 }

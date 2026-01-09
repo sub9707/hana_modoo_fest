@@ -1,7 +1,44 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import { Prize } from '@/types/online-festival'
 import { Play, Lock, Clock, AlertCircle } from 'lucide-react'
+
+const Wheel = dynamic(
+  () => import('react-custom-roulette').then((mod) => mod.Wheel),
+  { ssr: false }
+)
+
+// 상품명에 따른 이미지 매핑
+const PRIZE_IMAGE_MAP: Record<string, string> = {
+  '바나나우유': '/images/prizes/banana_milk.png',
+  '치킨': '/images/prizes/chicken.png',
+  '스타벅스': '/images/prizes/coffee.png',
+  '커피': '/images/prizes/coffee.png',
+  '꽝': '/images/prizes/no luck.png',
+  '홈런볼': '/images/prizes/snack.png',
+  '스낵': '/images/prizes/snack.png',
+  '과자': '/images/prizes/snack.png',
+}
+
+// 상품 이미지 가져오기 함수
+const getPrizeImage = (prizeName: string): string | null => {
+  // 정확한 매칭
+  if (PRIZE_IMAGE_MAP[prizeName]) {
+    return PRIZE_IMAGE_MAP[prizeName]
+  }
+
+  // 부분 매칭 (상품명에 키워드가 포함되어 있는지 확인)
+  for (const [key, value] of Object.entries(PRIZE_IMAGE_MAP)) {
+    if (prizeName.includes(key) || key.includes(prizeName)) {
+      return value
+    }
+  }
+
+  return null
+}
 
 interface RouletteWheelProps {
   prizes: Prize[]
@@ -14,6 +51,7 @@ interface RouletteWheelProps {
   isLoading: boolean
   requiresLogin: boolean
   eventEnded?: boolean
+  winningPrizeIndex?: number
 }
 
 export default function RouletteWheel({
@@ -26,9 +64,18 @@ export default function RouletteWheel({
   serverLoad,
   isLoading,
   requiresLogin,
-  eventEnded = false
+  eventEnded = false,
+  winningPrizeIndex = 0
 }: RouletteWheelProps) {
-  
+  const [mustSpin, setMustSpin] = useState(false)
+  const [prizeNumber, setPrizeNumber] = useState(0)
+
+  useEffect(() => {
+    if (isSpinning && !mustSpin) {
+      setMustSpin(true)
+    }
+  }, [isSpinning, mustSpin])
+
   const getButtonContent = () => {
     if (eventEnded) {
       return (
@@ -94,60 +141,66 @@ export default function RouletteWheel({
     )
   }
 
+  // 주황색, 노랑색, 옅은 노랑색 팔레트 (3개씩 교차)
+  const orangeYellowColors = [
+    '#FF8C00', // 주황색
+    '#FFD700', // 노랑색
+    '#FFEC8B', // 옅은 노랑색
+  ]
+
+  // react-custom-roulette 데이터 형식으로 변환 (이미지 또는 아이콘 표시)
+  const wheelData = prizes.map((prize, index) => {
+    const prizeImage = getPrizeImage(prize.name)
+
+    return {
+      option: prizeImage ? '' : (prize.icon || '🎁'),
+      image: prizeImage ? {
+        uri: prizeImage,
+        offsetX: 0,
+        offsetY: 50,
+        sizeMultiplier: 1.0,
+        landscape: false
+      } : undefined,
+      style: {
+        backgroundColor: orangeYellowColors[index % orangeYellowColors.length],
+        textColor: '#ffffff',
+      },
+    }
+  })
+
   const degreesPerPrize = 360 / prizes.length
 
   return (
     <div className="relative">
       {/* 룰렛 컨테이너 */}
-      <div className="relative w-80 h-80 md:w-96 md:h-96">
-        {/* 화살표 */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-20">
-          <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-red-500 drop-shadow-lg" />
-        </div>
-
-        {/* 룰렛 휠 */}
-        <div
-          className="absolute inset-0 rounded-full shadow-2xl overflow-hidden border-8 border-white"
-          style={{
-            transform: `rotate(${currentRotation}deg)`,
-            transition: isSpinning ? 'transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
-          }}
-        >
-          {prizes.map((prize, index) => {
-            const rotation = index * degreesPerPrize
-            return (
-              <div
-                key={prize.id}
-                className="absolute w-full h-full origin-center"
-                style={{
-                  transform: `rotate(${rotation}deg)`,
-                  clipPath: `polygon(50% 50%, 50% 0%, ${50 + Math.tan((degreesPerPrize * Math.PI) / 360) * 50}% 0%)`,
-                  backgroundColor: prize.color,
-                }}
-              >
-                <div
-                  className="absolute top-8 left-1/2 -translate-x-1/2 text-center"
-                  style={{
-                    transform: `rotate(${degreesPerPrize / 2}deg)`,
-                  }}
-                >
-                  <div className="text-2xl mb-1">{prize.icon}</div>
-                  <div className="text-xs font-bold text-white drop-shadow-md whitespace-nowrap">
-                    {prize.name}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+      <div className="relative w-80 h-80 md:w-96 md:h-96 mx-auto flex items-center justify-center">
+        <div className="rounded-full shadow-2xl">
+          <Wheel
+            mustStartSpinning={mustSpin}
+            prizeNumber={winningPrizeIndex}
+            data={wheelData}
+            onStopSpinning={() => {
+              setMustSpin(false)
+            }}
+            outerBorderColor="#ffffff"
+            outerBorderWidth={8}
+            innerBorderColor="#ffffff"
+            innerBorderWidth={0}
+            radiusLineColor="#ffffff"
+            radiusLineWidth={2}
+            fontSize={prizes.length <= 6 ? 45 : prizes.length <= 10 ? 40 : 35}
+            textDistance={60}
+            spinDuration={0.5}
+          />
         </div>
 
         {/* 중앙 버튼 */}
         <button
           onClick={onSpin}
           disabled={eventEnded || !canParticipate || isSpinning || hasParticipatedToday || requiresLogin || isLoading}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 
-                     w-24 h-24 md:w-28 md:h-28 rounded-full 
-                     bg-gradient-to-br from-yellow-400 to-orange-500 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30
+                     w-24 h-24 md:w-28 md:h-28 rounded-full
+                     bg-gradient-to-br from-yellow-400 to-orange-500
                      flex flex-col items-center justify-center gap-2
                      border-4 border-white shadow-xl
                      disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed

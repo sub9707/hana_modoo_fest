@@ -4,6 +4,7 @@ import PartnerHero from '@/components/partners/PartnerHero'
 import PartnerSection from '@/components/partners/PartnerSection'
 import { PartnersData } from '@/types/partners'
 import Link from 'next/link'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '함께하는 기관',
@@ -35,7 +36,7 @@ export default async function PartnersPage() {
     partners.participants.length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-cyan-50 font-paper">
+    <PageLayout variant="gradient-partners">
       {/* 히어로 섹션 */}
       <PartnerHero partnersData={partners} />
 
@@ -185,6 +186,6 @@ export default async function PartnersPage() {
           </div>
         </section>
       </div>
-    </div>
+    </PageLayout>
   )
 }

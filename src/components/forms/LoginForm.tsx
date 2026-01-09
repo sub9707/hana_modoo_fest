@@ -9,6 +9,7 @@ import { loginSchema, type LoginData } from '@/lib/validations/auth'
 import Image from 'next/image'
 import { loginAction } from '@/lib/actions/auth'
 import Link from 'next/link'
+import Alert from '@/components/ui/Alert'
 
 interface LoginFormProps {
   redirectTo?: string
@@ -80,6 +81,33 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
     }
   }
 
+  const handleTestLogin = async () => {
+    setError(null)
+
+    startTransition(async () => {
+      const formData = new FormData()
+      formData.append('username', 'test_admin')
+      formData.append('password', 'Test1234!')
+
+      try {
+        const result = await loginAction(formData)
+
+        if (result.error) {
+          setError(result.error)
+        } else if (result.success) {
+          reset()
+
+          router.refresh()
+          await new Promise(resolve => setTimeout(resolve, 150))
+          window.location.href = redirectTo
+        }
+      } catch (error) {
+        console.error('Test login error:', error)
+        setError('테스트 계정 로그인 중 오류가 발생했습니다.')
+      }
+    })
+  }
+
   const isLoading = isSubmitting || isPending
 
   return (
@@ -101,9 +129,7 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
+            <Alert type="error" message={error} />
           )}
 
           <div>
@@ -242,6 +268,39 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
               >
                 회원가입
               </Link>
+            </p>
+          </div>
+
+          {/* 테스트 계정 로그인 */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleTestLogin}
+              disabled={isLoading || socialLoading !== null}
+              className={`
+                w-full flex items-center justify-center gap-2 px-4 py-2.5
+                border-2 border-dashed border-gray-300 rounded-lg
+                text-sm font-medium text-gray-600
+                transition-all
+                ${isLoading || socialLoading !== null
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:border-gray-400 hover:bg-gray-50 hover:text-gray-800'
+                }
+              `}
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>테스트 계정으로 로그인</span>
+                </>
+              )}
+            </button>
+            <p className="mt-2 text-xs text-center text-gray-500">
+              프로젝트 리뷰를 위한 데모 계정으로 로그인합니다
             </p>
           </div>
         </form>

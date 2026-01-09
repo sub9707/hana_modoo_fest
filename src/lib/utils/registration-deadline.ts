@@ -2,9 +2,9 @@
 
 /**
  * 사전 접수 마감 시간
- * 2025년 10월 17일 금요일 17:00:00 (KST)
+ * 2026년 10월 17일 토요일 17:00:00 (KST) - 테스트 앱: 1년 연장
  */
-export const REGISTRATION_DEADLINE = new Date('2025-10-17T17:00:00+09:00')
+export const REGISTRATION_DEADLINE = new Date('2026-10-17T17:00:00+09:00')
 
 /**
  * 사전 접수가 마감되었는지 확인

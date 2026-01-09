@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import RouletteWheel from './RouletteWheel'
 import WinnerAnnouncement from './WinnerAnnouncement'
@@ -9,19 +10,48 @@ import { Prize } from '@/types/online-festival'
 import { RecentWinner } from '@/types/event'
 import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle } from 'lucide-react'
 
+// 상품명에 따른 이미지 매핑
+const PRIZE_IMAGE_MAP: Record<string, string> = {
+  '바나나우유': '/images/prizes/banana_milk.png',
+  '치킨': '/images/prizes/chicken.png',
+  '스타벅스': '/images/prizes/coffee.png',
+  '커피': '/images/prizes/coffee.png',
+  '꽝': '/images/prizes/no luck.png',
+  '홈런볼': '/images/prizes/snack.png',
+  '스낵': '/images/prizes/snack.png',
+  '과자': '/images/prizes/snack.png',
+}
+
+// 상품 이미지 가져오기 함수
+function getPrizeImage(prizeName: string): string | null {
+  // 정확한 매칭
+  if (PRIZE_IMAGE_MAP[prizeName]) {
+    return PRIZE_IMAGE_MAP[prizeName]
+  }
+
+  // 부분 매칭 (상품명에 키워드가 포함되어 있는지 확인)
+  for (const [key, value] of Object.entries(PRIZE_IMAGE_MAP)) {
+    if (prizeName.includes(key) || key.includes(prizeName)) {
+      return value
+    }
+  }
+
+  return null
+}
+
 // 시간 차이 계산 함수
 function getTimeAgo(wonAt: string): string {
   const now = new Date()
   const wonDate = new Date(wonAt)
   const diffMs = now.getTime() - wonDate.getTime()
   const diffMins = Math.floor(diffMs / 60000)
-  
+
   if (diffMins < 1) return '방금 전'
   if (diffMins < 60) return `${diffMins}분 전`
-  
+
   const diffHours = Math.floor(diffMins / 60)
   if (diffHours < 24) return `${diffHours}시간 전`
-  
+
   const diffDays = Math.floor(diffHours / 24)
   return `${diffDays}일 전`
 }
@@ -37,9 +67,10 @@ export default function RandomEvent() {
   const [serverLoad, setServerLoad] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [winningPrizeIndex, setWinningPrizeIndex] = useState(0)
 
-  // 이벤트 종료 상태
-  const EVENT_ENDED = true
+  // 테스트 앱: 이벤트 항상 진행 중
+  const EVENT_ENDED = false
 
   // 초기 데이터 로드
   useEffect(() => {
@@ -111,20 +142,22 @@ export default function RandomEvent() {
   }
 
   const spin = useCallback(async () => {
-    if (EVENT_ENDED) {
-      setError('랜덤 이벤트가 종료되었습니다.')
-      return
-    }
+    // 테스트 앱: 이벤트 종료 체크 제거
+    // if (EVENT_ENDED) {
+    //   setError('랜덤 이벤트가 종료되었습니다.')
+    //   return
+    // }
 
     if (!user) {
       setError('로그인이 필요합니다.')
       return
     }
 
-    if (hasParticipatedToday) {
-      setError('오늘은 이미 참여하셨습니다.')
-      return
-    }
+    // 테스트 앱: 일일 참여 제한 체크 제거
+    // if (hasParticipatedToday) {
+    //   setError('오늘은 이미 참여하셨습니다.')
+    //   return
+    // }
 
     if (isSpinning) return
 
@@ -132,7 +165,7 @@ export default function RandomEvent() {
     setError(null)
 
     try {
-      const response = await fetch('/api/event/participation/spin', {
+      const response = await fetch('/api/event/roulette/spin', {
         method: 'POST',
       })
 
@@ -145,18 +178,16 @@ export default function RandomEvent() {
       const winningPrize = data.data.prize
       const prizeIndex = prizes.findIndex((p) => p.id === winningPrize.id)
 
-      const spins = 5
-      const degreesPerPrize = 360 / prizes.length
-      const targetRotation = 360 * spins + prizeIndex * degreesPerPrize
-
-      setCurrentRotation(currentRotation + targetRotation)
+      setWinningPrizeIndex(prizeIndex)
 
       setTimeout(() => {
         setIsSpinning(false)
-        setHasParticipatedToday(true)
-        setCanParticipate(false)
+        // 테스트 앱: 참여 제한 상태 업데이트 제거 - 계속 참여 가능
+        // setHasParticipatedToday(true)
+        // setCanParticipate(false)
+        setCanParticipate(true) // 항상 참여 가능 상태 유지
         loadRecentWinners()
-      }, 5000)
+      }, 5500)
     } catch (err) {
       setIsSpinning(false)
       setError(err instanceof Error ? err.message : '참여 중 오류가 발생했습니다.')
@@ -177,13 +208,22 @@ export default function RandomEvent() {
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           랜덤 이벤트
         </h2>
-        <p className="text-md sm:text-lg text-gray-600">
-          {EVENT_ENDED 
+        <p className="text-md sm:text-lg text-gray-600 mb-3">
+          {EVENT_ENDED
             ? '랜덤 이벤트가 종료되었습니다. 참여해주신 모든 분들께 감사드립니다.'
             : '룰렛을 돌려 특별한 선물을 받아보세요!'
           }
         </p>
-        
+
+        {/* 테스트 앱 안내 */}
+        {!EVENT_ENDED && (
+          <div className="inline-block px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700 font-medium">
+              ⚙️ 테스트 앱: 일일 참여 제한 없이 지속적으로 참여 가능합니다
+            </p>
+          </div>
+        )}
+
         {/* 새로고침 버튼 */}
         <button
           onClick={handleRefresh}
@@ -259,6 +299,7 @@ export default function RandomEvent() {
                 isLoading={isLoading}
                 requiresLogin={!user}
                 eventEnded={EVENT_ENDED}
+                winningPrizeIndex={winningPrizeIndex}
               />
             </div>
 
@@ -306,21 +347,38 @@ export default function RandomEvent() {
             
             {prizes.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {prizes.map((prize) => (
-                  <div
-                    key={prize.id}
-                    className="bg-white/60 rounded-xl p-4 text-center border border-white/40 hover:shadow-md transition-shadow"
-                  >
-                    <div className="text-3xl mb-2">{prize.icon}</div>
-                    <div className="font-semibold text-gray-900 mb-1">{prize.name}</div>
-                    {prize.description && (
-                      <div className="text-xs text-gray-600">{prize.description}</div>
-                    )}
-                    <div className="mt-2 text-xs text-gray-500">
-                      남은 수량: {prize.current_quantity}개
+                {prizes.map((prize) => {
+                  const prizeImage = getPrizeImage(prize.name)
+
+                  return (
+                    <div
+                      key={prize.id}
+                      className="bg-white/60 rounded-xl p-4 text-center border border-white/40 hover:shadow-md transition-shadow"
+                    >
+                      {prizeImage ? (
+                        <div className="relative w-16 h-16 mx-auto mb-2">
+                          <Image
+                            src={prizeImage}
+                            alt={prize.name}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="relative w-16 h-16 mx-auto mb-2 flex items-center justify-center bg-gray-100 rounded-lg">
+                          <span className="text-3xl">{prize.icon || '🎁'}</span>
+                        </div>
+                      )}
+                      <div className="font-semibold text-gray-900 mb-1">{prize.name}</div>
+                      {prize.description && (
+                        <div className="text-xs text-gray-600">{prize.description}</div>
+                      )}
+                      <div className="mt-2 text-xs text-gray-500">
+                        남은 수량: {prize.current_quantity}개
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center text-gray-500">상품 정보를 불러오는 중...</div>

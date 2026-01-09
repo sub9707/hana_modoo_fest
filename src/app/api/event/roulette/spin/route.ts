@@ -2,20 +2,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
-import { getRedisClient, isRedisHealthy } from '@/lib/redis/connection'
 import { headers } from 'next/headers'
 import { randomUUID } from 'crypto'
 import type { SpinResponse, PrizeWithProbability } from '@/types/event'
-import type { RedisClient } from '@/lib/redis/connection'
 
-// Redis 키 상수
-const REDIS_KEYS = {
-  CONCURRENT_SPIN: (userId: string) => `roulette:concurrent:${userId}`,
-  DAILY_PARTICIPATION: (userId: string, date: string) => `roulette:daily:${userId}:${date}`,
-  COOLDOWN: (userId: string) => `roulette:cooldown:${userId}`,
-  SERVER_LOAD: 'roulette:server_load',
-  PRIZES_CACHE: 'roulette:prizes:active'
-} as const
+// 동시 실행 제한을 위한 인메모리 맵
+const concurrentSpins = new Map<string, boolean>()
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,183 +27,41 @@ export async function POST(request: NextRequest) {
       'unknown'
     const user_agent = headersList.get('user-agent') || 'unknown'
 
-    // Redis 상태 확인 및 클라이언트 가져오기
-    const redisHealthy = await isRedisHealthy()
-    let redis: RedisClient | null = null
-
-    if (redisHealthy) {
-      try {
-        redis = await getRedisClient()
-      } catch (error) {
-        console.warn('Redis connection failed, falling back to DB-only mode:', error)
-        redis = null
-      }
-    }
-
-    // 이벤트 활성 상태 확인
-    const eventActive = await queryOne(
-      'SELECT setting_value FROM event_settings WHERE setting_key = ?',
-      ['event_active']
-    )
-
-    if (!eventActive || eventActive.setting_value !== 'true') {
-      return NextResponse.json<SpinResponse>(
-        { success: false, error: '현재 이벤트가 진행되지 않습니다.' },
-        { status: 400 }
-      )
-    }
+    // 테스트 앱: 이벤트 활성 상태 체크 제거
+    // 항상 이벤트 진행 중
 
     const today = new Date().toISOString().split('T')[0]
 
-    // Redis를 사용한 일일 참여 제한 확인 (우선순위)
-    let hasParticipatedToday = false
+    // 테스트 앱: 일일 참여 제한 및 쿨다운 제거
+    // 무한정 참여 가능
 
-    if (redis) {
-      try {
-        const redisParticipation = await redis.get(REDIS_KEYS.DAILY_PARTICIPATION(user.id, today))
-        hasParticipatedToday = !!redisParticipation
-      } catch (error) {
-        console.warn('Redis daily participation check failed:', error)
-        // Redis 에러 시 아래 DB 체크로 fallback
-      }
-    }
-
-    // Redis 실패하거나 없는 경우 DB 확인
-    if (!redis || !hasParticipatedToday) {
-      const todayParticipation = await queryOne(
-        `SELECT id FROM event_participations 
-         WHERE user_id = ? AND participation_date = ?`,
-        [user.id, today]
-      )
-      hasParticipatedToday = !!todayParticipation
-    }
-
-    if (hasParticipatedToday) {
+    // 인메모리 동시 실행 제한
+    if (concurrentSpins.get(user.id)) {
       return NextResponse.json<SpinResponse>(
-        { success: false, error: '오늘 이미 참여하셨습니다.' },
-        { status: 400 }
+        { success: false, error: '이미 처리 중입니다. 잠시만 기다려주세요.' },
+        { status: 429 }
       )
     }
 
-    // Redis를 사용한 쿨다운 확인
-    if (redis) {
-      try {
-        const cooldownTTL = await redis.ttl(REDIS_KEYS.COOLDOWN(user.id))
-        if (cooldownTTL > 0) {
-          return NextResponse.json<SpinResponse>(
-            { success: false, error: `${cooldownTTL}초 후에 다시 시도해주세요.` },
-            { status: 429 }
-          )
-        }
-      } catch (error) {
-        console.warn('Redis cooldown check failed:', error)
-        // Redis 에러 시 DB로 쿨다운 확인
-        const recentSpin = await queryOne(
-          `SELECT id FROM event_participations 
-           WHERE user_id = ? AND participated_at > DATE_SUB(NOW(), INTERVAL 5 SECOND)`,
-          [user.id]
-        )
+    // 동시 실행 플래그 설정
+    concurrentSpins.set(user.id, true)
 
-        if (recentSpin) {
-          return NextResponse.json<SpinResponse>(
-            { success: false, error: '잠시만 기다려주세요.' },
-            { status: 429 }
-          )
-        }
-      }
-    } else {
-      // Redis 사용 불가 시 DB로 쿨다운 확인
-      const recentSpin = await queryOne(
-        `SELECT id FROM event_participations 
-         WHERE user_id = ? AND participated_at > DATE_SUB(NOW(), INTERVAL 5 SECOND)`,
-        [user.id]
-      )
-
-      if (recentSpin) {
-        return NextResponse.json<SpinResponse>(
-          { success: false, error: '잠시만 기다려주세요.' },
-          { status: 429 }
-        )
-      }
-    }
-
-    // Redis를 사용한 동시 실행 제한
-    if (redis) {
-      try {
-        const currentConcurrent = await redis.get(REDIS_KEYS.CONCURRENT_SPIN(user.id))
-        if (currentConcurrent && parseInt(currentConcurrent) > 0) {
-          return NextResponse.json<SpinResponse>(
-            { success: false, error: '이미 처리 중입니다. 잠시만 기다려주세요.' },
-            { status: 429 }
-          )
-        }
-
-        // 동시 실행 카운터 증가
-        const multi = redis.multi()
-        multi.incr(REDIS_KEYS.CONCURRENT_SPIN(user.id))
-        multi.expire(REDIS_KEYS.CONCURRENT_SPIN(user.id), 10)
-        await multi.exec()
-      } catch (error) {
-        console.warn('Redis concurrent limit check failed:', error)
-      }
-    }
+    // 10초 후 자동 제거
+    setTimeout(() => {
+      concurrentSpins.delete(user.id)
+    }, 10000)
 
     try {
-      // 서버 부하 기록 (Redis) - 수정된 메서드 사용
-      if (redis) {
-        try {
-          const timestamp = Date.now()
-          const requestId = `request:${timestamp}:${user.id}`
-
-          // node-redis v4+ 올바른 사용법
-          await redis.zAdd(REDIS_KEYS.SERVER_LOAD, {
-            score: timestamp,
-            value: requestId
-          })
-
-          // 5분 이전 데이터 정리
-          const fiveMinutesAgo = timestamp - (5 * 60 * 1000)
-          await redis.zRemRangeByScore(REDIS_KEYS.SERVER_LOAD, fiveMinutesAgo, timestamp)
-        } catch (error) {
-          console.warn('Redis server load tracking failed:', error)
-        }
-      }
-
       // 트랜잭션으로 룰렛 실행
       const result = await transaction(async (connection) => {
-        // 캐시된 상품 조회 시도 (Redis)
-        let activePrizes: any[] | null = null
-
-        if (redis) {
-          try {
-            const cachedPrizes = await redis.get(REDIS_KEYS.PRIZES_CACHE)
-            if (cachedPrizes) {
-              activePrizes = JSON.parse(cachedPrizes)
-            }
-          } catch (error) {
-            console.warn('Redis prizes cache read failed:', error)
-          }
-        }
-
-        // 캐시 미스 시 DB에서 조회
-        if (!activePrizes) {
-          activePrizes = await query(
-            `SELECT p.*, pp.probability 
-             FROM prizes p
-             JOIN prize_probabilities pp ON p.id = pp.prize_id
-             WHERE p.is_active = 1 AND pp.is_active = 1 AND p.current_quantity > 0
-             ORDER BY p.sort_order`
-          )
-
-          // Redis에 캐시 저장 (1분)
-          if (redis && activePrizes) {
-            try {
-              await redis.setEx(REDIS_KEYS.PRIZES_CACHE, 60, JSON.stringify(activePrizes))
-            } catch (error) {
-              console.warn('Redis prizes cache write failed:', error)
-            }
-          }
-        }
+        // DB에서 활성 상품 조회
+        const activePrizes = await query(
+          `SELECT p.*, pp.probability
+           FROM prizes p
+           JOIN prize_probabilities pp ON p.id = pp.prize_id
+           WHERE p.is_active = 1 AND pp.is_active = 1 AND p.current_quantity > 0
+           ORDER BY p.sort_order`
+        )
 
         if (!activePrizes || activePrizes.length === 0) {
           throw new Error('현재 참여 가능한 상품이 없습니다.')
@@ -279,15 +129,6 @@ export async function POST(request: NextRequest) {
              VALUES (?, ?, ?, ?)`,
             [winnerId, participationId, user.id, selectedPrize.id]
           )
-
-          // Redis 캐시 무효화 (상품 수량 변경으로 인해)
-          if (redis) {
-            try {
-              await redis.del(REDIS_KEYS.PRIZES_CACHE)
-            } catch (error) {
-              console.warn('Redis cache invalidation failed:', error)
-            }
-          }
         }
 
         // 업데이트된 수량 조회
@@ -306,22 +147,7 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      // Redis에 참여 기록 저장 (다음날 자정까지)
-      if (redis) {
-        try {
-          const tomorrow = new Date()
-          tomorrow.setDate(tomorrow.getDate() + 1)
-          tomorrow.setHours(0, 0, 0, 0)
-          const ttl = Math.floor((tomorrow.getTime() - Date.now()) / 1000)
-
-          await redis.setEx(REDIS_KEYS.DAILY_PARTICIPATION(user.id, today), ttl, '1')
-
-          // 쿨다운 설정 (5분)
-          await redis.setEx(REDIS_KEYS.COOLDOWN(user.id), 300, '1')
-        } catch (error) {
-          console.warn('Redis participation/cooldown recording failed:', error)
-        }
-      }
+      // 테스트 앱: 무한정 참여 가능
 
       return NextResponse.json<SpinResponse>({
         success: true,
@@ -338,14 +164,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     } finally {
-      // 동시 실행 카운터 감소
-      if (redis) {
-        try {
-          await redis.decr(REDIS_KEYS.CONCURRENT_SPIN(user.id))
-        } catch (error) {
-          console.warn('Redis concurrent counter cleanup failed:', error)
-        }
-      }
+      // 동시 실행 플래그 제거
+      concurrentSpins.delete(user.id)
     }
 
   } catch (error) {

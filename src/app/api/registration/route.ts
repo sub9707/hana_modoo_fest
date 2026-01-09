@@ -103,16 +103,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (isRegistrationClosed()) {
-      return NextResponse.json(
-        { 
-          error: '사전 접수가 마감되었습니다.',
-          deadline: getFormattedDeadline(),
-          closed: true
-        },
-        { status: 403 }
-      )
-    }
+    // 테스트 앱: 마감 시간 체크 제거
+    // 항상 참가 가능
 
     const data: RegistrationFormData = await request.json()
 
@@ -130,17 +122,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const existingRegistration = await queryOne(
-      'SELECT id, status FROM registrations WHERE user_id = ? AND status != "cancelled"',
-      [user.id]
-    )
-
-    if (existingRegistration) {
-      return NextResponse.json(
-        { error: '이미 참가신청을 완료하셨습니다.' },
-        { status: 409 }
-      )
-    }
+    // 테스트 앱: 중복 참여 제한 제거
+    // 무한정 참여 가능
 
     const registrationNumber = await generateRegistrationNumber()
     const registrationId = crypto.randomUUID()

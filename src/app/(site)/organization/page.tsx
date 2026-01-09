@@ -4,6 +4,7 @@ import VisionSection from '@/components/organization/VisionSection'
 import BusinessSection from '@/components/organization/BusinessSection'
 import OrganizationBanner from '@/components/organization/OrganizationBanner'
 import { organizationData } from '@/data/Organization'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '기관 소개',
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 
 export default async function OrganizationPage() {
   return (
-    <div className="min-h-screen font-paper">
+    <PageLayout variant="white">
       {/* 히어로 섹션 */}
       <OrganizationHero organizationData={organizationData} />
 
@@ -37,7 +38,6 @@ export default async function OrganizationPage() {
 
       {/*배너 기관 배너 */}
       <OrganizationBanner />
-
-    </div>
+    </PageLayout>
   )
 }

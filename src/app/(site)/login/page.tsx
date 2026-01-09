@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/mysql/server'
 import LoginForm from '@/components/forms/LoginForm'
 import { cookies } from 'next/headers'
 import LoginMessageDisplay from '@/components/auth/LoginMessageDisplay'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '로그인',
@@ -43,7 +44,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   const redirectPath = params.callbackUrl || params.redirect || '/'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 font-paper">
+    <PageLayout variant="gray" className="flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 -mt-16">
         {/* ✅ 메시지 표시를 위한 Client Component 추가 */}
         <LoginMessageDisplay
@@ -52,6 +53,6 @@ export default async function LoginPage({ searchParams }: PageProps) {
         />
         <LoginForm redirectTo={redirectPath} />
       </div>
-    </div>
+    </PageLayout>
   )
 }

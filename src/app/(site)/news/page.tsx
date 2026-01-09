@@ -4,6 +4,7 @@ import NewsContainer from '@/components/news/NewsContainer'
 import NewsHero from '@/components/news/NewsHero'
 import { NewsService } from '@/lib/services/news-service'
 import NewsListSkeleton from '@/components/news/NewsListSkeleton'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -67,7 +68,7 @@ export default async function NewsPage() {
   const initialData = await getInitialData()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
+    <PageLayout variant="gradient-purple">
       {/* 히어로 섹션 */}
       <NewsHero />
 
@@ -81,6 +82,6 @@ export default async function NewsPage() {
           initialNextCursor={initialData.nextCursor}
         />
       </Suspense>
-    </div>
+    </PageLayout>
   )
 }

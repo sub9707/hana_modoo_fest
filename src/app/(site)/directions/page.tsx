@@ -5,6 +5,7 @@ import ParkingSection from '@/components/directions/ParkingSection';
 import TransportationSection from '@/components/directions/TransportationSection';
 import DirectionsMap from '@/components/directions/DirectionsMap';
 import AccessibilitySection from '@/components/directions/AccessibilitySection';
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '오시는 길',
@@ -43,7 +44,7 @@ const venueData = {
 
 export default function DirectionsPage() {
   return (
-    <div className="min-h-screen bg-white font-paper">
+    <PageLayout variant="white">
       {/* 날씨/안전 공지 배너 */}
       <WeatherNotice />
 
@@ -61,6 +62,6 @@ export default function DirectionsPage() {
 
       {/* 접근성 & 편의시설 */}
       {/* <AccessibilitySection /> */}
-    </div >
+    </PageLayout>
   )
 }

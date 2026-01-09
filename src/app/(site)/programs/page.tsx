@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import ProgramHero from '@/components/programs/ProgramHero'
 import ProgramTabs from '@/components/programs/ProgramTabs'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '행사 프로그램 안내',
@@ -24,12 +25,12 @@ export const metadata: Metadata = {
 
 export default function ProgramPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
+    <PageLayout variant="gradient-purple">
       {/* 히어로 섹션 */}
       <ProgramHero />
 
       {/* 탭 및 컨텐츠 섹션 */}
       <ProgramTabs />
-    </div>
+    </PageLayout>
   )
 }

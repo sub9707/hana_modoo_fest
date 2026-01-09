@@ -1,7 +1,6 @@
 // src/app/api/quiz/register-participation/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
-import { quizRedisService } from '@/lib/redis/quiz'
 import { getClientIP, getUserAgent } from '@/lib/utils/request'
 
 interface ParticipationRequest {
@@ -12,6 +11,9 @@ interface ParticipationRequest {
   completionTime: number
   participatedAt: string
 }
+
+// 쿨다운 인메모리 맵
+const cooldowns = new Map<string, number>()
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,8 +28,11 @@ export async function POST(request: NextRequest) {
     }
 
     // 쿨다운 체크 (중복 클릭 방지)
-    const canProceed = await quizRedisService.checkCooldown(data.userId, 'register')
-    if (!canProceed) {
+    const cooldownKey = `${data.userId}:register`
+    const lastRequest = cooldowns.get(cooldownKey)
+    const now = Date.now()
+
+    if (lastRequest && now - lastRequest < 3000) {
       return NextResponse.json(
         { success: false, message: '잠시만 기다려주세요.' },
         { status: 429 }
@@ -35,7 +40,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 쿨다운 설정 (3초)
-    await quizRedisService.setCooldown(data.userId, 'register', 3)
+    cooldowns.set(cooldownKey, now)
+    setTimeout(() => cooldowns.delete(cooldownKey), 3000)
 
     // 사용자 존재 확인
     const userExists = await query(
@@ -50,18 +56,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 중복 참여 확인
-    const existingParticipation = await query(
-      'SELECT id FROM quiz_event_participants WHERE user_id = ? AND quiz_version = ? LIMIT 1',
-      [data.userId, 'v1']
-    )
-
-    if (existingParticipation.length > 0) {
-      return NextResponse.json(
-        { success: false, message: '이미 퀴즈 이벤트에 참여하셨습니다.' },
-        { status: 409 }
-      )
-    }
+    // 테스트 앱: 중복 참여 제한 제거
+    // 무한정 참여 가능
 
     // 클라이언트 정보 추출
     const clientIP = getClientIP(request)
@@ -105,13 +101,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('참여 등록 오류:', error)
-    
-    if (error instanceof Error && error.message.includes('Duplicate entry')) {
-      return NextResponse.json(
-        { success: false, message: '이미 퀴즈 이벤트에 참여하셨습니다.' },
-        { status: 409 }
-      )
-    }
 
     return NextResponse.json(
       { success: false, message: `서버 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}` },

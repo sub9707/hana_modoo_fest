@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import OnlineFestivalTabs from '@/components/online-festival/OnlineFestivalTabs'
 import OnelineFestivalHero from '@/components/online-festival/OnlineFestivalHero'
+import PageLayout from '@/components/layout/PageLayout'
 
 export const metadata: Metadata = {
   title: '온라인 축제 | 모두하나대축제 2025',
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function OnlineFestivalPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-50 font-paper">
+    <PageLayout variant="gradient-purple">
       {/* 히어로 영역 */}
       <OnelineFestivalHero />
 
@@ -35,6 +36,6 @@ export default function OnlineFestivalPage() {
           <OnlineFestivalTabs />
         </div>
       </section>
-    </div>
+    </PageLayout>
   )
 }

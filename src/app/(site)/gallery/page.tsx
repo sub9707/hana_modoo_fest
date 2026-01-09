@@ -3,6 +3,8 @@ import GalleryHero from '@/components/gallery/GalleryHero'
 import GalleryFilters from '@/components/gallery/GalleryFilters'
 import GalleryGrid from '@/components/gallery/GalleryGrid'
 import UploadGuide from '@/components/gallery/UploadGuide'
+import PageLayout from '@/components/layout/PageLayout'
+import Section from '@/components/common/Section'
 
 export const metadata: Metadata = {
   title: '갤러리',
@@ -34,30 +36,30 @@ export default async function GalleryPage() {
   const galleryData = await getGalleryData()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout variant="gray" useFontPaper={false}>
       {/* 히어로 섹션 */}
       <GalleryHero totalPhotos={galleryData.totalPhotos} />
-      
+
       {/* 메인 콘텐츠 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <Section>
         {/* 필터 섹션 */}
-        <section className="mb-8">
-          <GalleryFilters 
+        <div className="mb-8">
+          <GalleryFilters
             years={galleryData.years}
             categories={galleryData.categories}
           />
-        </section>
-        
+        </div>
+
         {/* 갤러리 그리드 */}
-        <section className="mb-16">
+        <div className="mb-16">
           <GalleryGrid />
-        </section>
-        
+        </div>
+
         {/* 업로드 가이드 */}
-        <section>
+        <div>
           <UploadGuide />
-        </section>
-      </div>
-    </div>
+        </div>
+      </Section>
+    </PageLayout>
   )
 }
