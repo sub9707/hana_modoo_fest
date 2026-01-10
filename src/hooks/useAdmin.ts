@@ -1,15 +1,8 @@
-// hooks/useAdmin.ts - Vercel 과비용 방지 최적화 버전
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin'
 import { User } from '@/types/auth'
-
-// API 응답 타입
-interface ApiResponse<T> {
-  success: boolean
-  data: T
-  message?: string
-  error?: string
-}
+import { ApiResponse } from '@/types/common'
+import { useAbortController, useLoadingPrevention } from './utils'
 
 interface PaginatedResponse<T> {
   items: T[]
@@ -19,40 +12,12 @@ interface PaginatedResponse<T> {
   totalPages: number
 }
 
-// 🚀 메모리 누수 방지를 위한 AbortController 훅
-function useAbortController() {
-  const abortControllerRef = useRef<AbortController | null>(null)
-
-  const getController = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-    abortControllerRef.current = new AbortController()
-    return abortControllerRef.current
-  }, [])
-
-  const cleanup = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-      abortControllerRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    return cleanup // 컴포넌트 언마운트 시 정리
-  }, [cleanup])
-
-  return { getController, cleanup }
-}
-
-// 🚀 최적화된 기본 API 훅 (무한 루프 완전 방지)
 function useApi<T>(url: string, initialOptions?: RequestInit) {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { getController } = useAbortController()
-  
-  // 🚀 options 메모이제이션으로 무한 루프 방지
+
   const memoizedOptions = useMemo(() => ({
     ...initialOptions,
     headers: {
@@ -61,20 +26,18 @@ function useApi<T>(url: string, initialOptions?: RequestInit) {
     },
   }), [initialOptions])
 
-  // 🚀 fetchData 함수 최적화 (의존성 안정화)
   const fetchData = useCallback(async () => {
     const controller = getController()
-    
+
     try {
       setLoading(true)
       setError(null)
-      
+
       const response = await fetch(url, {
         ...memoizedOptions,
-        signal: controller.signal // 🚀 AbortController로 요청 취소 가능
+        signal: controller.signal
       })
 
-      // 요청이 취소된 경우 무시
       if (controller.signal.aborted) return
 
       if (!response.ok) {
@@ -82,26 +45,24 @@ function useApi<T>(url: string, initialOptions?: RequestInit) {
       }
 
       const result: ApiResponse<T> = await response.json()
-      
-      // 다시 한번 취소 확인
+
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
         setData(result.data)
       } else {
         setError(result.error || '알 수 없는 오류가 발생했습니다.')
       }
     } catch (err) {
-      // AbortError는 무시
       if (err instanceof Error && err.name === 'AbortError') return
-      
+
       setError(err instanceof Error ? err.message : '네트워크 오류가 발생했습니다.')
     } finally {
       if (!controller.signal.aborted) {
         setLoading(false)
       }
     }
-  }, [url, memoizedOptions, getController]) // 🚀 안정된 의존성만 포함
+  }, [url, memoizedOptions, getController])
 
   useEffect(() => {
     fetchData()
@@ -110,7 +71,6 @@ function useApi<T>(url: string, initialOptions?: RequestInit) {
   return { data, loading, error, refetch: fetchData }
 }
 
-// 🚀 대시보드 통계 훅 (최적화됨)
 export function useDashboardStats() {
   const { data, loading, error, refetch } = useApi<{
     totalVisitors: number

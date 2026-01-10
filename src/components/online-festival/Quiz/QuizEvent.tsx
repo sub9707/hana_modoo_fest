@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { useQuiz } from '@/hooks/useQuiz'
 import { useAuth } from '@/contexts/AuthContext'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, MessageSquareQuote, CheckCircle } from 'lucide-react'
 import styles from './QuizEvent.module.css'
 import { QuizCard } from './QuizCard'
 import { ResultScreen } from './ResultScreen'
 import { ParticipationCompleted } from './ParticipationCompleted'
 import { LoginRequired } from './LoginRequired'
+import FestivalTabHeader from '../FestivalTabHeader'
 
 export default function QuizEvent() {
   const { user, isLoading } = useAuth()
@@ -16,7 +17,7 @@ export default function QuizEvent() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
   // 이벤트 종료 상태
-  const EVENT_ENDED = true
+  const EVENT_ENDED = false
 
   // 결과 등록 핸들러
   const handleRegisterResult = async () => {
@@ -55,25 +56,21 @@ export default function QuizEvent() {
   return (
     <div className="p-1 py-4 sm:p-8 md:p-12">
       {/* 헤더 */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-          <span className="text-2xl">🧩</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          퀴즈 이벤트
-        </h2>
-        <p className="text-md sm:text-lg text-gray-600 mb-2">
-          {EVENT_ENDED 
+      <FestivalTabHeader
+        title="퀴즈 이벤트"
+        description={
+          EVENT_ENDED
             ? '퀴즈 이벤트가 종료되었습니다. 참여해주신 모든 분들께 감사드립니다.'
             : '가족 관련 퀴즈를 풀고 만점을 달성하여 경품 추첨에 참여하세요!'
-          }
-        </p>
+        }
+        titleColorVariant="default"
+      >
         {!EVENT_ENDED && (
           <p className="text-sm text-gray-500">
             아래 퀴즈는 여러번 풀 수 있고, 만점 시 추첨을 통해 100명에게 경품을 제공합니다.
           </p>
         )}
-      </div>
+      </FestivalTabHeader>
 
       {/* 이벤트 종료 안내 배너 */}
       {EVENT_ENDED && (
@@ -97,8 +94,9 @@ export default function QuizEvent() {
 
       {/* 성공 메시지 */}
       {showSuccessMessage && (
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse">
-          🎉 이벤트 참여 완료! 추첨 결과를 기다려주세요!
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse flex items-center space-x-2">
+          <CheckCircle className="w-5 h-5" />
+          <span>이벤트 참여 완료! 추첨 결과를 기다려주세요!</span>
         </div>
       )}
 
@@ -119,8 +117,9 @@ export default function QuizEvent() {
       {/* 성공 메시지 */}
       {quiz.showCelebration && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-40">
-          <div className={styles.successText}>
-            정답! 🎉
+          <div className={`${styles.successText} flex items-center space-x-2`}>
+            <CheckCircle className="w-8 h-8" />
+            <span>정답!</span>
           </div>
         </div>
       )}
@@ -129,7 +128,7 @@ export default function QuizEvent() {
       {EVENT_ENDED ? (
         <div className="max-w-3xl mx-auto">
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center border border-white/20 shadow-lg">
-            <div className="text-6xl mb-6">🎯</div>
+            <CheckCircle className="w-20 h-20 text-gray-400 mx-auto mb-6" />
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               퀴즈 이벤트가 종료되었습니다
             </h3>

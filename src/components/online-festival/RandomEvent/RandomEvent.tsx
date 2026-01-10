@@ -6,9 +6,11 @@ import { useAuth } from '@/contexts/AuthContext'
 import RouletteWheel from './RouletteWheel'
 import WinnerAnnouncement from './WinnerAnnouncement'
 import MyWinnings from './MyWinnings'
+import InfoCard from '@/components/common/InfoCard'
+import FestivalTabHeader from '../FestivalTabHeader'
 import { Prize } from '@/types/online-festival'
 import { RecentWinner } from '@/types/event'
-import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle } from 'lucide-react'
+import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle, CheckCircle, User, LogIn, PackageX, Phone } from 'lucide-react'
 
 // 상품명에 따른 이미지 매핑
 const PRIZE_IMAGE_MAP: Record<string, string> = {
@@ -201,20 +203,15 @@ export default function RandomEvent() {
   return (
     <div className="p-1 py-4 sm:p-8 md:p-12">
       {/* 헤더 */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-6">
-          <span className="text-2xl">🎰</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          랜덤 이벤트
-        </h2>
-        <p className="text-md sm:text-lg text-gray-600 mb-3">
-          {EVENT_ENDED
+      <FestivalTabHeader
+        title="랜덤 이벤트"
+        description={
+          EVENT_ENDED
             ? '랜덤 이벤트가 종료되었습니다. 참여해주신 모든 분들께 감사드립니다.'
             : '룰렛을 돌려 특별한 선물을 받아보세요!'
-          }
-        </p>
-
+        }
+        titleColorVariant="default"
+      >
         {/* 테스트 앱 안내 */}
         {!EVENT_ENDED && (
           <div className="inline-block px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
@@ -233,7 +230,7 @@ export default function RandomEvent() {
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           <span>새로고침</span>
         </button>
-      </div>
+      </FestivalTabHeader>
 
       {/* 이벤트 종료 안내 배너 */}
       {EVENT_ENDED && (
@@ -271,7 +268,7 @@ export default function RandomEvent() {
         <div className="max-w-4xl mx-auto space-y-8">
           {/* 종료 안내 카드 */}
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center border border-white/20 shadow-lg">
-            <div className="text-6xl mb-6">🎁</div>
+            <CheckCircle className="w-20 h-20 text-gray-400 mx-auto mb-6" />
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               랜덤 이벤트가 종료되었습니다
             </h3>
@@ -311,40 +308,57 @@ export default function RandomEvent() {
               />
 
               {/* 참여 안내 */}
-              <div className="bg-white/70 rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <Clock className="w-5 h-5 mr-2 text-festival-orange" />
-                  이벤트 안내
-                </h3>
-                <div className="space-y-3 text-gray-700">
-                  <div className="flex items-start space-x-3">
-                    <span className="text-festival-orange font-bold">•</span>
-                    <span>하루 1회 참여 가능합니다</span>
+              <InfoCard
+                title="이벤트 안내"
+                icon={Clock}
+                iconColor="text-orange-500"
+                variant="gradient"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3 p-3 bg-orange-50/50 rounded-lg">
+                    <Clock className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">참여 횟수</div>
+                      <div className="text-gray-700 text-sm">하루 1회 참여 가능합니다</div>
+                    </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <span className="text-festival-orange font-bold">•</span>
-                    <span>로그인한 회원만 참여 가능합니다</span>
+
+                  <div className="flex items-start space-x-3 p-3 bg-blue-50/50 rounded-lg">
+                    <LogIn className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">참여 자격</div>
+                      <div className="text-gray-700 text-sm">로그인한 회원만 참여 가능합니다</div>
+                    </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <span className="text-festival-orange font-bold">•</span>
-                    <span>상품 소진 시 해당 상품은 제외됩니다</span>
+
+                  <div className="flex items-start space-x-3 p-3 bg-purple-50/50 rounded-lg">
+                    <PackageX className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">상품 소진</div>
+                      <div className="text-gray-700 text-sm">상품 소진 시 해당 상품은 제외됩니다</div>
+                    </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <span className="text-festival-orange font-bold">•</span>
-                    <span>기프티콘은 가입된 전화번호로 전달됩니다.</span>
+
+                  <div className="flex items-start space-x-3 p-3 bg-green-50/50 rounded-lg">
+                    <Phone className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="font-semibold text-gray-900 text-sm">기프티콘 전달</div>
+                      <div className="text-gray-700 text-sm">가입된 전화번호로 전달됩니다</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </InfoCard>
             </div>
           </div>
 
           {/* 상품 안내 */}
-          <div className="mt-12 bg-white/80 rounded-3xl p-8 border border-white/20 backdrop-blur-sm">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
-              <Gift className="w-6 h-6 mr-3 text-festival-orange" />
-              상품 안내
-            </h3>
-            
+          <InfoCard
+            title="상품 안내"
+            icon={Gift}
+            iconColor="text-orange-500"
+            variant="glow"
+            className="mt-12"
+          >
             {prizes.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {prizes.map((prize) => {
@@ -353,10 +367,10 @@ export default function RandomEvent() {
                   return (
                     <div
                       key={prize.id}
-                      className="bg-white/60 rounded-xl p-4 text-center border border-white/40 hover:shadow-md transition-shadow"
+                      className="group bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
                     >
                       {prizeImage ? (
-                        <div className="relative w-16 h-16 mx-auto mb-2">
+                        <div className="relative w-16 h-16 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
                           <Image
                             src={prizeImage}
                             alt={prize.name}
@@ -365,25 +379,27 @@ export default function RandomEvent() {
                           />
                         </div>
                       ) : (
-                        <div className="relative w-16 h-16 mx-auto mb-2 flex items-center justify-center bg-gray-100 rounded-lg">
-                          <span className="text-3xl">{prize.icon || '🎁'}</span>
+                        <div className="relative w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                          <Gift className="w-8 h-8 text-gray-400" />
                         </div>
                       )}
-                      <div className="font-semibold text-gray-900 mb-1">{prize.name}</div>
+                      <div className="font-bold text-gray-900 mb-1 text-sm">{prize.name}</div>
                       {prize.description && (
-                        <div className="text-xs text-gray-600">{prize.description}</div>
+                        <div className="text-xs text-gray-600 mb-2">{prize.description}</div>
                       )}
-                      <div className="mt-2 text-xs text-gray-500">
-                        남은 수량: {prize.current_quantity}개
+                      <div className="mt-2 px-2 py-1 bg-orange-50 rounded-full">
+                        <div className="text-xs font-medium text-orange-700">
+                          남은 수량: {prize.current_quantity}개
+                        </div>
                       </div>
                     </div>
                   )
                 })}
               </div>
             ) : (
-              <div className="text-center text-gray-500">상품 정보를 불러오는 중...</div>
+              <div className="text-center text-gray-500 py-8">상품 정보를 불러오는 중...</div>
             )}
-          </div>
+          </InfoCard>
 
           {/* 나의 당첨 내역 */}
           {user && (

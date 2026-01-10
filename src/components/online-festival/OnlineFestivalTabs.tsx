@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Clipboard, MessageSquareQuote, MessageCircle, Pen, Dices } from 'lucide-react'
 import PreRegistration from './PreRegistration'
 import QuizEvent from './Quiz/QuizEvent'
 import SupportComments from './SupportComment/SupportComments'
@@ -11,52 +12,58 @@ import FamilyWriting from './FamilyWriting/FamilyWriting'
 interface Tab {
   id: string
   label: string
-  icon: string
+  icon: React.ComponentType<{ className?: string }>
   description: string
   color: string
   bgColor: string
+  bgHex: string
 }
 
 const tabs: Tab[] = [
   {
     id: 'registration',
     label: '사전접수',
-    icon: '✍️',
+    icon: Clipboard,
     description: '축제 사전참가 신청',
     color: 'text-festival-blue',
-    bgColor: 'bg-festival-blue'
+    bgColor: 'bg-festival-blue',
+    bgHex: '#3B82F6'
   },
   {
     id: 'quiz',
     label: '퀴즈이벤트',
-    icon: '🧩',
+    icon: MessageSquareQuote,
     description: '가족 관련 퀴즈 도전',
     color: 'text-festival-green',
-    bgColor: 'bg-festival-green'
+    bgColor: 'bg-festival-green',
+    bgHex: '#10B981'
   },
   {
     id: 'comments',
     label: '응원댓글',
-    icon: '💬',
+    icon: MessageCircle,
     description: '따뜻한 응원 메시지',
     color: 'text-festival-purple',
-    bgColor: 'bg-festival-purple'
+    bgColor: 'bg-festival-purple',
+    bgHex: '#8B5CF6'
   },
   {
     id: 'writing',
     label: '글짓기',
-    icon: '📝',
+    icon: Pen,
     description: '가족 주제 글짓기',
     color: 'text-festival-pink',
-    bgColor: 'bg-festival-pink'
+    bgColor: 'bg-festival-pink',
+    bgHex: '#EC4899'
   },
   {
     id: 'random',
     label: '랜덤이벤트',
-    icon: '🎰',
+    icon: Dices,
     description: '행운의 룰렛 이벤트',
     color: 'text-festival-orange',
-    bgColor: 'bg-festival-orange'
+    bgColor: 'bg-festival-orange',
+    bgHex: '#F97316'
   }
 ]
 
@@ -88,18 +95,24 @@ export default function OnlineFestivalTabs() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 relative px-4 py-4 rounded-xl transition-all duration-300 ${
+              className={`flex-1 relative px-4 py-4 rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-white shadow-md transform scale-[1.02]'
+                  ? ''
                   : 'hover:bg-white/50'
               }`}
+              style={activeTab === tab.id ? {
+                backgroundColor: `${tab.bgHex}10`,
+                border: `2px solid ${tab.bgHex}30`
+              } : {
+                border: '2px solid transparent'
+              }}
               role="tab"
               aria-selected={activeTab === tab.id}
               aria-controls={`panel-${tab.id}`}
             >
               <div className="text-center">
-                <div className={`text-2xl mb-2 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
-                  {tab.icon}
+                <div className={`mb-2 flex justify-center ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                  <tab.icon className={`w-6 h-6 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`} />
                 </div>
                 <div className={`font-semibold mb-1 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
                   {tab.label}
@@ -128,15 +141,21 @@ export default function OnlineFestivalTabs() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 max-w-[140px] px-2 py-3 rounded-xl transition-all duration-300 ${
+                className={`flex-1 max-w-[140px] px-2 py-3 rounded-xl transition-all duration-300 cursor-pointer ${
                   activeTab === tab.id
-                    ? 'bg-white shadow-md'
+                    ? ''
                     : 'hover:bg-white/50'
                 }`}
+                style={activeTab === tab.id ? {
+                  backgroundColor: `${tab.bgHex}10`,
+                  border: `2px solid ${tab.bgHex}30`
+                } : {
+                  border: '2px solid transparent'
+                }}
               >
                 <div className="text-center">
-                  <div className={`text-base mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
-                    {tab.icon}
+                  <div className={`mb-1 flex justify-center ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`} />
                   </div>
                   <div className={`font-medium text-xs ${activeTab === tab.id ? tab.color : 'text-gray-600'}`}>
                     {tab.label}
@@ -155,15 +174,21 @@ export default function OnlineFestivalTabs() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 px-2 py-2.5 rounded-xl transition-all duration-300 border-2 ${
+                className={`flex-1 px-2 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                   activeTab === tab.id
-                    ? `border-current ${tab.color}`
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-white/50'
+                    ? tab.color
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
                 }`}
+                style={activeTab === tab.id ? {
+                  backgroundColor: `${tab.bgHex}10`,
+                  border: `2px solid ${tab.bgHex}30`
+                } : {
+                  border: '2px solid transparent'
+                }}
               >
                 <div className="text-center">
-                  <div className={`text-sm mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
-                    {tab.icon}
+                  <div className={`mb-1 flex justify-center ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`} />
                   </div>
                   <div className="font-medium text-xs leading-tight">
                     {tab.label}
@@ -179,15 +204,21 @@ export default function OnlineFestivalTabs() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-[calc(50%-4px)] px-2 py-2.5 rounded-xl transition-all duration-300 border-2 ${
+                className={`w-[calc(50%-4px)] px-2 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                   activeTab === tab.id
-                    ? `border-current ${tab.color}`
-                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-white/50'
+                    ? tab.color
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
                 }`}
+                style={activeTab === tab.id ? {
+                  backgroundColor: `${tab.bgHex}10`,
+                  border: `2px solid ${tab.bgHex}30`
+                } : {
+                  border: '2px solid transparent'
+                }}
               >
                 <div className="text-center">
-                  <div className={`text-sm mb-1 ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
-                    {tab.icon}
+                  <div className={`mb-1 flex justify-center ${activeTab === tab.id ? 'scale-110' : ''} transition-transform duration-300`}>
+                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? tab.color : 'text-gray-600'}`} />
                   </div>
                   <div className="font-medium text-xs leading-tight">
                     {tab.label}

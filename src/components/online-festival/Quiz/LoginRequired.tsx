@@ -2,7 +2,7 @@
 'use client'
 
 import { memo } from 'react'
-import { LogIn, Shield, User, Lock } from 'lucide-react'
+import {  Shield } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export const LoginRequired = memo(() => {
@@ -23,12 +23,11 @@ export const LoginRequired = memo(() => {
     <div className="min-h-screen p-8 md:p-12 relative">
       {/* 헤더 */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full mb-6">
-          <span className="text-2xl">🧩</span>
+        <div className="inline-flex items-center justify-center mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 to-yellow-300 bg-clip-text text-transparent">
+            모두하나 퀴즈 이벤트
+          </h1>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 to-yellow-300 bg-clip-text text-transparent mb-4">
-          모두하나 퀴즈 이벤트
-        </h1>
         <p className="text-md sm:text-lg text-gray-600 mb-2">
           가족과 관련된 다양한 퀴즈를 풀어보세요!
         </p>

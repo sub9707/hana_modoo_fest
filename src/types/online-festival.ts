@@ -1,4 +1,5 @@
-// 사전접수 관련 타입
+import { ApiResponse, PaginatedResponse, SearchParams } from "./common"
+
 export interface Registration {
   id: string
   user_id: string
@@ -18,7 +19,6 @@ export interface Registration {
   created_at: string
 }
 
-// 퀴즈 참여자 관련 타입
 export interface QuizParticipant {
   id: string
   user_id: string
@@ -33,7 +33,6 @@ export interface QuizParticipant {
   participated_at: string
 }
 
-// 응원댓글 참여자 관련 타입
 export interface CommentParticipant {
   user_id: string
   name: string
@@ -42,7 +41,6 @@ export interface CommentParticipant {
   latest_comment_at: string
 }
 
-// 응원댓글 관련 타입
 export interface SupportComment {
   id: string
   user_id: string
@@ -53,7 +51,6 @@ export interface SupportComment {
   created_at: string
 }
 
-// 가족주제글짓기 관련 타입
 export interface Writing {
   id: string
   user_id: string
@@ -68,7 +65,6 @@ export interface Writing {
   updated_at: string
 }
 
-// 랜덤이벤트 당첨자 관련 타입
 export interface Winner {
   id: string
   user_id: string
@@ -86,7 +82,6 @@ export interface Winner {
   notes: string | null
 }
 
-// 상품 관련 타입
 export interface Prize {
   id: number
   name: string
@@ -103,7 +98,6 @@ export interface Prize {
   updated_at: string
 }
 
-// 당첨자 통계 관련 타입
 export interface WinnerStats {
   total_winners: number
   claimed_count: number
@@ -117,29 +111,6 @@ export interface WinnerStats {
     value: number
     total_value: number
   }>
-}
-
-// API 응답 관련 타입
-export interface ApiResponse<T = any> {
-  success: boolean
-  data?: T
-  message?: string
-  error?: string
-}
-
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
-}
-
-// 검색 및 필터 관련 타입
-export interface SearchParams {
-  page?: number
-  limit?: number
-  search?: string
 }
 
 export interface RegistrationSearchParams extends SearchParams {
@@ -161,13 +132,11 @@ export interface WinnerSearchParams extends SearchParams {
   claimed?: boolean
 }
 
-// 엑셀 다운로드 관련 타입
 export interface ExportRequest {
   filters?: Record<string, any>
   format?: 'xlsx' | 'csv'
 }
 
-// 통계 관련 타입
 export interface OnlineFestivalStats {
   registrations: {
     total: number

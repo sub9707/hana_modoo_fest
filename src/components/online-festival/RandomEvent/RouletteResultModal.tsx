@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Gift, RotateCcw } from 'lucide-react'
+import { X, Gift, RotateCcw, PartyPopper, Frown } from 'lucide-react'
 import type { RouletteResult } from '@/types/event'
 
 interface RouletteResultModalProps {
@@ -116,13 +116,20 @@ export default function RouletteResultModal({
               <>
                 {/* 당첨 메시지 */}
                 <div className="mb-6">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-3">
+                  <div className="flex items-center justify-center mb-3">
                     {result.prize.type === 'none' ? (
-                      <span className="text-purple-600">아쉽게도!</span>
+                      <Frown className="w-8 h-8 text-purple-600 mr-2" />
                     ) : (
-                      <span className="text-green-600">축하합니다! 🎉</span>
+                      <PartyPopper className="w-8 h-8 text-green-600 mr-2" />
                     )}
-                  </h3>
+                    <h3 className="text-3xl font-bold text-gray-900">
+                      {result.prize.type === 'none' ? (
+                        <span className="text-purple-600">아쉽게도!</span>
+                      ) : (
+                        <span className="text-green-600">축하합니다!</span>
+                      )}
+                    </h3>
+                  </div>
                   
                   <h4 
                     className="text-2xl font-semibold mb-3" 
@@ -162,7 +169,7 @@ export default function RouletteResultModal({
                 {result.prize.type === 'none' && (
                   <div className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
                     <div className="text-purple-700 space-y-2">
-                      <p className="text-xl font-bold">다음 기회에 도전하세요! 💪</p>
+                      <p className="text-xl font-bold">다음 기회에 도전하세요!</p>
                       <p className="text-purple-600">
                         내일 다시 참여하실 수 있습니다
                       </p>

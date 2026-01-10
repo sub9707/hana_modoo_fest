@@ -1,5 +1,6 @@
 import WritingCard from './WritingCard'
 import { WritingEntry, User, SortType, WritingTopic } from '@/types/writing'
+import { Pen } from 'lucide-react'
 
 interface BrowseTabProps {
   browseWritings: WritingEntry[]
@@ -122,7 +123,7 @@ export default function BrowseTab({
 
       {browseWritings.length === 0 && !loading && (
         <div className="text-center py-12">
-          <div className="text-4xl mb-4">📝</div>
+          <Pen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-600 mb-2">
             {browseTopic === 'all' ? '아직 작품이 없어요' : `${browseTopic} 주제의 작품이 없어요`}
           </h3>

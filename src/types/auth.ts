@@ -1,8 +1,5 @@
-// src/types/auth.ts
+import { ApiResponse } from "./common"
 
-/**
- * 사용자 기본 정보 타입
- */
 export interface User {
   id: string
   name: string
@@ -24,9 +21,6 @@ export interface User {
   updated_at: string
 }
 
-/**
- * 세션 정보 타입
- */
 export interface UserSession {
   id: string
   name: string
@@ -38,9 +32,6 @@ export interface UserSession {
   session_expires_at: string
 }
 
-/**
- * 로그인 응답 타입
- */
 export interface LoginResponse {
   success: boolean
   user?: {
@@ -52,27 +43,18 @@ export interface LoginResponse {
   error?: string
 }
 
-/**
- * 비밀번호 변경 요청 타입
- */
 export interface ChangePasswordRequest {
   currentPassword: string
   newPassword: string
   confirmNewPassword: string
 }
 
-/**
- * 비밀번호 변경 응답 타입
- */
 export interface ChangePasswordResponse {
   success: boolean
   message?: string
   error?: string
 }
 
-/**
- * 비밀번호 강도 결과 타입 (유틸리티에서 재사용)
- */
 export interface PasswordStrengthResult {
   score: number
   feedback: string[]
@@ -80,9 +62,6 @@ export interface PasswordStrengthResult {
   strength: 'very-weak' | 'weak' | 'fair' | 'good' | 'strong'
 }
 
-/**
- * 소셜 계정 정보 타입
- */
 export interface SocialAccount {
   id: string
   user_id: string
@@ -98,9 +77,6 @@ export interface SocialAccount {
   updated_at: string
 }
 
-/**
- * 회원가입 요청 타입
- */
 export interface SignupRequest {
   name: string
   username: string
@@ -117,9 +93,6 @@ export interface SignupRequest {
   marketingConsent?: boolean
 }
 
-/**
- * 비밀번호 재설정 요청 타입
- */
 export interface ResetPasswordRequest {
   phone: string
   newPassword: string
@@ -127,9 +100,6 @@ export interface ResetPasswordRequest {
   verificationCode: string
 }
 
-/**
- * 프로필 업데이트 요청 타입
- */
 export interface UpdateProfileRequest {
   name: string
   company?: string
@@ -138,38 +108,16 @@ export interface UpdateProfileRequest {
   zipCode?: string
 }
 
-/**
- * 인증 에러 타입
- */
 export interface AuthError {
   message: string
   code?: string
   path?: string[]
 }
 
-/**
- * API 응답 기본 타입
- */
-export interface ApiResponse<T = any> {
-  success: boolean
-  data?: T
-  error?: string
-  message?: string
-}
-
-/**
- * 세션 상태 타입
- */
 export type SessionStatus = 'loading' | 'authenticated' | 'unauthenticated'
 
-/**
- * 권한 레벨 타입
- */
 export type Role = 'admin' | 'editor' | 'user'
 
-/**
- * 로그인 이력 타입
- */
 export interface LoginHistory {
   id: string
   user_id: string
@@ -178,9 +126,6 @@ export interface LoginHistory {
   created_at: string
 }
 
-/**
- * 보안 이벤트 타입
- */
 export interface SecurityEvent {
   id: string
   user_id?: string
@@ -192,9 +137,6 @@ export interface SecurityEvent {
   created_at: string
 }
 
-/**
- * 앱 설정 타입
- */
 export interface AppSettings {
   allowPhoneRegistration: boolean
   allowNaverLogin: boolean
@@ -206,9 +148,6 @@ export interface AppSettings {
   smsRateLimitPerDay: number
 }
 
-/**
- * 관리자 액션 로그 타입
- */
 export interface AdminAction {
   id: string
   admin_id: string
@@ -220,9 +159,6 @@ export interface AdminAction {
   created_at: string
 }
 
-/**
- * 계정 삭제 정보 타입
- */
 export interface AccountDeletion {
   id: string
   user_id_hash: string
@@ -241,9 +177,6 @@ export interface AccountDeletion {
   admin_id?: string
 }
 
-/**
- * 사용자 블랙리스트 타입
- */
 export interface UserBlacklist {
   id: string
   phone_hash: string
@@ -257,9 +190,6 @@ export interface UserBlacklist {
   updated_at: string
 }
 
-/**
- * 인증 제한 타입
- */
 export interface VerificationLimit {
   id: string
   identifier: string
@@ -271,9 +201,6 @@ export interface VerificationLimit {
   updated_at: string
 }
 
-/**
- * NextJS 15: Server Action 결과 타입
- */
 export interface ServerActionResult<T = any> {
   success: boolean
   data?: T
@@ -281,9 +208,6 @@ export interface ServerActionResult<T = any> {
   message?: string
 }
 
-/**
- * 비밀번호 변경 이력 조회 결과
- */
 export interface PasswordChangeHistory {
   created_at: string
   reason: string
@@ -297,9 +221,6 @@ export interface PasswordChangeHistory {
   }
 }
 
-/**
- * 사용자 통계 타입
- */
 export interface UserStats {
   total_users: number
   admin_count: number
@@ -314,18 +235,12 @@ export interface UserStats {
   active_users_last_7days: number
 }
 
-/**
- * 폼 검증 상태 타입
- */
 export interface FormValidationState {
   isValid: boolean
   errors: Record<string, string>
   touched: Record<string, boolean>
 }
 
-/**
- * 비밀번호 정책 설정
- */
 export interface PasswordPolicy {
   minLength: number
   maxLength: number
@@ -335,20 +250,14 @@ export interface PasswordPolicy {
   requireSpecialChars: boolean
   preventRepetition: boolean
   preventCommonPasswords: boolean
-  maxAge: number // days
+  maxAge: number
 }
 
-/**
- * NextJS 15: 클라이언트 컴포넌트 props 타입
- */
 export interface AuthProviderProps {
   children: React.ReactNode
   initialUser?: User | null
 }
 
-/**
- * 컨텍스트 상태 타입
- */
 export interface AuthContextState {
   user: User | null
   isLoading: boolean
@@ -359,39 +268,24 @@ export interface AuthContextState {
   refreshUser: () => Promise<void>
 }
 
-/**
- * 일별 가입 데이터
- */
 export interface DailySignupData {
   date: string;
   signups: number;
 }
 
-/**
- * 확장된 사용자 통계 (일별 가입 데이터 포함)
- */
 export interface ExtendedUserStats extends UserStats {
   dailySignups: DailySignupData[];
 }
 
-/**
- * 이메일 인증 요청 타입
- */
 export interface EmailVerificationRequest {
   email: string
 }
 
-/**
- * 이메일 인증 코드 확인 요청 타입
- */
 export interface EmailVerificationCodeRequest {
   email: string
   code: string
 }
 
-/**
- * 이메일 인증 응답 타입
- */
 export interface EmailVerificationResponse {
   success: boolean
   message?: string
@@ -400,9 +294,6 @@ export interface EmailVerificationResponse {
   available?: boolean
 }
 
-/**
- * 비밀번호 재설정 (이메일 인증) 요청 타입
- */
 export interface ResetPasswordWithEmailRequest {
   email: string
   emailVerificationCode: string
@@ -410,9 +301,6 @@ export interface ResetPasswordWithEmailRequest {
   confirmPassword: string
 }
 
-/**
- * 이메일 인증 기반 비밀번호 변경 요청 타입
- */
 export interface EmailBasedPasswordChangeRequest {
   email: string
   verificationCode: string
@@ -420,18 +308,12 @@ export interface EmailBasedPasswordChangeRequest {
   confirmPassword: string
 }
 
-/**
- * 이메일 인증 기반 비밀번호 변경 응답 타입
- */
 export interface EmailBasedPasswordChangeResponse {
   success: boolean
   message?: string
   error?: string
 }
 
-/**
- * 이메일 인증 상태 타입
- */
 export interface EmailVerificationStatus {
   email: string
   isVerified: boolean

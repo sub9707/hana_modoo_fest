@@ -1,7 +1,7 @@
 'use client'
 
 import { WritingTopic } from '@/types/writing'
-import { Clock, PenTool, AlertCircle } from 'lucide-react'
+import { Clock, PenTool, AlertCircle, Lock, Pen, CheckCircle } from 'lucide-react'
 
 interface CooldownState {
   canWrite: boolean
@@ -69,7 +69,7 @@ export default function WriteTab({
   if (!currentUser) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">🔒</div>
+        <Lock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-xl font-bold text-gray-800 mb-2">로그인이 필요합니다</h3>
         <p className="text-gray-600">글을 작성하려면 먼저 로그인해주세요.</p>
       </div>
@@ -79,7 +79,7 @@ export default function WriteTab({
   if (!selectedTopic) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">📝</div>
+        <Pen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
         <h3 className="text-xl font-bold text-gray-800 mb-2">주제를 선택해주세요</h3>
         <p className="text-gray-600 mb-6">글을 쓰기 전에 먼저 주제를 선택해야 합니다.</p>
         <div className="flex justify-center">
@@ -117,7 +117,7 @@ export default function WriteTab({
 
         {isSubmitted && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-            <div className="text-4xl mb-4">🎉</div>
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-green-800 mb-2">글이 성공적으로 제출되었습니다!</h3>
             <p className="text-green-600">소중한 이야기를 나눠주셔서 감사합니다.</p>
           </div>

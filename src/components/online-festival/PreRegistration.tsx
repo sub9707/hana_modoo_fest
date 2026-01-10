@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { ArrowRight, Users, Calendar, MapPin, Gift, Loader2 } from 'lucide-react'
+import { Users, Calendar, MapPin, Gift, Loader2, CheckCircle, PartyPopper } from 'lucide-react'
+import HeroCTAButton from '@/components/home/HeroCTAButton'
+import FestivalTabHeader from './FestivalTabHeader'
 
 interface CampaignStats {
   preregistration_count: number
@@ -12,15 +13,27 @@ interface CampaignStats {
   active_campaigns: number
 }
 
-const benefits = [
-  {
-    icon: <Gift className="w-6 h-6" />,
-    title: '사전접수 선물',
-    description: '사전 접수 후 현장 참여 시 선물제공'
-  }
-]
-
 const TARGET_PARTICIPANTS = 2000 // 목표 인원
+
+// 혜택 카드 컴포넌트
+interface BenefitCardProps {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  description: string
+  showShadow?: boolean
+}
+
+const BenefitCard = ({ icon: Icon, title, description, showShadow = true }: BenefitCardProps) => (
+  <div className={`flex items-start space-x-4 p-6 bg-white/80 backdrop-blur-sm rounded-2xl hover:bg-white/90 transition-all duration-300 ${showShadow ? 'shadow-lg hover:shadow-xl' : ''}`}>
+    <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+      <Icon className="w-6 h-6 text-blue-600" />
+    </div>
+    <div>
+      <h4 className="font-semibold text-gray-900 mb-2">{title}</h4>
+      <p className="text-gray-600 text-sm">{description}</p>
+    </div>
+  </div>
+)
 
 export default function PreRegistration() {
   const [stats, setStats] = useState<CampaignStats | null>(null)
@@ -83,20 +96,22 @@ export default function PreRegistration() {
     if (!stats) return []
 
     return [
-      { 
-        number: isLoading ? '...' : stats.total_participants.toLocaleString(), 
-        label: '참여 인원', 
-        color: 'text-festival-blue' 
+      {
+        number: isLoading ? '...' : stats.total_participants.toLocaleString(),
+        label: '참여 인원',
+        gradient: 'bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent'
       },
-      { 
-        number: TARGET_PARTICIPANTS.toLocaleString(), 
-        label: '목표 인원', 
-        color: 'text-festival-green' 
+      {
+        number: TARGET_PARTICIPANTS.toLocaleString(),
+        label: '목표 인원',
+        gradient: 'bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent'
       },
-      { 
-        number: isLoading ? '...' : isAchieved ? '달성!' : `${achievementRate}%`, 
-        label: '달성률', 
-        color: isAchieved ? 'text-festival-pink' : 'text-festival-purple'
+      {
+        number: isLoading ? '...' : isAchieved ? '달성!' : `${achievementRate}%`,
+        label: '달성률',
+        gradient: isAchieved
+          ? 'bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent'
+          : 'bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent'
       }
     ]
   }
@@ -104,18 +119,17 @@ export default function PreRegistration() {
   return (
     <div className="p-8 md:p-12">
       {/* 헤더 섹션 */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-festival-blue/10 rounded-full mb-6">
-          <span className="text-2xl">✍️</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          모두하나대축제 <br className='flex sm:hidden'/> 사전참가 신청
-        </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto break-keep">
-          10월 18일 여의도공원에서 열리는 모두하나대축제에 미리 신청하고<br />
-          더 특별한 혜택을 받아보세요!
-        </p>
-      </div>
+      <FestivalTabHeader
+        title={<>모두하나대축제 <br className='flex sm:hidden'/> 사전참가 신청</>}
+        description={
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto break-keep">
+            10월 18일 여의도공원에서 열리는 모두하나대축제에 미리 신청하고<br />
+            더 특별한 혜택을 받아보세요!
+          </p>
+        }
+        titleColorVariant="default"
+        className="mb-12"
+      />
 
       {/* 에러 메시지 */}
       {error && (
@@ -133,13 +147,13 @@ export default function PreRegistration() {
       {/* 통계 섹션 */}
       <div className="grid grid-cols-3 gap-6 mb-12">
         {getStatsArray().map((stat, index) => (
-          <div key={index} className="text-center p-0 sm:p-6 bg-white/50 rounded-2xl relative">
+          <div key={index} className="text-center p-0 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl sm:shadow-lg relative">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
               </div>
             )}
-            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.color} mb-2 ${isLoading ? 'opacity-30' : ''}`}>
+            <div className={`text-xl sm:text-2xl md:text-3xl font-bold ${stat.gradient} mb-2 ${isLoading ? 'opacity-30' : ''}`}>
               {stat.number}
             </div>
             <div className={`text-sm md:text-base text-gray-600 ${isLoading ? 'opacity-30' : ''}`}>
@@ -148,7 +162,7 @@ export default function PreRegistration() {
             {/* 달성 축하 효과 */}
             {isAchieved && index === 2 && !isLoading && (
               <div className="absolute -top-2 -right-2 w-6 h-6 bg-festival-pink rounded-full flex items-center justify-center animate-bounce">
-                <span className="text-white text-xs">🎉</span>
+                <CheckCircle className="w-4 h-4 text-white" />
               </div>
             )}
           </div>
@@ -157,9 +171,9 @@ export default function PreRegistration() {
 
       {/* 달성 축하 메시지 */}
       {isAchieved && !isLoading && (
-        <div className="mb-8 p-6 bg-gradient-to-r from-festival-pink/10 to-festival-purple/10 border-2 border-festival-pink/20 rounded-2xl text-center">
-          <div className="text-2xl mb-2">🎉</div>
-          <h3 className="text-xl font-bold text-festival-pink mb-2">
+        <div className="mb-8 p-6 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl text-center shadow-lg">
+          <PartyPopper className="w-12 h-12 text-pink-600 mx-auto mb-3" />
+          <h3 className="text-xl font-bold text-pink-600 mb-2">
             목표 달성 축하합니다!
           </h3>
           <p className="text-gray-600">
@@ -174,35 +188,29 @@ export default function PreRegistration() {
           사전접수 혜택
         </h3>
         <div className="flex justify-center">
-          <div className="flex items-start space-x-4 p-6 bg-white/50 rounded-2xl hover:bg-white/70 transition-colors duration-300">
-            <div className="flex-shrink-0 w-12 h-12 bg-festival-blue/10 rounded-full flex items-center justify-center text-festival-blue">
-              <Gift className="w-6 h-6" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">사전접수 선물</h4>
-              <p className="text-gray-600 text-sm">사전 접수 후 현장 참여 시 선물제공</p>
-            </div>
-          </div>
+          <BenefitCard
+            icon={Gift}
+            title="사전접수 선물"
+            description="사전 접수 후 현장 참여 시 선물제공"
+            showShadow={false}
+          />
         </div>
       </div>
 
       {/* 축제 정보 카드 */}
-      <div className="bg-gradient-to-br from-festival-blue/5 via-festival-purple/5 to-festival-pink/5 rounded-2xl p-8 mb-12">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 mb-12 shadow-lg">
         <div className="grid md:grid-cols-3 gap-6 text-center">
           <div>
-            <div className="text-2xl mb-3">📅</div>
             <h4 className="font-semibold text-gray-900 mb-2">축제 날짜</h4>
             <p className="text-gray-600">2025년 10월 18일 (토)</p>
             <p className="text-gray-600">11:00 - 17:00</p>
           </div>
           <div>
-            <div className="text-2xl mb-3">📍</div>
             <h4 className="font-semibold text-gray-900 mb-2">축제 장소</h4>
             <p className="text-gray-600">여의도공원</p>
             <p className="text-gray-600">문화의마당</p>
           </div>
           <div>
-            <div className="text-2xl mb-3">🎪</div>
             <h4 className="font-semibold text-gray-900 mb-2">참가 대상</h4>
             <p className="text-gray-600">시민, 가족</p>
             <p className="text-gray-600">누구나 무료 참가</p>
@@ -212,13 +220,12 @@ export default function PreRegistration() {
 
       {/* 신청 버튼 */}
       <div className="text-center">
-        <Link
-          href="/registration"
-          className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-festival-blue to-festival-purple text-white font-semibold rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 btn-festival"
-        >
-          <span className="mr-2">지금 사전참가 신청하기</span>
-          <ArrowRight className="w-5 h-5" />
-        </Link>
+        <div className="max-w-md mx-auto">
+          <HeroCTAButton
+            text="사전참가 신청하기"
+            href="/registration"
+          />
+        </div>
         <p className="text-sm text-gray-500 mt-4">
           신청은 무료이며, 언제든지 취소 가능합니다
         </p>
@@ -233,7 +240,7 @@ export default function PreRegistration() {
 
       {/* 주의사항 */}
       <div className="mt-12 p-6 bg-yellow-50/80 rounded-2xl border-l-4 border-yellow-400">
-        <h4 className="font-semibold text-yellow-800 mb-2">📢 안내사항</h4>
+        <h4 className="font-semibold text-yellow-800 mb-2">안내사항</h4>
         <ul className="text-sm text-yellow-700 space-y-1">
           <li>• 사전접수는 10월 17일(금) 17시까지 가능합니다</li>
           <li>• 개인정보는 축제 운영 목적으로만 사용되며, 종료 후 안전하게 폐기됩니다</li>

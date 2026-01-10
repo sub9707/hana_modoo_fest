@@ -88,7 +88,7 @@ export const ParticipationCompleted = memo(({ user }: ParticipationCompletedProp
           퀴즈 이벤트 참여 완료!
         </h1>
         <p className="text-lg text-gray-600 mb-2">
-          {user.name}님, 퀴즈 이벤트에 이미 참여하셨습니다! 🎉
+          {user.name}님, 퀴즈 이벤트에 이미 참여하셨습니다!
         </p>
         <p className="text-sm text-gray-500">
           추첨 결과는 추후 공지사항을 통해 안내드릴 예정입니다.
@@ -114,9 +114,12 @@ export const ParticipationCompleted = memo(({ user }: ParticipationCompletedProp
             만점 달성 및 이벤트 참여 완료!
           </h2>
           
-          <div className="space-y-2 text-green-700">
-            <p className="font-medium">🎯 모든 문제를 정답으로 맞히셨습니다!</p>
-            <p className="text-sm">추첨 대상자로 등록되었습니다.</p>
+          <div className="space-y-2 text-green-700 flex items-center justify-center space-x-2">
+            <CheckCircle className="w-5 h-5" />
+            <div>
+              <p className="font-medium">모든 문제를 정답으로 맞히셨습니다!</p>
+              <p className="text-sm">추첨 대상자로 등록되었습니다.</p>
+            </div>
           </div>
         </div>
 
@@ -194,31 +197,27 @@ export const ParticipationCompleted = memo(({ user }: ParticipationCompletedProp
         )}
 
         {/* 이벤트 안내 */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 text-center flex items-center justify-center">
             <Gift className="w-6 h-6 mr-2 text-orange-500" />
             이벤트 안내
           </h3>
           <div className="space-y-3 text-gray-700 text-sm flex flex-col justify-center items-center">
-            <div className="flex items-start space-x-3">
-              <span className="text-orange-500 font-bold">•</span>
-              <span>추첨을 통해 총 100명에게 경품을 제공합니다</span>
-            </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-orange-500 font-bold">•</span>
-              <span>추첨 결과는 축제 종료 후 공지사항을 통해 발표됩니다</span>
-            </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-orange-500 font-bold">•</span>
-              <span>당첨자에게는 개별 연락을 통해 경품을 전달합니다</span>
-            </div>
-            <div className="flex items-start space-x-3">
-              <span className="text-orange-500 font-bold">•</span>
-              <span>한 번 참여하면 중복 참여는 불가능합니다</span>
-            </div>
+            <InfoItem text="추첨을 통해 총 100명에게 경품을 제공합니다" />
+            <InfoItem text="추첨 결과는 축제 종료 후 공지사항을 통해 발표됩니다" />
+            <InfoItem text="당첨자에게는 개별 연락을 통해 경품을 전달합니다" />
+            <InfoItem text="한 번 참여하면 중복 참여는 불가능합니다" />
           </div>
         </div>
       </div>
     </div>
   )
 })
+
+// 재사용 가능한 정보 아이템 컴포넌트
+const InfoItem = ({ text }: { text: string }) => (
+  <div className="flex items-start space-x-3">
+    <CheckCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+    <span>{text}</span>
+  </div>
+)

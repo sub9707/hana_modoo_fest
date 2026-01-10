@@ -1,4 +1,3 @@
-// app/(site)/layout.tsx - 일반 사이트용 (모든 SEO/분석 포함)
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import Header from '@/components/layout/Header'

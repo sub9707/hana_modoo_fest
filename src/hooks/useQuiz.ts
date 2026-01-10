@@ -1,4 +1,3 @@
-// src/hooks/useQuiz.ts
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Quiz } from '@/types/Quiz'
 import QUIZ_DATA from '@/data/QuizData.json'
@@ -33,21 +32,18 @@ export function useQuiz() {
   const progress = useMemo(() => ((currentQuiz + 1) / totalQuizzes) * 100, [currentQuiz, totalQuizzes])
   const isPerfectScore = useMemo(() => score === totalQuizzes, [score, totalQuizzes])
 
-  // 퀴즈 시작 시 시간 기록
   useEffect(() => {
     if (!startTime) {
       setStartTime(new Date())
     }
   }, [startTime])
 
-  // 사용자 참여 상태 확인
   useEffect(() => {
     if (user?.id) {
       checkParticipationStatus()
     }
   }, [user?.id])
 
-  // 퀴즈 완료 시 등록 버튼 표시 여부 결정
   useEffect(() => {
     if (isCompleted && isPerfectScore && !hasParticipated) {
       setCanShowRegisterButton(true)
@@ -56,7 +52,6 @@ export function useQuiz() {
     }
   }, [isCompleted, isPerfectScore, hasParticipated])
 
-  // 참여 상태 확인
   const checkParticipationStatus = async () => {
     if (!user?.id) return
 

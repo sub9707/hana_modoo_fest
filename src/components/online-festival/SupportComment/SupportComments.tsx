@@ -6,6 +6,7 @@ import { MessageCircle, Heart, Gift } from 'lucide-react'
 import RecentCommentsSlider from './RecentCommentsSlider'
 import CommentForm from './CommentForm'
 import CommentList from './CommentList'
+import FestivalTabHeader from '../FestivalTabHeader'
 
 interface Stats {
   totalComments: number
@@ -44,17 +45,11 @@ export default function SupportComments() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12">
       <div className="max-w-4xl mx-auto px-4 space-y-8">
         {/* 헤더 */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2">
-            <Gift className="w-8 h-8 text-purple-600" />
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              온라인 축제 응원하기
-            </h2>
-          </div>
-          <p className="text-gray-600 text-lg">
-            여러분의 따뜻한 응원 메시지를 남겨주세요
-          </p>
-        </div>
+        <FestivalTabHeader
+          title="온라인 축제 응원하기"
+          description="여러분의 따뜻한 응원 메시지를 남겨주세요"
+          titleColorVariant="purple-pink"
+        />
 
         {/* 통계 카드 */}
         <div className="grid grid-cols-2 gap-4">

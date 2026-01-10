@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Trophy, Calendar, Gift, TrendingUp, RotateCcw } from 'lucide-react'
+import { Trophy, Calendar, Gift, TrendingUp, RotateCcw, Dices, X } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface MyParticipationRecord {
@@ -103,7 +103,7 @@ export default function MyWinnings() {
     // 꽝인 경우 (prize_type이 'none'이거나 is_winner가 false)
     if (!isRealWinner) {
       return {
-        icon: '💔',
+        icon: <X className="w-6 h-6" />,
         name: '아쉬워요',
         description: '다음 기회에 도전하세요',
         color: '#9CA3AF'
@@ -112,7 +112,7 @@ export default function MyWinnings() {
 
     // 실제 상품 당첨인 경우
     return {
-      icon: record.prize_icon || '🎁',
+      icon: record.prize_icon ? record.prize_icon : <Gift className="w-6 h-6" />,
       name: record.prize_name || '상품',
       description: record.prize_description || '',
       color: record.prize_color || '#F59E0B'
@@ -258,7 +258,7 @@ export default function MyWinnings() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">🎰</div>
+              <Dices className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <div className="text-lg font-medium text-gray-700 mb-2">
                 아직 참여 내역이 없습니다
               </div>

@@ -18,6 +18,7 @@ import WriteTab from './WriteTab'
 import BrowseTab from './BrowseTab'
 import FeaturedTab from './FeaturedTab'
 import MyWritingsTab from './MyWritingTab'
+import FestivalTabHeader from '../FestivalTabHeader'
 import { Gift } from 'lucide-react'
 
 export default function FamilyWriting() {
@@ -88,23 +89,18 @@ export default function FamilyWriting() {
   return (
     <div className="p-1 py-4 sm:p-8 md:p-12">
       {/* 헤더 */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-pink-600/10 rounded-full mb-6">
-          <span className="text-2xl">📝</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          가족 이야기 글짓기
-        </h2>
-        <p className="text-md sm:text-lg text-gray-600">
-          가족에 대한 소중한 이야기를 글로 표현해보세요
-        </p>
-        <div className="inline-flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full border border-amber-200 mt-4">
+      <FestivalTabHeader
+        title="가족 이야기 글짓기"
+        description="가족에 대한 소중한 이야기를 글로 표현해보세요"
+        titleColorVariant="default"
+      >
+        <div className="inline-flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full border border-amber-200">
           <Gift className="w-4 h-4 text-amber-600" />
           <span className="text-sm font-medium text-amber-700">
             응원 댓글을 남기신 분들 가운데 추첨을 통해 100분께 선물을 드립니다
           </span>
         </div>
-      </div>
+      </FestivalTabHeader>
 
       {/* 탭 네비게이션 */}
       <TabNavigation

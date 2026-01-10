@@ -78,7 +78,7 @@ export default function FeaturedTab({
 
       {featuredWritings.length === 0 && (
         <div className="text-center py-12 bg-white/50 rounded-2xl">
-          <div className="text-4xl mb-4">🏆</div>
+          <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-600 mb-2">
             {featuredTopic === 'all' ? '아직 우수 작품이 없어요' : `${featuredTopic} 주제의 우수 작품이 없어요`}
           </h3>

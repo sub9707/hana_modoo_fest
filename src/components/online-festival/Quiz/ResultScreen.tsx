@@ -39,20 +39,17 @@ export const ResultScreen = memo(({
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-6 border border-white/20">
         {/* 헤더 */}
         <div className="text-center mb-8">
-          <div className={`text-8xl mb-4 ${isPerfectScore ? 'animate-bounce' : ''}`}>
-            {isPerfectScore ? '🏆' : scorePercentage >= 80 ? '🎉' : scorePercentage >= 60 ? '👏' : '💪'}
-          </div>
           <h2 className={`text-3xl font-bold mb-2 ${
-            isPerfectScore 
-              ? 'bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent' 
+            isPerfectScore
+              ? 'bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent'
               : 'text-gray-800'
           }`}>
-            {isPerfectScore 
-              ? '완벽합니다!' 
-              : scorePercentage >= 80 
-                ? '훌륭해요!' 
-                : scorePercentage >= 60 
-                  ? '잘했어요!' 
+            {isPerfectScore
+              ? '완벽합니다!'
+              : scorePercentage >= 80
+                ? '훌륭해요!'
+                : scorePercentage >= 60
+                  ? '잘했어요!'
                   : '다시 도전하세요!'}
           </h2>
           <p className="text-gray-600">
@@ -81,7 +78,10 @@ export const ResultScreen = memo(({
               <Sparkles className="w-6 h-6 text-orange-500 ml-2" />
             </div>
             <div className="text-center space-y-2 text-orange-700">
-              <p className="font-medium">🎯 만점을 달성하셨습니다!</p>
+              <div className="flex items-center justify-center space-x-2">
+                <Target className="w-5 h-5" />
+                <p className="font-medium">만점을 달성하셨습니다!</p>
+              </div>
               <p className="text-sm">추첨을 통해 100명에게 경품을 제공합니다.</p>
               <p className="text-sm font-medium">아래 버튼을 눌러 이벤트에 참여하세요!</p>
             </div>

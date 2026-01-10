@@ -16,10 +16,8 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
   const [loading, setLoading] = useState(false)
   const [likingWritings, setLikingWritings] = useState<Set<string>>(new Set())
 
-  // 로딩 중복 방지를 위한 ref
   const isLoadingRef = useRef(false)
 
-  // API 호출 함수들
   const loadBrowseWritings = useCallback(async (reset = false) => {
     if (isLoadingRef.current) return
     isLoadingRef.current = true

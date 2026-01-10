@@ -153,7 +153,7 @@ export default function RouletteWheel({
     const prizeImage = getPrizeImage(prize.name)
 
     return {
-      option: prizeImage ? '' : (prize.icon || '🎁'),
+      option: prizeImage ? '' : (prize.icon || ''),
       image: prizeImage ? {
         uri: prizeImage,
         offsetX: 0,

@@ -1,4 +1,4 @@
-// types/event.ts
+import { ApiResponse } from "./common"
 
 export interface Prize {
   id: number
@@ -121,13 +121,6 @@ export interface SpinResponse {
     winner_id?: string
     remaining_quantity: number
   }
-  error?: string
-  message?: string
-}
-
-export interface ApiResponse<T = any> {
-  success: boolean
-  data?: T
   error?: string
   message?: string
 }

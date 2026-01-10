@@ -1,4 +1,4 @@
-import { User } from 'lucide-react'
+import { User, Lock, Pen } from 'lucide-react'
 import { WritingEntry, User as UserType, TabType } from '@/types/writing'
 import WritingCard from './WritingCard'
 
@@ -21,7 +21,7 @@ export default function MyWritingsTab({
     return (
       <div className="max-w-4xl mx-auto">
         <div className="text-center py-12">
-          <div className="text-4xl mb-4">🔒</div>
+          <Lock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-600 mb-2">로그인이 필요합니다</h3>
           <p className="text-gray-500">내 글을 보려면 로그인해주세요</p>
         </div>
@@ -67,7 +67,7 @@ export default function MyWritingsTab({
 
       {myWritings.length === 0 && !loading && (
         <div className="text-center py-12">
-          <div className="text-4xl mb-4">✍️</div>
+          <Pen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-600 mb-2">아직 작성한 글이 없어요</h3>
           <p className="text-gray-500 mb-6">첫 번째 글을 작성해보세요!</p>
           <button
