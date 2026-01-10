@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export function getCorsHeaders(): HeadersInit {
   const origin = process.env.NODE_ENV === 'development'
@@ -13,12 +13,8 @@ export function getCorsHeaders(): HeadersInit {
   }
 }
 
-export function handleCorsOptions(allowedMethods?: string): NextResponse {
+export function handleCorsOptions(request: NextRequest): NextResponse {
   const headers = getCorsHeaders()
-
-  if (allowedMethods) {
-    headers['Access-Control-Allow-Methods'] = allowedMethods
-  }
 
   return new NextResponse(null, {
     status: 200,
