@@ -1,7 +1,6 @@
 // src/app/api/quiz/participation-status/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
-import { quizRedisService } from '@/lib/redis/quiz'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,33 +14,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Redis에서 먼저 확인
-    const hasParticipatedRedis = await quizRedisService.hasUserParticipated(userId)
-
-    if (hasParticipatedRedis) {
-      return NextResponse.json({
-        success: true,
-        hasParticipated: true,
-      })
-    }
-
-    // Redis에 없으면 DB에서 확인 (quiz_version 추가)
+    // DB에서 참여 여부 확인
     const participationRecord = await query(
       'SELECT id FROM quiz_event_participants WHERE user_id = ? AND quiz_version = ? LIMIT 1',
       [userId, 'v1']
     )
 
     const hasParticipated = participationRecord.length > 0
-
-    // DB에 참여 기록이 있으면 Redis에도 캐싱
-    if (hasParticipated) {
-      await quizRedisService.recordParticipation(userId, {
-        perfectScore: true,
-        totalQuestions: 0,
-        correctAnswers: 0,
-        completionTime: 0
-      })
-    }
 
     return NextResponse.json({
       success: true,

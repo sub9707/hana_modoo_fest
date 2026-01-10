@@ -85,14 +85,6 @@ export async function POST(request: NextRequest) {
       throw new Error('참여 기록 저장 실패 - 영향받은 행이 없습니다')
     }
 
-    // Redis에 캐싱
-    await quizRedisService.recordParticipation(data.userId, {
-      perfectScore: data.perfectScore,
-      totalQuestions: data.totalQuestions,
-      correctAnswers: data.correctAnswers,
-      completionTime: data.completionTime
-    })
-
     return NextResponse.json({
       success: true,
       message: '퀴즈 이벤트 참여가 완료되었습니다!',
