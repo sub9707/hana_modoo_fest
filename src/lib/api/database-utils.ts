@@ -2,12 +2,12 @@ import { queryOne } from '@/lib/db'
 
 export async function checkTableExists(tableName: string): Promise<boolean> {
   try {
-    const result = await queryOne<{ count: number }>(
+    const result = await queryOne(
       `SELECT COUNT(*) as count
        FROM information_schema.tables
        WHERE table_schema = DATABASE() AND table_name = ?`,
       [tableName]
-    )
+    ) as { count: number } | null
     return result ? result.count > 0 : false
   } catch (error) {
     console.warn(`테이블 ${tableName} 존재 여부 확인 실패:`, error)

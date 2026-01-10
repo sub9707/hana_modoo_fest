@@ -49,7 +49,7 @@ function useApi<T>(url: string, initialOptions?: RequestInit) {
       if (controller.signal.aborted) return
 
       if (result.success) {
-        setData(result.data)
+        setData(result.data ?? null)
       } else {
         setError(result.error || '알 수 없는 오류가 발생했습니다.')
       }
@@ -132,9 +132,9 @@ export function useRegistrations() {
       const result: ApiResponse<PaginatedResponse<Registration>> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setRegistrations(result.data.items)
+        setRegistrations(result.data?.items ?? [])
       } else {
         setError(result.error || '사전접수 목록을 불러오는데 실패했습니다.')
       }
@@ -215,9 +215,9 @@ export function useQuizzes() {
       const result: ApiResponse<Quiz[]> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setQuizzes(result.data)
+        setQuizzes(result.data ?? [])
       } else {
         setError(result.error || '퀴즈 목록을 불러오는데 실패했습니다.')
       }
@@ -249,9 +249,9 @@ export function useQuizzes() {
       const result: ApiResponse<Quiz> = await response.json()
       
       if (controller.signal.aborted) return null
-      
-      if (result.success) {
-        setQuizzes(prev => [result.data, ...prev])
+
+      if (result.success && result.data) {
+        setQuizzes(prev => [result.data!, ...prev])
         return result.data
       } else {
         throw new Error(result.error || '퀴즈 생성에 실패했습니다.')
@@ -279,9 +279,9 @@ export function useQuizzes() {
       const result: ApiResponse<Quiz> = await response.json()
       
       if (controller.signal.aborted) return null
-      
-      if (result.success) {
-        setQuizzes(prev => prev.map(q => q.id === id ? result.data : q))
+
+      if (result.success && result.data) {
+        setQuizzes(prev => prev.map(q => q.id === id ? result.data! : q))
         return result.data
       } else {
         throw new Error(result.error || '퀴즈 수정에 실패했습니다.')
@@ -358,9 +358,9 @@ export function useUsers() {
       const result: ApiResponse<User[]> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setUsers(result.data)
+        setUsers(result.data ?? [])
       } else {
         setError(result.error || '사용자 목록을 불러오는데 실패했습니다.')
       }
@@ -444,9 +444,9 @@ export function useComments() {
       const result: ApiResponse<Comment[]> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setComments(result.data)
+        setComments(result.data ?? [])
       } else {
         setError(result.error || '댓글 목록을 불러오는데 실패했습니다.')
       }
@@ -555,9 +555,9 @@ export function useGallery() {
       const result: ApiResponse<GalleryPhoto[]> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setPhotos(result.data)
+        setPhotos(result.data ?? [])
       } else {
         setError(result.error || '갤러리를 불러오는데 실패했습니다.')
       }
@@ -606,9 +606,9 @@ export function useNotices() {
       const result: ApiResponse<Notice[]> = await response.json()
       
       if (controller.signal.aborted) return
-      
+
       if (result.success) {
-        setNotices(result.data)
+        setNotices(result.data ?? [])
       } else {
         setError(result.error || '공지사항 목록을 불러오는데 실패했습니다.')
       }
@@ -639,9 +639,9 @@ export function useNotices() {
       const result: ApiResponse<Notice> = await response.json()
       
       if (controller.signal.aborted) return null
-      
-      if (result.success) {
-        setNotices(prev => [result.data, ...prev])
+
+      if (result.success && result.data) {
+        setNotices(prev => [result.data!, ...prev])
         return result.data
       } else {
         throw new Error(result.error || '공지사항 생성에 실패했습니다.')
@@ -668,9 +668,9 @@ export function useNotices() {
       const result: ApiResponse<Notice> = await response.json()
       
       if (controller.signal.aborted) return null
-      
-      if (result.success) {
-        setNotices(prev => prev.map(n => n.id === id ? result.data : n))
+
+      if (result.success && result.data) {
+        setNotices(prev => prev.map(n => n.id === id ? result.data! : n))
         return result.data
       } else {
         throw new Error(result.error || '공지사항 수정에 실패했습니다.')

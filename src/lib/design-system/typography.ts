@@ -97,7 +97,7 @@ export function combineTypography(
   weight?: keyof typeof fontWeights,
   height?: keyof typeof lineHeights
 ): string {
-  const classes = [fontSizes[size]]
+  const classes: string[] = [fontSizes[size]]
   if (weight) classes.push(fontWeights[weight])
   if (height) classes.push(lineHeights[height])
   return classes.join(' ')
