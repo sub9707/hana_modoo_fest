@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query } from '@/lib/mysql/connection'
-import type { ApiResponse } from '@/types/event'
+import type { ApiResponse } from '@/types/common'
 
 // 상품 수량 업데이트 (관리자만)
 export async function PATCH(

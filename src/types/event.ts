@@ -1,5 +1,7 @@
 import { ApiResponse } from "./common"
 
+export type { ApiResponse }
+
 export interface Prize {
   id: number
   name: string
