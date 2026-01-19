@@ -10,16 +10,7 @@ import LogoutButton from '../auth/LogoutButton'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
 import HeaderCTAButton from './HeaderCTAButton'
-
-const navigation = [
-  { name: '축제 소개', href: '/about' },
-  { name: '기관 소개', href: '/organization' },
-  { name: '온라인 축제', href: '/online-festival' },
-  { name: '행사 프로그램', href: '/programs' },
-  { name: '공지/소식', href: '/news' },
-  { name: '오시는 길', href: '/directions' },
-  { name: '함께하는 기관', href: '/partners' },
-]
+import { MAIN_NAVIGATION, ROUTES } from '@/constants'
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -85,7 +76,7 @@ export default function Header() {
             </div>
 
             <nav className="hidden md:hidden lg:flex items-center space-x-1" role="navigation" aria-label="주요 메뉴">
-              {navigation.map((item) => {
+              {MAIN_NAVIGATION.map((item) => {
                 const isActive = pathname === item.href
 
                 return (
@@ -111,7 +102,7 @@ export default function Header() {
 
             <div className='flex items-center gap-6'>
               <div className='flex items-center gap-4 ml-6 sm:ml-0'>
-                <HeaderCTAButton href='/registration' type='primary' title='사전참가 신청' />
+                <HeaderCTAButton href={ROUTES.registration} type='primary' title='사전참가 신청' />
 
                 {/* 로그인 상태에 따른 분기 처리 */}
                 <div className='hidden lg:flex items-center gap-3'>
@@ -120,7 +111,7 @@ export default function Header() {
                   ) : user ? (
                     <>
                       <Link
-                        href="/my-page"
+                        href={ROUTES.myPage}
                         className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
                       >
                         <User className="h-4 w-4" />
@@ -130,7 +121,7 @@ export default function Header() {
                       <LogoutButton type="link" variant="ghost" size="sm" />
                     </>
                   ) : (
-                    <HeaderCTAButton href='login' title='로그인/회원가입' type='secondary' />
+                    <HeaderCTAButton href={ROUTES.login} title='로그인/회원가입' type='secondary' />
                   )}
                 </div>
 
@@ -156,7 +147,7 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="px-4 py-2 space-y-1">
-              {navigation.map((item) => {
+              {MAIN_NAVIGATION.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
@@ -184,7 +175,7 @@ export default function Header() {
                 ) : user ? (
                   <>
                     <Link
-                      href="/my-page"
+                      href={ROUTES.myPage}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
                     >
@@ -197,7 +188,7 @@ export default function Header() {
                   </>
                 ) : (
                   <Link
-                    href='/login'
+                    href={ROUTES.login}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block px-3 py-2 text-base font-medium text-slate-700 hover:text-blue-600 rounded-md transition-colors"
                   >

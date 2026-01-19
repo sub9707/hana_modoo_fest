@@ -5,26 +5,12 @@ import PartnerSection from '@/components/partners/PartnerSection'
 import { PartnersData } from '@/types/partners'
 import Link from 'next/link'
 import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata, SITE, ROUTES } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '함께하는 기관',
-  description: '모두하나대축제 2025와 함께하는 주최, 후원, 협력, 참여기관을 소개합니다.',
-  openGraph: {
-    title: '함께하는 기관 | 모두하나대축제 2025',
-    description: '모두하나대축제 2025와 함께하는 주최, 후원, 협력, 참여기관을 소개합니다.',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
-  icons: {
-    icon: '/favicon.ico',
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.partners.title,
+  `${SITE.fullName}와 함께하는 주최, 후원, 협력, 참여기관을 소개합니다.`
+)
 
 export default async function PartnersPage() {
   const partners = partnersData as PartnersData
@@ -163,7 +149,7 @@ export default async function PartnersPage() {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
-                    href="/contact"
+                    href={ROUTES.contact}
                     className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full hover:shadow-xl transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:to-indigo-700"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +158,7 @@ export default async function PartnersPage() {
                     파트너십 문의
                   </Link>
                   <Link
-                    href="/programs"
+                    href={ROUTES.programs}
                     className="inline-flex items-center px-8 py-4 bg-white border-2 border-purple-300 text-purple-600 font-semibold rounded-full hover:bg-purple-50 hover:border-purple-400 transition-all duration-300 hover:scale-105"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

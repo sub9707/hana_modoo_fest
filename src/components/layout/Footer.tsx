@@ -1,6 +1,14 @@
 import Link from 'next/link'
-import { Mail, Phone, MapPin, ExternalLink, Instagram, Youtube, Globe } from 'lucide-react'
+import { Mail, Phone, MapPin, Instagram, Youtube, Globe } from 'lucide-react'
 import Image from 'next/image'
+import {
+  SITE,
+  FESTIVAL,
+  CONTACT,
+  ROUTES,
+  FOOTER_QUICK_LINKS,
+  FOOTER_LEGAL_LINKS,
+} from '@/constants'
 
 export default function Footer() {
   return (
@@ -13,12 +21,12 @@ export default function Footer() {
             <div className="lg:col-span-1">
               <div className="mb-4 flex items-center justify-center sm:justify-start">
                 <div className="relative w-80 h-15 flex items-center justify-center">
-                  <Image src={'/icons/logo.png'} fill alt='모두하나대축제 로고' />
+                  <Image src={'/icons/logo.png'} fill alt={`${SITE.name} 로고`} />
                 </div>
               </div>
 
               <p className="text-center text-gray-600 mb-4 text-sm leading-relaxed">
-                가족다양성을 존중하고 시민이 함께 즐기는 연대의 장
+                {SITE.description}
               </p>
 
               {/* 축제 정보 */}
@@ -26,8 +34,8 @@ export default function Footer() {
                 <div className="flex items-start space-x-2">
                   <MapPin className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="font-medium text-gray-800">2025.10.18(토) 11:00-17:00</p>
-                    <p className="text-gray-600">여의도공원 문화의마당</p>
+                    <p className="font-medium text-gray-800">{FESTIVAL.dateShort} {FESTIVAL.time}</p>
+                    <p className="text-gray-600">{FESTIVAL.location.name}</p>
                   </div>
                 </div>
               </div>
@@ -42,18 +50,18 @@ export default function Footer() {
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <Phone className="w-4 h-4 text-purple-500 flex-shrink-0" />
-                      <a href="tel:02-861-3020" className="text-sm hover:text-purple-600 transition-colors">
-                        02-861-3020
+                      <a href={`tel:${CONTACT.phone}`} className="text-sm hover:text-purple-600 transition-colors">
+                        {CONTACT.phone}
                       </a>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <Mail className="w-4 h-4 text-purple-500 flex-shrink-0" />
                       <a
-                        href="mailto:hanbumo1@seoul.go.kr"
+                        href={`mailto:${CONTACT.email}`}
                         className="text-sm hover:text-purple-600 transition-colors"
                       >
-                        hanbumo1@seoul.go.kr
+                        {CONTACT.email}
                       </a>
                     </div>
                   </div>
@@ -63,30 +71,15 @@ export default function Footer() {
                 <div>
                   <h4 className="text-base font-semibold mb-3 text-gray-800">바로가기</h4>
                   <div className="grid grid-cols-2 gap-2">
-                    <Link
-                      href="/register"
-                      className="text-sm hover:text-purple-600 transition-colors"
-                    >
-                      사전참가신청
-                    </Link>
-                    <Link
-                      href="/programs"
-                      className="text-sm hover:text-purple-600 transition-colors"
-                    >
-                      행사프로그램
-                    </Link>
-                    <Link
-                      href="/online-festival"
-                      className="text-sm hover:text-purple-600 transition-colors"
-                    >
-                      온라인축제
-                    </Link>
-                    <Link
-                      href="/location"
-                      className="text-sm hover:text-purple-600 transition-colors"
-                    >
-                      오시는길
-                    </Link>
+                    {FOOTER_QUICK_LINKS.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="text-sm hover:text-purple-600 transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -100,31 +93,31 @@ export default function Footer() {
             {/* SNS 링크 */}
             <div className="flex justify-center space-x-4">
               <a
-                href="https://www.instagram.com/seoulhanbumo_official/"
+                href={CONTACT.social.instagram.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
-                aria-label="인스타그램"
+                aria-label={CONTACT.social.instagram.label}
               >
                 <Instagram className="w-5 h-5 text-purple-600" />
               </a>
 
               <a
-                href="https://youtube.com/@서울특별시한부모가족"
+                href={CONTACT.social.youtube.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
-                aria-label="유튜브"
+                aria-label={CONTACT.social.youtube.label}
               >
                 <Youtube className="w-5 h-5 text-purple-600" />
               </a>
 
               <a
-                href="https://www.seoulhanbumo.or.kr/han/main/index.do"
+                href={CONTACT.social.website.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-white rounded-lg shadow-sm border border-purple-200 hover:border-purple-300 transition-colors"
-                aria-label="홈페이지"
+                aria-label={CONTACT.social.website.label}
               >
                 <Globe className="w-5 h-5 text-purple-600" />
               </a>
@@ -133,29 +126,29 @@ export default function Footer() {
             {/* 주최/주관 정보 */}
             <div className="text-center">
               <div className="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-gray-600 mb-2">
-                <span>주최: 서울특별시</span>
+                <span>주최: {SITE.organizer}</span>
                 <span className="hidden sm:block">|</span>
-                <span>주관: 서울특별시한부모가족지원센터</span>
+                <span>주관: {SITE.host}</span>
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-gray-500 mb-3">
-                <Link
-                  href="/privacy-policy"
-                  className="flex items-center text-gray-700 hover:text-purple-600 transition-colors font-medium"
-                >
-                  개인정보처리방침
-                </Link>
-                <span className="hidden sm:block text-gray-400">|</span>
-                <Link
-                  href="/terms-of-service"
-                  className="flex items-center text-gray-700 hover:text-purple-600 transition-colors font-medium"
-                >
-                  이용약관
-                </Link>
+                {FOOTER_LEGAL_LINKS.map((link, index) => (
+                  <span key={link.href} className="contents">
+                    <Link
+                      href={link.href}
+                      className="flex items-center text-gray-700 hover:text-purple-600 transition-colors font-medium"
+                    >
+                      {link.name}
+                    </Link>
+                    {index < FOOTER_LEGAL_LINKS.length - 1 && (
+                      <span className="hidden sm:block text-gray-400">|</span>
+                    )}
+                  </span>
+                ))}
               </div>
 
               <p className="text-xs text-gray-500">
-                © 2025 서울특별시한부모가족지원센터. All rights reserved. | 개발 및 운영: (주)하우두유두
+                {SITE.copyright} | 개발 및 운영: {SITE.developer}
               </p>
             </div>
           </div>

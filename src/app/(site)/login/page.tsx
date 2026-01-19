@@ -5,10 +5,11 @@ import LoginForm from '@/components/forms/LoginForm'
 import { cookies } from 'next/headers'
 import LoginMessageDisplay from '@/components/auth/LoginMessageDisplay'
 import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, SITE } from '@/constants'
 
 export const metadata: Metadata = {
-  title: '로그인',
-  description: '모두하나대축제 2025 로그인',
+  title: PAGE_SEO.login.title,
+  description: `${SITE.fullName} 로그인`,
   robots: {
     follow: false,
     index: false

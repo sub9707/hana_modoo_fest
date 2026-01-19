@@ -7,26 +7,12 @@ import FestivalPrograms from '@/components/about/FestivalPrograms'
 import FestivalJoinGuide from '@/components/about/FestivalJoinGuide';
 import JoinFestival from '@/components/about/JoinFestival';
 import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '축제 소개',
-  description: '서울시 대표 가족축제 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장. 2025년 10월 18일 여의도공원에서 만나요.',
-  openGraph: {
-    title: '축제 소개 | 모두하나대축제 2025',
-    description: '서울시 대표 가족축제 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
-  icons: {
-    icon: '/favicon.ico',
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.about.title,
+  PAGE_SEO.about.description
+)
 
 
 export default async function AboutPage() {

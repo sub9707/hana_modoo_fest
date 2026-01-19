@@ -1,5 +1,13 @@
 import Image from 'next/image'
 import React from 'react'
+import {
+  SITE,
+  ROUTES,
+  FALLBACK_STATS,
+  CAMPAIGN_STAT_LABELS,
+  CAMPAIGN_SECTION_TEXT,
+  API_TIMEOUTS,
+} from '@/constants'
 
 interface CampaignStat {
   number: string
@@ -34,83 +42,83 @@ function safeToNumber(value: any): number {
 
 // 폴백 데이터
 const getFallbackStats = (): CampaignStatsData => ({
-  preregistration_count: 1247,
-  comment_count: 1786,
-  writing_count: 103
+  preregistration_count: FALLBACK_STATS.preregistration_count,
+  comment_count: FALLBACK_STATS.comment_count,
+  writing_count: FALLBACK_STATS.writing_count
 })
 
 // 최적화된 데이터 조회 함수
 async function getCampaignStatsData(): Promise<CampaignStatsData> {
   const startTime = Date.now()
-  
+
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
-                   (process.env.NODE_ENV === 'production' 
-                     ? 'https://www.모두하나대축제.com' 
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
+                   (process.env.NODE_ENV === 'production'
+                     ? SITE.url
                      : 'http://localhost:3000')
-    
-    const response = await fetch(`${baseUrl}/api/campaign/stats`, {
+
+    const response = await fetch(`${baseUrl}${ROUTES.api.campaignStats}`, {
       cache: 'default',
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'CampaignStats/1.0'
       },
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(API_TIMEOUTS.default)
     })
-    
+
     const responseTime = Date.now() - startTime
-    
+
     if (!response.ok) {
-      console.warn(`❌ API 응답 오류: ${response.status} ${response.statusText}`)
+      console.warn(`API 응답 오류: ${response.status} ${response.statusText}`)
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    
+
     const result = await response.json()
-  
-    
+
+
     // 기본 응답 구조 검증
     if (!result.success || !result.data) {
       console.warn('⚠️ 잘못된 API 응답 구조:', result)
       throw new Error('Invalid API response structure')
     }
-    
+
     const { data } = result
-    
+
     // 안전한 타입 변환 및 검증
     const safeData: CampaignStatsData = {
       preregistration_count: safeToNumber(data.preregistration_count),
       comment_count: safeToNumber(data.comment_count),
       writing_count: safeToNumber(data.writing_count)
     }
-    
+
     // 변환된 데이터 검증
-    const isValidData = 
+    const isValidData =
       safeData.preregistration_count >= 0 &&
       safeData.comment_count >= 0 &&
       safeData.writing_count >= 0
 
     if (!isValidData) {
-      console.warn('⚠️ 데이터 값이 유효하지 않음:', safeData)
+      console.warn('데이터 값이 유효하지 않음:', safeData)
       throw new Error('Invalid data values after conversion')
     }
 
     return safeData
-    
+
   } catch (error) {
     const responseTime = Date.now() - startTime
-    
+
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        console.error(`⏰ API 타임아웃 (${responseTime}ms):`, error.message)
+        console.error(`API 타임아웃 (${responseTime}ms):`, error.message)
       } else if (error.message.includes('fetch failed')) {
-        console.error(`🌐 네트워크 오류 (${responseTime}ms):`, error.message)
+        console.error(`네트워크 오류 (${responseTime}ms):`, error.message)
       } else {
-        console.error(`❌ API 오류 (${responseTime}ms):`, error.message)
+        console.error(`API 오류 (${responseTime}ms):`, error.message)
       }
     } else {
-      console.error(`❓ 알 수 없는 오류 (${responseTime}ms):`, error)
+      console.error(`알 수 없는 오류 (${responseTime}ms):`, error)
     }
-    
+
     // 폴백 데이터 반환
     const fallbackData = getFallbackStats()
     return fallbackData
@@ -119,22 +127,22 @@ async function getCampaignStatsData(): Promise<CampaignStatsData> {
 
 export default async function JoinCampaignsSection() {
   const statsData = await getCampaignStatsData()
-  
+
   const campaignStats: CampaignStat[] = [
     {
       number: formatNumber(statsData.preregistration_count),
-      label: "사전접수 참여자",
-      description: "축제 사전 등록을 완료한 시민"
+      label: CAMPAIGN_STAT_LABELS.preregistration.label,
+      description: CAMPAIGN_STAT_LABELS.preregistration.description
     },
     {
       number: formatNumber(statsData.comment_count),
-      label: "응원 댓글", 
-      description: "따뜻한 응원과 격려 메시지"
+      label: CAMPAIGN_STAT_LABELS.comment.label,
+      description: CAMPAIGN_STAT_LABELS.comment.description
     },
     {
       number: formatNumber(statsData.writing_count),
-      label: "가족주제 글짓기",
-      description: "가족에 대한 진솔한 이야기"
+      label: CAMPAIGN_STAT_LABELS.writing.label,
+      description: CAMPAIGN_STAT_LABELS.writing.description
     }
   ]
 
@@ -153,19 +161,19 @@ export default async function JoinCampaignsSection() {
           <div className="flex items-center justify-between mb-12 max-w-6xl ml-0 sm:ml-20 translate-x-0 sm:translate-x-1/3 relative z-10">
             <div className="text-left flex-1 relative">
               <h2 className="text-2xl sm:text-3xl lg:text-7xl font-black mb-6 text-center sm:text-left">
-                온라인 캠페인 참여하기
+                {CAMPAIGN_SECTION_TEXT.title}
               </h2>
 
               <p className="text-md sm:text-lg lg:text-2xl font-medium opacity-90 break-keep text-center sm:text-start">
-                집에서도, 길에서도, 언제 어디서나 함께할 수 있는 &nbsp;
+                {CAMPAIGN_SECTION_TEXT.description.split(' 온라인 캠페인에')[0]} &nbsp;
                 <br className='hidden sm:block' />
-                온라인 캠페인에 참여해보세요
+                온라인 캠페인에{CAMPAIGN_SECTION_TEXT.description.split('온라인 캠페인에')[1]}
               </p>
               <div className='absolute -left-85 -top-5 w-70 h-55 hidden sm:flex'>
-                <Image 
-                  src={'/images/main/join_left.webp'} 
-                  alt='참여 좌측 캐릭터' 
-                  fill 
+                <Image
+                  src={'/images/main/join_left.webp'}
+                  alt='참여 좌측 캐릭터'
+                  fill
                   priority={false}
                   sizes="(max-width: 768px) 0px, 280px"
                   className="object-contain"
@@ -192,25 +200,18 @@ export default async function JoinCampaignsSection() {
               </div>
             ))}
           </div>
-          
+
           {/* 모바일 캐릭터 */}
           <div className='absolute right-0 bottom-0 w-40 h-30 sm:hidden'>
-            <Image 
-              src={'/images/main/join_left.webp'} 
-              alt='참여 좌측 캐릭터' 
-              fill 
+            <Image
+              src={'/images/main/join_left.webp'}
+              alt='참여 좌측 캐릭터'
+              fill
               sizes="160px"
               className="object-contain"
             />
           </div>
-          
-          {/* 실시간 업데이트 표시 */}
-          <div className="absolute top-4 right-4 text-xs opacity-60 z-20">
-            <div className="flex items-center gap-1 bg-white/10 rounded-full px-2 py-1 backdrop-blur-sm">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              실시간 업데이트
-            </div>
-          </div>
+
         </div>
       </div>
     </section>

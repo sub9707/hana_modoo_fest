@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
 import TermsOfServiceContent from '@/components/legal/TermOfServiceContent'
+import { PAGE_SEO, SITE, CONTACT } from '@/constants'
 
 export const metadata: Metadata = {
-  title: '서비스 이용약관 | 모두하나대축제 2025',
-  description: '모두하나대축제 2025 서비스 이용약관',
+  title: `${PAGE_SEO.termsOfService.title} | ${SITE.fullName}`,
+  description: `${SITE.fullName} 서비스 이용약관`,
   robots: {
     follow: false,
     index: false
@@ -40,8 +41,8 @@ export default function TermsOfServicePage() {
                 이용약관에 대한 문의사항이 있으시면 아래로 연락주세요.
               </p>
               <div className="space-y-1">
-                <p><strong>이메일:</strong> hanbumo1@seoul.go.kr</p>
-                <p><strong>전화:</strong> 02-861-3020</p>
+                <p><strong>이메일:</strong> {CONTACT.email}</p>
+                <p><strong>전화:</strong> {CONTACT.phone}</p>
               </div>
             </div>
           </div>

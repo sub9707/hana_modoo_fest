@@ -4,44 +4,45 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
 import ScrollToTop from '@/components/common/ScrollToTop'
+import { SITE, FESTIVAL, DEFAULT_SEO, CONTACT } from '@/constants'
 
 export const metadata: Metadata = {
     title: {
-        default: '모두하나대축제 2025 | 서울시 대표 가족축제',
-        template: '%s | 모두하나대축제 2025'
+        default: DEFAULT_SEO.title,
+        template: `%s | ${SITE.fullName}`
     },
-    description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
-    keywords: ['모두하나대축제', '서울시', '가족축제', '한부모가족', '가족다양성', '여의도공원'],
+    description: DEFAULT_SEO.description,
+    keywords: [...DEFAULT_SEO.keywords],
     openGraph: {
-        type: 'website',
-        locale: 'ko_KR',
-        url: 'https://www.모두하나대축제.com',
-        title: '모두하나대축제 2025 | 서울시 대표 가족축제',
-        description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
-        siteName: '모두하나대축제',
+        type: DEFAULT_SEO.type,
+        locale: DEFAULT_SEO.locale,
+        url: SITE.url,
+        title: DEFAULT_SEO.title,
+        description: DEFAULT_SEO.description,
+        siteName: SITE.name,
         images: [
             {
-                url: '/images/modoo_hana_image.png',
-                width: 332,
-                height: 265,
-                alt: '모두하나대축제 2025 로고',
+                url: DEFAULT_SEO.ogImage,
+                width: DEFAULT_SEO.ogImageWidth,
+                height: DEFAULT_SEO.ogImageHeight,
+                alt: DEFAULT_SEO.ogImageAlt,
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: '모두하나대축제 2025 | 서울시 대표 가족축제',
-        description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
-        images: ['/images/og-image.jpg'],
+        title: DEFAULT_SEO.title,
+        description: DEFAULT_SEO.description,
+        images: [DEFAULT_SEO.ogImage],
     },
     robots: {
         index: true,
         follow: true,
     },
     icons: {
-        icon: '/favicon.ico',
+        icon: DEFAULT_SEO.favicon,
     },
-    metadataBase: new URL('https://www.모두하나대축제.com')
+    metadataBase: new URL(SITE.url)
 }
 
 export default function SiteLayout({
@@ -72,13 +73,13 @@ export default function SiteLayout({
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@type": "Event",
-                        "name": "모두하나대축제 2025",
-                        "description": "서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.",
-                        "startDate": "2025-10-18T11:00:00+09:00",
-                        "endDate": "2025-10-18T17:00:00+09:00",
+                        "name": SITE.fullName,
+                        "description": DEFAULT_SEO.description,
+                        "startDate": FESTIVAL.isoStartDate,
+                        "endDate": FESTIVAL.isoEndDate,
                         "location": {
                             "@type": "Place",
-                            "name": "여의도공원 문화의마당",
+                            "name": FESTIVAL.location.name,
                             "address": {
                                 "@type": "PostalAddress",
                                 "addressLocality": "서울특별시",
@@ -88,8 +89,8 @@ export default function SiteLayout({
                         },
                         "organizer": {
                             "@type": "Organization",
-                            "name": "서울특별시한부모가족지원센터",
-                            "url": "https://seoulhanbumo.or.kr/"
+                            "name": SITE.host,
+                            "url": CONTACT.social.website
                         },
                         "offers": {
                             "@type": "Offer",

@@ -5,15 +5,12 @@ import GalleryGrid from '@/components/gallery/GalleryGrid'
 import UploadGuide from '@/components/gallery/UploadGuide'
 import PageLayout from '@/components/layout/PageLayout'
 import Section from '@/components/common/Section'
+import { PAGE_SEO, createPageMetadata, SITE } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '갤러리',
-  description: '모두하나대축제의 소중한 순간들을 만나보세요. 매년 축제의 다양한 프로그램과 참여자들의 행복한 모습을 담은 사진들을 감상하실 수 있습니다.',
-  openGraph: {
-    title: '갤러리 | 모두하나대축제 2025',
-    description: '모두하나대축제의 소중한 순간들을 사진으로 만나보세요.',
-  },
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.gallery.title,
+  `${SITE.name}의 소중한 순간들을 만나보세요. 매년 축제의 다양한 프로그램과 참여자들의 행복한 모습을 담은 사진들을 감상하실 수 있습니다.`
+)
 
 // 서버 컴포넌트에서 갤러리 데이터 가져오기 (실제로는 DB나 API에서)
 async function getGalleryData() {

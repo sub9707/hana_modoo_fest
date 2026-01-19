@@ -2,66 +2,7 @@
 
 import { useState } from 'react';
 import TransportationCard from './TransportationCard';
-
-const transportationData = [
-  {
-    type: '지하철',
-    routes: [
-      {
-        line: '5호선',
-        station: '여의도역',
-        exit: '3번 출구',
-        walkTime: '도보 5분',
-        color: 'purple'
-      },
-      {
-        line: '9호선',
-        station: '여의도역',
-        exit: '3번 출구', 
-        walkTime: '도보 5분',
-        color: 'amber'
-      }
-    ]
-  },
-  {
-    type: '버스',
-    routes: [
-      {
-        line: '간선버스',
-        station: '162, 261, 362, 461',
-        exit: '여의도공원 정류장',
-        walkTime: '도보 2분',
-        color: 'blue'
-      },
-      {
-        line: '지선버스',
-        station: '5623, 5633',
-        exit: '여의도공원 정류장',
-        walkTime: '도보 2분',
-        color: 'green'
-      }
-    ]
-  },
-  {
-    type: '자가용',
-    routes: [
-      {
-        line: '강변북로',
-        station: '여의도 IC 이용',
-        exit: '여의도공원 방향',
-        walkTime: '주차 후 도보 3분',
-        color: 'gray'
-      },
-      {
-        line: '올림픽대로',
-        station: '여의도 나들목',
-        exit: '여의도공원 방향',
-        walkTime: '주차 후 도보 3분',
-        color: 'gray'
-      }
-    ]
-  }
-];
+import { TRANSPORTATION_DATA, TRANSPORTATION_GUIDE } from '@/constants';
 
 export default function TransportationSection() {
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -82,7 +23,7 @@ export default function TransportationSection() {
 
           {/* 교통편 카드들 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {transportationData.map((transport, index) => (
+            {TRANSPORTATION_DATA.map((transport, index) => (
               <TransportationCard
                 key={transport.type}
                 data={transport}
@@ -100,20 +41,20 @@ export default function TransportationSection() {
                 교통편 이용 안내
               </h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
               <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800">🚇 지하철 이용시</h4>
-                <p>• 5호선, 9호선 여의도역 3번 출구 이용</p>
-                <p>• 출구에서 여의도공원 방향으로 직진</p>
-                <p>• 문화의마당은 공원 중앙에 위치</p>
+                <h4 className="font-semibold text-gray-800">{TRANSPORTATION_GUIDE.subway.title}</h4>
+                {TRANSPORTATION_GUIDE.subway.items.map((item, index) => (
+                  <p key={index}>• {item}</p>
+                ))}
               </div>
-              
+
               <div className="space-y-2">
-                <h4 className="font-semibold text-gray-800">🚌 버스 이용시</h4>
-                <p>• 여의도공원 정류장 하차</p>
-                <p>• 공원 입구에서 문화의마당까지 도보 2분</p>
-                <p>• 행사 당일 임시 정류장 운영 예정</p>
+                <h4 className="font-semibold text-gray-800">{TRANSPORTATION_GUIDE.bus.title}</h4>
+                {TRANSPORTATION_GUIDE.bus.items.map((item, index) => (
+                  <p key={index}>• {item}</p>
+                ))}
               </div>
             </div>
           </div>

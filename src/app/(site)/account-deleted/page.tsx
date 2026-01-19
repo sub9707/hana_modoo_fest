@@ -1,4 +1,3 @@
-// src/app/(site)/account-deleted/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'

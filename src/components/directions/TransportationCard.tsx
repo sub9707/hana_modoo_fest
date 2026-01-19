@@ -44,14 +44,6 @@ export default function TransportationCard({
     onSelect(isSelected ? null : data.type);
   };
 
-  const getTransportIcon = (type: string) => {
-    switch (type) {
-      case '지하철': return '🚇';
-      case '버스': return '🚌';
-      case '자가용': return '🚗';
-      default: return '🚇';
-    }
-  };
 
   return (
     <div 
@@ -76,7 +68,6 @@ export default function TransportationCard({
       `}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{getTransportIcon(data.type)}</span>
             <h3 className="text-lg font-bold text-gray-900">
               {data.type}
             </h3>

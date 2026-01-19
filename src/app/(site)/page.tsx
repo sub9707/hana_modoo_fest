@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import HeroSection from '@/components/home/HeroSection'
+import { SITE, DEFAULT_SEO } from '@/constants'
 
-// 뷰포트 밖의 섹션들은 lazy load
+// 뷰포트 밖이라 Lazy load 필요..
 const Introduction = dynamic(() => import('@/components/home/Introduction'), {
   loading: () => <div className="min-h-80 bg-[#885ef9]" />
 })
@@ -21,23 +22,23 @@ const CampaignSection = dynamic(() => import('@/components/home/CampaignSection'
 
 
 export const metadata: Metadata = {
-  title: '모두하나대축제 2025 | 서울시 대표 가족축제',
-  description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
+  title: DEFAULT_SEO.title,
+  description: DEFAULT_SEO.description,
   openGraph: {
-    title: '모두하나대축제 2025 | 서울시 대표 가족축제',
-    description: '서울특별시가 주최하는 모두하나대축제 2025. 가족다양성을 존중하고 시민이 함께 즐기는 연대의 장.',
-    url: 'https://모두하나대축제.com',
+    title: DEFAULT_SEO.title,
+    description: DEFAULT_SEO.description,
+    url: SITE.url,
     images: [
       {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
+        url: DEFAULT_SEO.ogImage,
+        width: DEFAULT_SEO.ogImageWidth,
+        height: DEFAULT_SEO.ogImageHeight,
+        alt: DEFAULT_SEO.ogImageAlt,
       },
     ],
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: DEFAULT_SEO.favicon,
   }
 }
 

@@ -6,40 +6,27 @@ import TransportationSection from '@/components/directions/TransportationSection
 import DirectionsMap from '@/components/directions/DirectionsMap';
 import AccessibilitySection from '@/components/directions/AccessibilitySection';
 import PageLayout from '@/components/layout/PageLayout'
+import { FESTIVAL, PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '오시는 길',
-  description: '모두하나대축제 2025가 열리는 여의도공원 문화의마당으로 오시는 길을 안내합니다.',
-  openGraph: {
-    title: '오시는 길 | 모두하나대축제 2025',
-    description: '여의도공원 문화의마당에서 10월 18일 만나요. 대중교통 및 주차 안내 정보를 확인하세요.',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
-  icons: {
-    icon: '/favicon.ico',
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.directions.title,
+  PAGE_SEO.directions.description,
+  {
+    ogTitle: `${PAGE_SEO.directions.title} | 모두하나대축제 2025`,
+    ogDescription: `여의도공원 문화의마당에서 ${FESTIVAL.date} 만나요. 대중교통 및 주차 안내 정보를 확인하세요.`,
   }
-};
+);
 
-// 행사장 정보 데이터
+// 행사장 정보 데이터 (FESTIVAL 상수 활용)
 const venueData = {
-  name: '여의도공원 문화의마당',
-  address: '서울특별시 영등포구 여의도동 여의도공원',
-  detailAddress: '서울특별시 영등포구 여의도공원',
-  date: '2025년 10월 18일 (토)',
-  time: '오전 11:00 - 오후 5:00',
-  operatingHours: '2025. 10. 18 (토) 11:00 - 17:00',
-  admission: '무료 (사전신청 권장)',
-  coordinates: {
-    lat: 37.5246435,
-    lng: 126.9203898
-  }
+  name: FESTIVAL.location.name,
+  address: FESTIVAL.location.fullAddress,
+  detailAddress: FESTIVAL.location.address,
+  date: FESTIVAL.date,
+  time: FESTIVAL.timeDisplay,
+  operatingHours: FESTIVAL.operatingHours,
+  admission: FESTIVAL.admission,
+  coordinates: FESTIVAL.location.coordinates
 };
 
 export default function DirectionsPage() {

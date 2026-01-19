@@ -5,26 +5,12 @@ import BusinessSection from '@/components/organization/BusinessSection'
 import OrganizationBanner from '@/components/organization/OrganizationBanner'
 import { organizationData } from '@/data/Organization'
 import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '기관 소개',
-  description: '서울특별시한부모가족지원센터를 소개합니다. 돌봄, 소통, 혁신의 가치로 한부모가족의 자립과 복지 증진을 위해 노력합니다.',
-  openGraph: {
-    title: '기관 소개 | 모두하나대축제 2025',
-    description: '서울특별시한부모가족지원센터를 소개합니다. 돌봄, 소통, 혁신의 가치로 한부모가족의 자립과 복지 증진을 위해 노력합니다.',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
-  icons: {
-    icon: '/favicon.ico',
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.organization.title,
+  '서울특별시한부모가족지원센터를 소개합니다. 돌봄, 소통, 혁신의 가치로 한부모가족의 자립과 복지 증진을 위해 노력합니다.'
+)
 
 
 export default async function OrganizationPage() {

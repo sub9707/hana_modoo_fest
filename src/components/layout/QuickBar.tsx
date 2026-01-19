@@ -1,18 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { Home, Calendar, UserPlus, Play, MapPin, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
-
-const quickBarItems = [
-  { icon: Home, label: '홈', href: '/' },
-  { icon: Calendar, label: '프로그램', href: '/programs' },
-  { icon: UserPlus, label: '신청', href: '/registration', isHighlight: true },
-  { icon: Play, label: '참여하기', href: '/online-festival' },
-  { icon: MapPin, label: '오시는 길', href: '/directions' }
-]
+import { QUICK_BAR_ITEMS } from '@/constants'
 
 export default function QuickBar() {
   const pathname = usePathname()
@@ -47,11 +40,12 @@ export default function QuickBar() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-slate-200 lg:hidden overflow-x-hidden">
       <nav className="flex justify-around py-2" role="navigation" aria-label="하단 퀵 메뉴">
-        {quickBarItems.map((item) => {
+        {QUICK_BAR_ITEMS.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
           const isLoading = (isPending || clickedHref === item.href) && pathname !== item.href
-          
+          const isHighlight = 'isHighlight' in item && item.isHighlight
+
           return (
             <Link
               key={item.href}
@@ -59,11 +53,11 @@ export default function QuickBar() {
               onClick={(e) => handleNavigation(e, item.href)}
               className={cn(
                 "flex flex-col items-center justify-center p-2 text-xs transition-all min-w-0 flex-1 relative",
-                isActive 
-                  ? "text-blue-600" 
+                isActive
+                  ? "text-blue-600"
                   : "text-slate-600 hover:text-blue-600",
                 isLoading && "opacity-70",
-                item.isHighlight && !isActive && "text-orange-500 font-semibold"
+                isHighlight && !isActive && "text-orange-500 font-semibold"
               )}
               aria-current={isActive ? 'page' : undefined}
               aria-disabled={isLoading}
@@ -74,7 +68,7 @@ export default function QuickBar() {
                 <Icon className="w-5 h-5 mb-1" />
               )}
               <span className="truncate">{item.label}</span>
-              {item.isHighlight && !isActive && (
+              {isHighlight && !isActive && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
             </Link>

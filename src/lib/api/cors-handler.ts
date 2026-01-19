@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { SITE } from '@/constants'
 
 export function getCorsHeaders(): HeadersInit {
   const origin = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000'
+    ? SITE.devUrl
     : process.env.APP_URL || ''
 
   return {

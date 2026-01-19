@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/provider/Provider'
 import { paperlogy } from '@/fonts/Paperlogy'
+import { SITE, DEFAULT_SEO } from '@/constants'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,10 +22,10 @@ const notoSansKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
-  title: '모두하나대축제 2025',
-  description: '가족과 함께하는 특별한 축제',
+  title: SITE.fullName,
+  description: SITE.description,
   icons: {
-    icon: '/favicon.ico',
+    icon: DEFAULT_SEO.favicon,
   }
 }
 

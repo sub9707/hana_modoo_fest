@@ -1,34 +1,19 @@
 import { Metadata } from 'next'
 import PrivacyPolicyContent from '@/components/legal/PrivacyPolicyContent'
+import { PAGE_SEO, createPageMetadata, SITE, CONTACT, ROUTES } from '@/constants'
 
 // NextJS 15 메타데이터 API 활용 - SEO 최적화
 export const metadata: Metadata = {
-  title: '개인정보 처리방침 | 모두하나대축제 2025',
-  description: '모두하나대축제 2025의 개인정보 처리방침입니다. 개인정보 수집, 이용, 보관, 파기에 대한 상세한 내용을 확인하세요.',
-  keywords: '개인정보처리방침, 개인정보보호, 모두하나대축제, 카카오로그인',
+  ...createPageMetadata(
+    `${PAGE_SEO.privacyPolicy.title} | ${SITE.fullName}`,
+    `${SITE.fullName}의 개인정보 처리방침입니다. 개인정보 수집, 이용, 보관, 파기에 대한 상세한 내용을 확인하세요.`
+  ),
   robots: {
     follow: false,
     index: false
   },
-  openGraph: {
-    title: '개인정보 처리방침 | 모두하나대축제 2025',
-    description: '모두하나대축제 2025의 개인정보 처리방침',
-    type: 'website',
-    locale: 'ko_KR',
-    images: [
-      {
-        url: '/images/modoo_hana_image.png',
-        width: 332,
-        height: 265,
-        alt: '모두하나대축제 2025 로고',
-      },
-    ],
-  },
   alternates: {
-    canonical: '/privacy-policy'
-  },
-  icons: {
-    icon: '/favicon.ico',
+    canonical: ROUTES.privacyPolicy
   },
 }
 
@@ -67,8 +52,8 @@ export default function PrivacyPolicyPage() {
                 개인정보 처리방침에 대한 문의사항이 있으시면 아래로 연락주세요.
               </p>
               <div className="space-y-1">
-                <p><strong>이메일:</strong> hanbumo1@seoul.go.kr</p>
-                <p><strong>전화:</strong> 02-861-3020</p>
+                <p><strong>이메일:</strong> {CONTACT.email}</p>
+                <p><strong>전화:</strong> {CONTACT.phone}</p>
               </div>
             </div>
           </div>

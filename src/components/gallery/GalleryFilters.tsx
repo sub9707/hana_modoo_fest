@@ -14,7 +14,7 @@ interface GalleryFiltersProps {
 }
 
 export default function GalleryFilters({ years, categories }: GalleryFiltersProps) {
-  const [selectedYear, setSelectedYear] = useState('2024')
+  const [selectedYear, setSelectedYear] = useState(years[0] || '2024')
   const [selectedCategory, setSelectedCategory] = useState('all')
 
   return (

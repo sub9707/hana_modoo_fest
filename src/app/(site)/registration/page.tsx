@@ -10,13 +10,14 @@ import type { Registration } from '@/types/registration'
 import { Loader2 } from 'lucide-react'
 import { isRegistrationClosed } from '@/lib/utils/registration-deadline'
 import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, SITE, ROUTES } from '@/constants'
 
 export const metadata: Metadata = {
-  title: '사전참가 신청',
-  description: '모두하나대축제 2025 사전참가 신청을 해주세요. 원활한 축제 참여를 위해 사전신청을 권장합니다.',
-  robots:{
-    index:false,
-    follow:false
+  title: PAGE_SEO.registration.title,
+  description: `${SITE.fullName} 사전참가 신청을 해주세요. 원활한 축제 참여를 위해 사전신청을 권장합니다.`,
+  robots: {
+    index: false,
+    follow: false
   }
 }
 
@@ -43,12 +44,12 @@ async function RegistrationContent() {
   const user = await getCurrentUser()
 
   if (!user) {
-    redirect('/login?callbackUrl=/registration&message=' +
+    redirect(`${ROUTES.login}?callbackUrl=${ROUTES.registration}&message=` +
       encodeURIComponent('사전참가 신청은 로그인이 필요합니다.'))
   }
 
   if (!user.phone || !user.name) {
-    redirect('/my-page?message=' +
+    redirect(`${ROUTES.myPage}?message=` +
       encodeURIComponent('프로필 정보를 먼저 입력해주세요.'))
   }
 
