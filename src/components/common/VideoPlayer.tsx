@@ -91,7 +91,6 @@ function VideoPlayer({ src, isMobile = false }: VideoPlayerProps) {
         playsInline
         controls={fullscreen}
         preload="metadata"
-        poster="/images/video-poster.jpg"
       >
         <source src={src} type="video/mp4" />
         브라우저가 지원하지 않는 비디오 플레이어입니다.
