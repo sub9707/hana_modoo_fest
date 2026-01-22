@@ -8,6 +8,7 @@ import {
   CAMPAIGN_SECTION_TEXT,
   API_TIMEOUTS,
 } from '@/constants'
+import { formatNumber, safeToNumber } from '@/lib/utils'
 
 interface CampaignStat {
   number: string
@@ -19,25 +20,6 @@ interface CampaignStatsData {
   preregistration_count: number
   comment_count: number
   writing_count: number
-}
-
-function formatNumber(num: number): string {
-  if (num >= 10000) {
-    return `${Math.floor(num / 1000)}K+`
-  } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}K`
-  }
-  return num.toLocaleString()
-}
-
-// 안전한 숫자 변환 함수
-function safeToNumber(value: any): number {
-  if (typeof value === 'number') return Math.max(0, Math.floor(value))
-  if (typeof value === 'string') {
-    const parsed = parseInt(value, 10)
-    return isNaN(parsed) ? 0 : Math.max(0, parsed)
-  }
-  return 0
 }
 
 // 폴백 데이터

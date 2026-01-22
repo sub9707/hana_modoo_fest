@@ -206,20 +206,14 @@ export default function NewsList({
       </div>
 
       {importantNews.length > 0 && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg">
-          <div className="font-semibold text-red-800 mb-4 flex items-center">
-            중요 공지
-          </div>
-          <div className="space-y-4">
-            {importantNews.map((newsItem) => (
-              <div key={`important-${newsItem.id}`} className="bg-white rounded-lg p-4">
-                <NewsCard 
-                  news={newsItem} 
-                  onClick={() => handleCardClick(newsItem)}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="space-y-4">
+          {importantNews.map((newsItem) => (
+            <NewsCard
+              key={`important-${newsItem.id}`}
+              news={newsItem}
+              onClick={() => handleCardClick(newsItem)}
+            />
+          ))}
         </div>
       )}
 

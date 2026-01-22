@@ -30,7 +30,7 @@ function ProgramCardSection() {
                 <span className="text-gray-500 text-sm whitespace-nowrap">좌우로 스와이프</span>
 
                 <div className="swipe-hint-container">
-                    {/* 더 큰 화살표들 - 간격 더 벌림 */}
+                    {/* 더 큰 화살표들 */}
                     <div className="swipe-arrows">
                         <svg width="100" height="50" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg" className="arrow-left">
                             <path d="M18 15L8 25L18 35M8 25H30" stroke="#9CA3AF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />

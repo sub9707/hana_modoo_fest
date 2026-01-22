@@ -69,7 +69,7 @@ function NewsCard({ news, onClick }: NewsCardProps) {
   return (
     <article
       onClick={onClick}
-      className={STYLES.container}
+      className={`${STYLES.container}${news.important ? ' border-l-4 border-red-500' : ''}`}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {

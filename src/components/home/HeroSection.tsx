@@ -6,7 +6,7 @@ import Image from "next/image";
 import HeroCTAButton from "./HeroCTAButton";
 import { FESTIVAL, ROUTES, HERO_TEXT, SITE } from "@/constants";
 
-// VideoPlayer를 lazy load
+// VideoPlayer -->> lazy load
 const VideoPlayer = dynamic(() => import("../common/VideoPlayer"), {
   loading: () => (
     <div className="w-full aspect-video rounded-2xl bg-gray-200 animate-pulse">
@@ -99,7 +99,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* 행사 정보 카드 */}
+          {/* 행사 정보 카드 (행사일정, 장소 카드) */}
           <div className="w-full max-w-3xl bg-gradient-to-r from-purple-200 via-blue-200 to-green-200 rounded-2xl p-6 sm:p-8 border-4 border-white shadow-lg animate-fade-in-up [animation-delay:1.9s] opacity-0">
             <div className="flex  text-center gap-6 sm:gap-0">
               <div className="flex-1 sm:pr-4">

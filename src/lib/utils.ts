@@ -18,6 +18,26 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// 🚀 숫자 포맷팅 (K+, K 형식)
+export function formatNumber(num: number): string {
+  if (num >= 10000) {
+    return `${Math.floor(num / 1000)}K+`
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`
+  }
+  return num.toLocaleString()
+}
+
+// 🚀 안전한 숫자 변환
+export function safeToNumber(value: unknown): number {
+  if (typeof value === 'number') return Math.max(0, Math.floor(value))
+  if (typeof value === 'string') {
+    const parsed = parseInt(value, 10)
+    return isNaN(parsed) ? 0 : Math.max(0, parsed)
+  }
+  return 0
+}
+
 // 🚀 날짜 포맷팅 (최적화된 버전)
 const DATE_FORMATTERS = {
   short: new Intl.DateTimeFormat('ko-KR', {

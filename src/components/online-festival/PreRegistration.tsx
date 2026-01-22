@@ -147,7 +147,7 @@ export default function PreRegistration() {
       {/* 통계 섹션 */}
       <div className="grid grid-cols-3 gap-6 mb-12">
         {getStatsArray().map((stat, index) => (
-          <div key={index} className="text-center p-0 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl sm:shadow-lg relative">
+          <div key={index} className="text-center p-0 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl relative">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
@@ -228,13 +228,6 @@ export default function PreRegistration() {
         </div>
         <p className="text-sm text-gray-500 mt-4">
           신청은 무료이며, 언제든지 취소 가능합니다
-        </p>
-      </div>
-
-      {/* 실시간 업데이트 안내 */}
-      <div className="mt-8 text-center">
-        <p className="text-xs text-gray-400">
-          참여 현황은 실시간으로 업데이트됩니다 • 마지막 업데이트: {stats ? new Date().toLocaleTimeString() : '로딩 중'}
         </p>
       </div>
 
