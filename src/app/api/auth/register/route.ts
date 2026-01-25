@@ -1,11 +1,12 @@
-// app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createHash, randomBytes } from 'crypto'
+import { randomBytes } from 'crypto'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { checkBlacklist, trackSignupPattern } from '@/utils/blacklist'
 import { cookies } from 'next/headers'
 import { checkRecentDeletion } from '@/utils/deletion-check'
+import { getClientIp, hashPassword } from '@/lib/api/request-utils'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 회원가입 스키마 (전화번호 가입)
 const phoneRegistrationSchema = z.object({
@@ -425,41 +426,6 @@ async function cleanupPhoneVerification(phone: string, connection: any): Promise
   )
 }
 
-// 비밀번호 해시화
-function hashPassword(password: string, salt: string): string {
-  return createHash('sha256').update(password + salt).digest('hex')
-}
-
-// 클라이언트 IP 추출
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const clientIp = request.headers.get('x-client-ip')
-
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
-  }
-  if (realIp) {
-    return realIp.trim()
-  }
-  if (clientIp) {
-    return clientIp.trim()
-  }
-
-  return '127.0.0.1'
-}
-
-// OPTIONS 메서드 지원 (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : process.env.APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

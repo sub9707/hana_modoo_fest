@@ -1,8 +1,9 @@
-// app/api/auth/verify-reset-code/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { randomBytes } from 'crypto'
 import { query, queryOne } from '@/lib/mysql/connection'
+import { getClientIp } from '@/lib/api/request-utils'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 개발/테스트 설정
 const DEV_MODE = process.env.NODE_ENV === 'development' || process.env.ENABLE_SMS_BYPASS === 'true'
@@ -66,26 +67,16 @@ export async function POST(request: NextRequest) {
 
     // 3. 개발 모드: 특정 인증번호로 바로 통과
     if (DEV_MODE && (code === DEV_VERIFICATION_CODE || code === ADMIN_BYPASS_CODE)) {
-      console.log('='.repeat(50))
-      console.log('  [비밀번호 찾기 인증 성공 - 개발 모드]')
-      console.log(`📞 전화번호: ${phone}`)
-      console.log(`👤 사용자: ${user.name}`)
-      console.log(`🔢 인증번호: ${code}`)
-      console.log(`🔧 모드: ${code === ADMIN_BYPASS_CODE ? '관리자 바이패스' : '개발 모드'}`)
-      console.log('='.repeat(50))
+      console.log('[DEV] 비밀번호 찾기 인증 성공 - 전화번호:', phone, '사용자:', user.name)
 
-      // 개발 모드용 토큰 생성
       const resetToken = generateResetToken()
-      
-      // 개발용 더미 인증 기록 저장
       await saveDummyVerificationRecord(phone, code, clientIp, resetToken)
 
       return NextResponse.json({
         success: true,
-        message: '인증이 완료되었습니다. (개발 모드)',
+        message: '인증이 완료되었습니다.',
         token: resetToken,
-        phone: phone,
-        devMode: true
+        phone: phone
       })
     }
 
@@ -102,11 +93,7 @@ export async function POST(request: NextRequest) {
 
     if (!verification) {
       return NextResponse.json(
-        { 
-          error: DEV_MODE 
-            ? `인증번호를 먼저 요청해주세요. (개발 모드: ${DEV_VERIFICATION_CODE} 또는 ${ADMIN_BYPASS_CODE} 사용 가능)`
-            : '인증번호를 먼저 요청해주세요.'
-        },
+        { error: '인증번호를 먼저 요청해주세요.' },
         { status: 400 }
       )
     }
@@ -173,10 +160,8 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(
-        { 
-          error: DEV_MODE 
-            ? `인증번호가 올바르지 않습니다. (${remainingAttempts}회 남음) - 개발 모드: ${DEV_VERIFICATION_CODE} 사용 가능`
-            : `인증번호가 올바르지 않습니다. (${remainingAttempts}회 남음)`,
+        {
+          error: `인증번호가 올바르지 않습니다. (${remainingAttempts}회 남음)`,
           remainingAttempts
         },
         { status: 400 }
@@ -191,14 +176,7 @@ export async function POST(request: NextRequest) {
       [verification.id]
     )
 
-    console.log('='.repeat(50))
-    console.log('  [비밀번호 찾기 인증 성공]')
-    console.log(`📞 전화번호: ${phone}`)
-    console.log(`👤 사용자: ${user.name}`)
-    console.log(`🔢 인증번호: ${code}`)
-    console.log(`🔑 재설정 토큰: ${resetToken}`)
-    console.log(`🆔 인증 ID: ${verification.id}`)
-    console.log('='.repeat(50))
+    console.log('[INFO] 비밀번호 찾기 인증 성공 - 전화번호:', phone, '사용자:', user.name)
 
     return NextResponse.json({
       success: true,
@@ -223,83 +201,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 클라이언트 IP 추출
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const clientIp = request.headers.get('x-client-ip')
-  
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
-  }
-  if (realIp) {
-    return realIp.trim()
-  }
-  if (clientIp) {
-    return clientIp.trim()
-  }
-  
-  return '127.0.0.1'
-}
-
 // 재설정 토큰 생성
 function generateResetToken(): string {
   return randomBytes(32).toString('hex')
 }
 
-// 개발용 더미 인증 기록 저장
 async function saveDummyVerificationRecord(
-  phone: string, 
-  code: string, 
-  clientIp: string, 
-  resetToken: string
+  phone: string,
+  code: string,
+  clientIp: string,
+  _resetToken: string
 ): Promise<void> {
-  try {
-    console.log(`💾 [비밀번호 찾기 더미 인증 기록 생성]`)
-    console.log(`- Phone: ${phone}`)
-    console.log(`- Code: ${code}`)
-    console.log(`- IP: ${clientIp}`)
-    console.log(`- Reset Token: ${resetToken}`)
-    
-    // 개발 모드에서도 실제 DB에 기록 (비밀번호 재설정에서 찾을 수 있도록)
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10분 후
-    
-    // 기존 미인증 코드 삭제
-    await query(
-      'DELETE FROM phone_verifications WHERE phone = ? AND verified = 0',
-      [phone]
-    )
-    
-    // 새 인증 코드 저장 (verified = 1로 설정)
-    await query(
-      `INSERT INTO phone_verifications (phone, code, ip_address, user_agent, expires_at, verified, created_at, updated_at)
-       VALUES (?, ?, ?, 'DEV_MODE_PASSWORD_RESET', ?, 1, NOW(), NOW())`,
-      [
-        phone,
-        code,
-        clientIp,
-        expiresAt.toISOString().slice(0, 19).replace('T', ' ')
-      ]
-    )
-    
-    console.log(`  개발 모드 비밀번호 찾기 인증 기록이 DB에 저장되었습니다.`)
-  } catch (error) {
-    console.warn('개발 모드 인증 기록 생성 실패:', error)
-    throw error
-  }
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000)
+
+  await query(
+    'DELETE FROM phone_verifications WHERE phone = ? AND verified = 0',
+    [phone]
+  )
+
+  await query(
+    `INSERT INTO phone_verifications (phone, code, ip_address, user_agent, expires_at, verified, created_at, updated_at)
+     VALUES (?, ?, ?, 'DEV_MODE_PASSWORD_RESET', ?, 1, NOW(), NOW())`,
+    [
+      phone,
+      code,
+      clientIp,
+      expiresAt.toISOString().slice(0, 19).replace('T', ' ')
+    ]
+  )
 }
 
-// OPTIONS 메서드 지원 (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : process.env.APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

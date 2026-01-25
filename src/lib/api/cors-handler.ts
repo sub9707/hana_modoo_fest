@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { SITE } from '@/constants'
 
 export function getCorsHeaders(): HeadersInit {
@@ -14,7 +14,7 @@ export function getCorsHeaders(): HeadersInit {
   }
 }
 
-export function handleCorsOptions(request: NextRequest): NextResponse {
+export function handleCorsOptions(): NextResponse {
   const headers = getCorsHeaders()
 
   return new NextResponse(null, {

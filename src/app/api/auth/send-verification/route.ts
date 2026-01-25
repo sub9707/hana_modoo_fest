@@ -1,8 +1,9 @@
-// app/api/auth/send-verification/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { query, queryOne } from '@/lib/mysql/connection'
-// import { sendVerificationSms } from '@/lib/sens/client' // 실제 SENS 사용 시 주석 해제
+import { getClientIp } from '@/lib/api/request-utils'
+import { checkTableExists } from '@/lib/api/database-utils'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 개발/테스트 설정
 const DEV_MODE = process.env.NODE_ENV === 'development' || process.env.ENABLE_SMS_BYPASS === 'true'
@@ -84,20 +85,14 @@ export async function POST(request: NextRequest) {
     let smsResult: { success: boolean; requestId?: string; error?: string }
 
     if (DEV_MODE) {
-      // 🔧 개발 모드: 실제 SMS 발송하지 않고 콘솔에 출력
-      console.log('='.repeat(50))
-      console.log('📱 [SMS 발송 시뮬레이션]')
-      console.log(`📞 전화번호: ${phone}`)
-      console.log(`🔢 인증번호: ${verificationCode}`)
-      console.log(`⏰ 만료시간: 5분`)
-      console.log('='.repeat(50))
-      
+      console.log('[DEV] SMS 발송 시뮬레이션 - 전화번호:', phone, '인증번호:', verificationCode)
+
       smsResult = {
         success: true,
         requestId: `dev-${Date.now()}`
       }
     } else {
-      // 🚀 실제 모드: SENS SMS 발송 (주석 해제 시 사용)
+      // 실제 모드: SENS SMS 발송 (주석 해제 시 사용)
       /*
       const smsResult = await sendVerificationSms(phone, verificationCode)
       if (!smsResult.success) {
@@ -108,9 +103,8 @@ export async function POST(request: NextRequest) {
         )
       }
       */
-      
-      // 임시: 실제 모드에서도 개발용으로 처리 (SENS 설정 완료 전까지)
-      console.log('⚠️ 실제 SENS 발송 코드가 주석 처리되어 있습니다.')
+
+      console.warn('실제 SENS 발송 코드가 주석 처리되어 있습니다.')
       smsResult = {
         success: false,
         error: 'SENS 설정이 완료되지 않았습니다. 개발 모드를 사용해주세요.'
@@ -139,17 +133,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: DEV_MODE 
-        ? `인증번호가 발송되었습니다. (개발 모드: ${verificationCode})`
-        : '인증번호가 발송되었습니다.',
-      expiresIn: 300, // 5분
-      requestId: smsResult.requestId,
-      // 개발 모드에서만 인증번호 노출
-      ...(DEV_MODE && { 
-        devMode: true,
-        verificationCode: verificationCode,
-        hint: '개발 모드입니다. 위 인증번호를 사용하세요.'
-      })
+      message: '인증번호가 발송되었습니다.',
+      expiresIn: 300
     })
 
   } catch (error) {
@@ -166,25 +151,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-// 클라이언트 IP 추출
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const clientIp = request.headers.get('x-client-ip')
-  
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
-  }
-  if (realIp) {
-    return realIp.trim()
-  }
-  if (clientIp) {
-    return clientIp.trim()
-  }
-  
-  return '127.0.0.1'
 }
 
 // 요청 제한 확인
@@ -300,7 +266,6 @@ async function logSmsDelivery(
     // sms_send_logs 테이블이 있는지 먼저 확인
     const tableExists = await checkTableExists('sms_send_logs')
     if (!tableExists) {
-      console.log('📝 sms_send_logs 테이블이 없습니다. 로그 기록을 건너뜁니다.')
       return
     }
 
@@ -324,29 +289,12 @@ async function logSmsDelivery(
   }
 }
 
-// 테이블 존재 여부 확인
-async function checkTableExists(tableName: string): Promise<boolean> {
-  try {
-    const result = await queryOne(
-      `SELECT COUNT(*) as count 
-       FROM information_schema.tables 
-       WHERE table_schema = DATABASE() AND table_name = ?`,
-      [tableName]
-    )
-    return result && result.count > 0
-  } catch (error) {
-    console.warn(`테이블 ${tableName} 존재 여부 확인 실패:`, error)
-    return false
-  }
-}
-
 // 요청 제한 카운터 업데이트
 async function updateRateLimitCounters(clientIp: string, phone: string): Promise<void> {
   try {
     // verification_limits 테이블이 있는지 확인
     const tableExists = await checkTableExists('verification_limits')
     if (!tableExists) {
-      console.log('📝 verification_limits 테이블이 없습니다. 카운터 업데이트를 건너뜁니다.')
       return
     }
 
@@ -376,17 +324,6 @@ async function updateRateLimitCounters(clientIp: string, phone: string): Promise
   }
 }
 
-// OPTIONS 메서드 지원 (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : process.env.APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

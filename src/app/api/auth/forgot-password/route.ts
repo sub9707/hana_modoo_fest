@@ -1,7 +1,9 @@
-// app/api/auth/forgot-password/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { query, queryOne } from '@/lib/mysql/connection'
+import { getClientIp } from '@/lib/api/request-utils'
+import { checkTableExists } from '@/lib/api/database-utils'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 개발/테스트 설정
 const DEV_MODE = process.env.NODE_ENV === 'development' || process.env.ENABLE_SMS_BYPASS === 'true'
@@ -101,13 +103,12 @@ export async function POST(request: NextRequest) {
       requestId: `test-forgot-${Date.now()}`
     }
 
-    /* 🚀 실제 SMS 발송 코드 (운영 시 주석 해제)
+    /* 실제 SMS 발송 코드 (운영 시 주석 해제)
     if (!DEV_MODE) {
       try {
-        // SENS SMS 발송
         const smsMessage = `[모두하나대축제 2025] 비밀번호 찾기 인증번호는 ${verificationCode}입니다. 5분 내에 입력해주세요.`
         const actualSmsResult = await sendVerificationSms(phone, verificationCode, smsMessage)
-        
+
         if (!actualSmsResult.success) {
           console.error('SENS SMS send failed:', actualSmsResult.error)
           return NextResponse.json(
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           )
         }
-        
+
         smsResult = actualSmsResult
       } catch (error) {
         console.error('SMS send error:', error)
@@ -142,15 +143,14 @@ export async function POST(request: NextRequest) {
       await updateRateLimitCounters(clientIp, phone)
     }
 
+    if (DEV_MODE) {
+      console.log('[DEV] 비밀번호 찾기 인증번호:', verificationCode)
+    }
+
     return NextResponse.json({
       success: true,
-      message: '인증번호가 발송되었습니다. (테스트 모드)',
-      expiresIn: 300, // 5분
-      requestId: smsResult.requestId,
-      // 테스트 모드에서 인증번호 노출
-      devMode: true,
-      verificationCode: verificationCode,
-      hint: '테스트 모드입니다. 위 인증번호를 사용하거나 관리자 코드(000000)를 사용하세요.'
+      message: '인증번호가 발송되었습니다.',
+      expiresIn: 300
     })
 
   } catch (error) {
@@ -167,25 +167,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-// 클라이언트 IP 추출
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const clientIp = request.headers.get('x-client-ip')
-  
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
-  }
-  if (realIp) {
-    return realIp.trim()
-  }
-  if (clientIp) {
-    return clientIp.trim()
-  }
-  
-  return '127.0.0.1'
 }
 
 // 요청 제한 확인
@@ -296,7 +277,6 @@ async function updateRateLimitCounters(clientIp: string, phone: string): Promise
     // verification_limits 테이블이 있는지 확인
     const tableExists = await checkTableExists('verification_limits')
     if (!tableExists) {
-      console.log('📝 verification_limits 테이블이 없습니다. 카운터 업데이트를 건너뜁니다.')
       return
     }
 
@@ -326,33 +306,6 @@ async function updateRateLimitCounters(clientIp: string, phone: string): Promise
   }
 }
 
-// 테이블 존재 여부 확인
-async function checkTableExists(tableName: string): Promise<boolean> {
-  try {
-    const result = await queryOne(
-      `SELECT COUNT(*) as count 
-       FROM information_schema.tables 
-       WHERE table_schema = DATABASE() AND table_name = ?`,
-      [tableName]
-    )
-    return result && result.count > 0
-  } catch (error) {
-    console.warn(`테이블 ${tableName} 존재 여부 확인 실패:`, error)
-    return false
-  }
-}
-
-// OPTIONS 메서드 지원 (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : process.env.APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

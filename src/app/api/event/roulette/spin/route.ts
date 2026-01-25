@@ -1,10 +1,10 @@
-// app/api/event/roulette/spin/route.ts (UUID 테이블 지원으로 수정)
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { headers } from 'next/headers'
 import { randomUUID } from 'crypto'
 import type { SpinResponse, PrizeWithProbability } from '@/types/event'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 동시 실행 제한을 위한 인메모리 맵
 const concurrentSpins = new Map<string, boolean>()
@@ -178,13 +178,5 @@ export async function POST(request: NextRequest) {
 }
 
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

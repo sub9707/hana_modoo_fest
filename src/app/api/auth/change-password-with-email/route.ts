@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createHash, randomBytes } from 'crypto'
 import { query, queryOne } from '@/lib/mysql/connection'
+import { getClientIp, hashPassword } from '@/lib/api/request-utils'
+import { checkTableExists } from '@/lib/api/database-utils'
+import { handleCorsOptions } from '@/lib/api/cors-handler'
 
 // 요청 스키마
 const changePasswordSchema = z.object({
@@ -156,30 +159,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 클라이언트 IP 추출
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIp = request.headers.get('x-real-ip')
-  const clientIp = request.headers.get('x-client-ip')
-  
-  if (forwarded) {
-    return forwarded.split(',')[0].trim()
-  }
-  if (realIp) {
-    return realIp.trim()
-  }
-  if (clientIp) {
-    return clientIp.trim()
-  }
-  
-  return '127.0.0.1'
-}
-
-// 비밀번호 해시화
-function hashPassword(password: string, salt: string): string {
-  return createHash('sha256').update(password + salt).digest('hex')
-}
-
 // 비밀번호 변경 로그 기록
 async function logPasswordChange(
   userId: string,
@@ -217,33 +196,6 @@ async function logPasswordChange(
   }
 }
 
-// 테이블 존재 여부 확인
-async function checkTableExists(tableName: string): Promise<boolean> {
-  try {
-    const result = await queryOne(
-      `SELECT COUNT(*) as count 
-       FROM information_schema.tables 
-       WHERE table_schema = DATABASE() AND table_name = ?`,
-      [tableName]
-    )
-    return result && result.count > 0
-  } catch (error) {
-    console.warn(`테이블 ${tableName} 존재 여부 확인 실패:`, error)
-    return false
-  }
-}
-
-// OPTIONS 메서드 지원 (CORS)
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : process.env.APP_URL || '',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
-  })
+  return handleCorsOptions()
 }

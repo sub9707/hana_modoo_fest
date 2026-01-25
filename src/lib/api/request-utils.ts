@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { createHash } from 'crypto'
 
 export function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for')
@@ -45,4 +46,8 @@ export function parseIntParam(searchParams: URLSearchParams, key: string, defaul
   if (value === null) return defaultValue
   const parsed = parseInt(value)
   return isNaN(parsed) ? defaultValue : parsed
+}
+
+export function hashPassword(password: string, salt: string): string {
+  return createHash('sha256').update(password + salt).digest('hex')
 }
