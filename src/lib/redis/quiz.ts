@@ -1,4 +1,3 @@
-// src/lib/redis/quiz.ts
 import { getRedisClient, isRedisHealthy } from '@/lib/redis/connection'
 import type { RedisClient } from '@/lib/redis/connection'
 

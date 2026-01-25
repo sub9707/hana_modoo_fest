@@ -1,4 +1,3 @@
-// src/lib/utils/password.ts
 
 /**
  * 비밀번호 강도 검사 결과 타입

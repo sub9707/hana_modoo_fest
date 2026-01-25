@@ -1,4 +1,3 @@
-// src/components/online-festival/Quiz/QuizCard.tsx
 import { memo } from 'react'
 import { CheckCircle, XCircle } from 'lucide-react'
 import { Quiz } from '@/types/Quiz'

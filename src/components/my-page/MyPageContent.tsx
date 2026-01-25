@@ -1,4 +1,3 @@
-// src/components/my-page/MyPageContent.tsx
 'use client'
 
 import Link from 'next/link'

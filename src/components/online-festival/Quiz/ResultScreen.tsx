@@ -1,4 +1,3 @@
-// src/components/online-festival/Quiz/ResultScreen.tsx
 'use client'
 
 import { memo } from 'react'

@@ -69,7 +69,7 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
       {/* 신청 상태 */}
       <div className="text-center">
         <div className="inline-flex items-center space-x-3 px-6 py-3 bg-green-100 text-green-800 rounded-xl font-semibold text-lg">
-          <span className="text-2xl">✅</span>
+          <span className="text-2xl"> </span>
           <span>참가신청 완료</span>
         </div>
       </div>

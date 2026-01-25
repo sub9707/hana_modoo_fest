@@ -1,4 +1,3 @@
-// src/app/api/support-comments/[id]/like/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { transaction } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'

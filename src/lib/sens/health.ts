@@ -1,4 +1,3 @@
-// src/lib/sens/health.ts
 import { createSensClient } from './client'
 
 export interface SensHealthCheck {

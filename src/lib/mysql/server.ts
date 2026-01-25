@@ -1,4 +1,3 @@
-// src/lib/mysql/server.ts
 import { Role } from '@/types/auth'
 import { cookies } from 'next/headers'
 import { query, queryOne } from '@/lib/mysql/connection'

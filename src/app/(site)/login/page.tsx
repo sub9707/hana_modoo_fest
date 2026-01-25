@@ -5,18 +5,15 @@ import LoginForm from '@/components/forms/LoginForm'
 import { cookies } from 'next/headers'
 import LoginMessageDisplay from '@/components/auth/LoginMessageDisplay'
 import PageLayout from '@/components/layout/PageLayout'
-import { PAGE_SEO, SITE } from '@/constants'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: PAGE_SEO.login.title,
-  description: `${SITE.fullName} 로그인`,
-  robots: {
-    follow: false,
-    index: false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.login.title,
+  PAGE_SEO.login.description,
+  { noIndex: true }
+)
 
-// ✅ 캐시 무효화
+// 캐시 무효화
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
@@ -31,12 +28,12 @@ interface PageProps {
 
 export default async function LoginPage({ searchParams }: PageProps) {
 
-  // ✅ 서버에서 사용자 확인
+  // 서버에서 사용자 확인
   const user = await getCurrentUser()
   const params = await searchParams
 
 
-  // ✅ 이미 로그인된 사용자는 리다이렉트
+  // 이미 로그인된 사용자는 리다이렉트
   if (user) {
     const redirectPath = params.callbackUrl || params.redirect || '/'
     redirect(redirectPath)
@@ -47,7 +44,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   return (
     <PageLayout variant="gray" className="flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 -mt-16">
-        {/* ✅ 메시지 표시를 위한 Client Component 추가 */}
+        {/* 메시지 표시를 위한 Client Component 추가 */}
         <LoginMessageDisplay
           message={params.message}
           sessionExpired={params.session_expired}

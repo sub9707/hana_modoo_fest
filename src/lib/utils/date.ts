@@ -1,4 +1,3 @@
-// src/lib/utils/date.ts
 
 /**
  * 날짜를 한국어 형식으로 포맷

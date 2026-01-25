@@ -1,19 +1,17 @@
 import { Metadata } from 'next'
 import TermsOfServiceContent from '@/components/legal/TermOfServiceContent'
-import { PAGE_SEO, SITE, CONTACT } from '@/constants'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata, CONTACT } from '@/constants'
 
-export const metadata: Metadata = {
-  title: `${PAGE_SEO.termsOfService.title} | ${SITE.fullName}`,
-  description: `${SITE.fullName} 서비스 이용약관`,
-  robots: {
-    follow: false,
-    index: false
-  },
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.termsOfService.title,
+  PAGE_SEO.termsOfService.description,
+  { noIndex: true }
+)
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 font-paper">
+    <PageLayout variant="gradient-blue-purple">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* 헤더 */}
@@ -48,6 +46,6 @@ export default function TermsOfServicePage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }

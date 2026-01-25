@@ -3,16 +3,15 @@ import { redirect, notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { queryOne } from '@/lib/mysql/connection'
 import RegistrationSuccess from '@/components/registration/RegistrationSuccess'
+import PageLayout from '@/components/layout/PageLayout'
 import type { Registration } from '@/types/registration'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '신청 완료',
-  description: '모두하나대축제 2025 사전참가 신청이 완료되었습니다.',
-  robots:{
-    index:false,
-    follow:false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.registrationSuccess.title,
+  PAGE_SEO.registrationSuccess.description,
+  { noIndex: true }
+)
 
 interface PageProps {
   searchParams: { id?: string }
@@ -76,9 +75,11 @@ export default async function RegistrationSuccessPage({ searchParams }: PageProp
   } as Registration
 
   return (
-    <RegistrationSuccess 
-      user={user}
-      registration={registration}
-    />
+    <PageLayout variant="gray">
+      <RegistrationSuccess
+        user={user}
+        registration={registration}
+      />
+    </PageLayout>
   )
 }

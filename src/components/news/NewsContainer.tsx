@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import NewsFilters from './NewsFilters'
 import NewsList from './NewsList'
 import { NewsSearchParams, NewsItem } from '@/types/Board'
@@ -31,9 +31,9 @@ export default function NewsContainer({
     limit: 10
   })
 
-  const handleFilterChange = (newParams: Partial<NewsSearchParams>) => {
+  const handleFilterChange = useCallback((newParams: Partial<NewsSearchParams>) => {
     setSearchParams(prev => ({ ...prev, ...newParams }))
-  }
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

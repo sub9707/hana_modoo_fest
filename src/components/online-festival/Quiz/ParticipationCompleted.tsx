@@ -1,4 +1,3 @@
-// src/components/online-festival/Quiz/ParticipationCompleted.tsx
 'use client'
 
 import { memo, useEffect, useState } from 'react'
@@ -176,7 +175,7 @@ export const ParticipationCompleted = memo(({ user }: ParticipationCompletedProp
                   <span className="font-medium text-yellow-800">추첨 자격</span>
                 </div>
                 <p className="text-yellow-700 text-sm font-bold">
-                  ✅ 획득 완료
+                    획득 완료
                 </p>
               </div>
             </div>

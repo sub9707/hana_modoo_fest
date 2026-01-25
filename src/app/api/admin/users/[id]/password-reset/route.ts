@@ -1,4 +1,3 @@
-// src/app/api/admin/users/[id]/password-reset/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser, checkUserRole } from '@/lib/mysql/server'
 import { getUserById, updateUserPassword } from '@/lib/services/users-service'

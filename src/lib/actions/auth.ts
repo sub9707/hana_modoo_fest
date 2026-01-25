@@ -1,4 +1,3 @@
-// src/lib/actions/auth.ts
 'use server'
 
 import { cookies, headers } from 'next/headers'

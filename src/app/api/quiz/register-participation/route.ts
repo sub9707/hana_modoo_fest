@@ -1,4 +1,3 @@
-// src/app/api/quiz/register-participation/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import { getClientIP, getUserAgent } from '@/lib/utils/request'

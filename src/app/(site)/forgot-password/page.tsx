@@ -1,15 +1,18 @@
 import { Metadata } from 'next'
 import ForgotPasswordForm from '@/components/forms/ForgotPasswordForm'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '비밀번호 찾기 | 모두하나대축제 2025',
-  description: '전화번호 인증을 통한 비밀번호 재설정',
-  robots: {
-    index: false,
-    follow: false,
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.forgotPassword.title,
+  PAGE_SEO.forgotPassword.description,
+  { noIndex: true }
+)
 
 export default function ForgotPasswordPage() {
-  return <ForgotPasswordForm />
+  return (
+    <PageLayout variant="gray" className="flex items-center justify-center py-8 px-4">
+      <ForgotPasswordForm />
+    </PageLayout>
+  )
 }

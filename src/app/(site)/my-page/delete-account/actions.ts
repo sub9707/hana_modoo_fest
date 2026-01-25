@@ -1,4 +1,3 @@
-// src/app/(site)/my-page/delete-account/actions.ts
 'use server'
 
 import { cookies } from 'next/headers'

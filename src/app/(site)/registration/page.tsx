@@ -10,16 +10,13 @@ import type { Registration } from '@/types/registration'
 import { Loader2 } from 'lucide-react'
 import { isRegistrationClosed } from '@/lib/utils/registration-deadline'
 import PageLayout from '@/components/layout/PageLayout'
-import { PAGE_SEO, SITE, ROUTES } from '@/constants'
+import { PAGE_SEO, createPageMetadata, ROUTES } from '@/constants'
 
-export const metadata: Metadata = {
-  title: PAGE_SEO.registration.title,
-  description: `${SITE.fullName} 사전참가 신청을 해주세요. 원활한 축제 참여를 위해 사전신청을 권장합니다.`,
-  robots: {
-    index: false,
-    follow: false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.registration.title,
+  PAGE_SEO.registration.description,
+  { noIndex: true }
+)
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0

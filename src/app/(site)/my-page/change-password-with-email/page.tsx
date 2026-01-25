@@ -1,4 +1,3 @@
-// src/app/(site)/my-page/change-password-with-email/page.tsx
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
@@ -6,18 +5,17 @@ import { getCurrentUser } from '@/lib/mysql/server'
 import { EmailBasedPasswordChangeForm } from '@/components/forms/EmailBasedPasswordChangeForm'
 import { ArrowLeft, Shield } from 'lucide-react'
 import Link from 'next/link'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export const metadata: Metadata = {
-  title: '이메일 인증으로 비밀번호 변경 | 모두하나축제',
-  description: '이메일 인증을 통해 비밀번호를 변경하세요',
-  robots: {
-    index: false,
-    follow: false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.changePasswordWithEmail.title,
+  PAGE_SEO.changePasswordWithEmail.description,
+  { noIndex: true }
+)
 
 export default async function ChangePasswordWithEmailPage() {
   const user = await getCurrentUser()
@@ -35,7 +33,7 @@ export default async function ChangePasswordWithEmailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 font-paper">
+    <PageLayout variant="gray" className="py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center mb-4">
@@ -68,6 +66,6 @@ export default async function ChangePasswordWithEmailPage() {
           <EmailBasedPasswordChangeForm userEmail={user.email} />
         </Suspense>
       </div>
-    </div>
+    </PageLayout>
   )
 }

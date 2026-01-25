@@ -12,7 +12,7 @@ interface PageLayoutProps {
  *
  * @param children - 페이지 콘텐츠
  * @param variant - 배경 스타일 variant
- * @param className - 추가 CSS 클래스
+ * @param className - 추가 클래스
  * @param useFontPaper - font-paper 클래스 사용 여부 (기본값: true)
  */
 export default function PageLayout({

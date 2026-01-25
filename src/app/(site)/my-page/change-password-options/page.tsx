@@ -1,24 +1,22 @@
-// src/app/(site)/my-page/change-password-options/page.tsx
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/mysql/server'  // ✅ 기존 함수 사용
+import { getCurrentUser } from '@/lib/mysql/server'
 import { ArrowLeft, Shield, Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export const metadata: Metadata = {
-  title: '비밀번호 변경 방법 선택 | 모두하나축제',
-  description: '비밀번호 변경 방법을 선택하세요',
-  robots: {
-    index: false,
-    follow: false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.changePasswordOptions.title,
+  PAGE_SEO.changePasswordOptions.description,
+  { noIndex: true }
+)
 
 export default async function ChangePasswordOptionsPage() {
-  const user = await getCurrentUser()  // ✅ 기존 함수 사용
+  const user = await getCurrentUser()  //   기존 함수 사용
   
   if (!user) {
     redirect('/login?redirect=/my-page/change-password-options')
@@ -31,7 +29,7 @@ export default async function ChangePasswordOptionsPage() {
   const hasEmail = !!user.email
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 font-paper">
+    <PageLayout variant="gray" className="py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="flex items-center mb-4">
@@ -144,6 +142,6 @@ export default async function ChangePasswordOptionsPage() {
           </ul>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }

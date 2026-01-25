@@ -1,4 +1,3 @@
-// src/lib/auth/session.ts
 import { cookies } from 'next/headers'
 import { queryOne } from '@/lib/mysql/connection'
 import type { User } from '@/types/auth'

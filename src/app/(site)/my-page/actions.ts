@@ -1,4 +1,3 @@
-// src/app/(site)/my-page/actions.ts
 'use server'
 
 import { cookies } from 'next/headers'

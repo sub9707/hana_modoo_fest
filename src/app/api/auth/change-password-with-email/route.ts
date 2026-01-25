@@ -1,4 +1,3 @@
-// src/app/api/auth/change-password-with-email/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createHash, randomBytes } from 'crypto'

@@ -1,4 +1,3 @@
-// src/components/online-festival/Quiz/LoginRequired.tsx
 'use client'
 
 import { memo } from 'react'

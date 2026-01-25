@@ -1,4 +1,3 @@
-// src/app/api/support-comments/recent/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 

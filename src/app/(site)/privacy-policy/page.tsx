@@ -1,26 +1,17 @@
 import { Metadata } from 'next'
 import PrivacyPolicyContent from '@/components/legal/PrivacyPolicyContent'
-import { PAGE_SEO, createPageMetadata, SITE, CONTACT, ROUTES } from '@/constants'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata, CONTACT } from '@/constants'
 
-// NextJS 15 메타데이터 API 활용 - SEO 최적화
-export const metadata: Metadata = {
-  ...createPageMetadata(
-    `${PAGE_SEO.privacyPolicy.title} | ${SITE.fullName}`,
-    `${SITE.fullName}의 개인정보 처리방침입니다. 개인정보 수집, 이용, 보관, 파기에 대한 상세한 내용을 확인하세요.`
-  ),
-  robots: {
-    follow: false,
-    index: false
-  },
-  alternates: {
-    canonical: ROUTES.privacyPolicy
-  },
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.privacyPolicy.title,
+  PAGE_SEO.privacyPolicy.description,
+  { noIndex: true }
+)
 
-// NextJS 15 Server Component 활용
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 font-paper">
+    <PageLayout variant="gradient-blue-purple">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           {/* 헤더 */}
@@ -59,6 +50,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }

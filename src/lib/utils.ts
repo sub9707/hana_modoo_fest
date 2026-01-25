@@ -1,4 +1,3 @@
-// src/lib/utils.ts - Vercel 과비용 방지 최적화 버전
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 

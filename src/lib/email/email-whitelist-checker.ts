@@ -1,4 +1,3 @@
-// src/lib/email/email-whitelist-checker.ts
 import { queryOne } from '@/lib/mysql/connection'
 
 /**

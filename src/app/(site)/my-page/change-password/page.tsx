@@ -1,51 +1,26 @@
-// src/app/(site)/my-page/change-password/page.tsx
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
-import { queryOne } from '@/lib/mysql/connection'
+import { getCurrentUser } from '@/lib/mysql/server'
 import { ChangePasswordForm } from '@/components/forms/ChangePasswordForm'
 import { ArrowLeft, Shield, Lock } from 'lucide-react'
 import Link from 'next/link'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-// NextJS 15: 메타데이터 최적화
-export const metadata: Metadata = {
-  title: '비밀번호 변경 | 모두하나축제',
-  description: '계정 보안을 위해 비밀번호를 변경하세요.',
-  robots: {
-    index:false,
-    follow:false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.changePassword.title,
+  PAGE_SEO.changePassword.description,
+  { noIndex: true }
+)
 
-// NextJS 15: 향상된 사용자 인증 확인
-async function getCurrentUser() {
-  try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get('session-token')?.value
-
-    if (!sessionToken) {
-      return null
-    }
-
-    const user = await queryOne(
-      `SELECT id, name, username, role, last_login_at
-       FROM users 
-       WHERE session_token = ? AND session_expires_at > NOW()`,
-      [sessionToken]
-    )
-
-    return user
-  } catch (error) {
-    console.error('Get current user error:', error)
-    return null
-  }
-}
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // 로딩 컴포넌트
 function ChangePasswordSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 헤더 스켈레톤 */}
         <div className="mb-8">
@@ -76,15 +51,14 @@ function ChangePasswordSkeleton() {
 
 // 메인 페이지 컴포넌트
 export default async function ChangePasswordPage() {
-  // 사용자 인증 확인
   const user = await getCurrentUser()
-  
+
   if (!user) {
-    redirect('/auth/login?redirect=/my-page/change-password')
+    redirect('/login?redirect=/my-page/change-password')
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <PageLayout variant="gray" className="py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 페이지 헤더 */}
         <div className="mb-8">
@@ -135,10 +109,6 @@ export default async function ChangePasswordPage() {
         </Suspense>
 
       </div>
-    </div>
+    </PageLayout>
   )
 }
-
-// NextJS 15: 정적 생성 비활성화 (개인 설정 페이지이므로)
-export const dynamic = 'force-dynamic'
-export const revalidate = 0

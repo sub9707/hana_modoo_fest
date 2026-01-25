@@ -1,4 +1,3 @@
-// src/components/my-page/ClientWrapper.tsx
 'use client'
 
 import { useEffect, useRef } from 'react'

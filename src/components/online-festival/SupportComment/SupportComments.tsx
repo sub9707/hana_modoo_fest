@@ -1,4 +1,3 @@
-// src/components/online-festival/SupportComment/SupportComments.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

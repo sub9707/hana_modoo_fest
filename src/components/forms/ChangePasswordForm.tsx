@@ -1,4 +1,3 @@
-// src/components/forms/ChangePasswordForm.tsx
 'use client'
 
 import { useState, useTransition, useEffect } from 'react'

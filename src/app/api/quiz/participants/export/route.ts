@@ -1,4 +1,3 @@
-// src/app/api/quiz/participants/export/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import * as XLSX from 'xlsx'

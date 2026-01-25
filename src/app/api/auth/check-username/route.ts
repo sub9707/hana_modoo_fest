@@ -1,4 +1,3 @@
-// src/app/api/auth/check-username/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { queryOne } from '@/lib/mysql/connection'
 import { usernameCheckSchema } from '@/lib/validations/registration'

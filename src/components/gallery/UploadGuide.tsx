@@ -45,7 +45,7 @@ export default function UploadGuide() {
             
             <div className="space-y-3 text-sm">
               <div className="bg-green-50 p-3 rounded-lg">
-                <div className="font-semibold text-green-800 mb-1">✅ 권장사항</div>
+                <div className="font-semibold text-green-800 mb-1">  권장사항</div>
                 <ul className="space-y-1 text-green-700">
                   <li>• 고화질 이미지 (최소 1920x1080)</li>
                   <li>• JPG, PNG 형식</li>

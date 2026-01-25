@@ -1,4 +1,3 @@
-// src/components/forms/DirectRegistrationForm.tsx
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'

@@ -210,7 +210,7 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
   }
 }
 
-// ✅ 개선된 무한 리다이렉트 감지 (쿠키 기반)
+//   개선된 무한 리다이렉트 감지 (쿠키 기반)
 function checkRedirectLoop(request: NextRequest): { isLoop: boolean; count: number } {
   const loopCookie = request.cookies.get('_redirect_loop')?.value
 
@@ -239,7 +239,7 @@ function checkRedirectLoop(request: NextRequest): { isLoop: boolean; count: numb
   }
 }
 
-// ✅ 리다이렉트 카운트 증가
+//   리다이렉트 카운트 증가
 function incrementRedirectCount(response: NextResponse, currentCount: number): void {
   const data = {
     count: currentCount + 1,
@@ -255,7 +255,7 @@ function incrementRedirectCount(response: NextResponse, currentCount: number): v
   })
 }
 
-// ✅ 리다이렉트 카운트 초기화
+//   리다이렉트 카운트 초기화
 function clearRedirectCount(response: NextResponse): void {
   response.cookies.set('_redirect_loop', '', {
     httpOnly: true,
@@ -266,7 +266,7 @@ function clearRedirectCount(response: NextResponse): void {
   })
 }
 
-// ✅ 메인 미들웨어 함수
+//   메인 미들웨어 함수
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
@@ -275,7 +275,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next()
   }
 
-  // ✅ 무한 리다이렉트 루프 감지 (쿠키 기반)
+  //   무한 리다이렉트 루프 감지 (쿠키 기반)
   const { isLoop, count } = checkRedirectLoop(request)
 
   if (isLoop) {
@@ -299,7 +299,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   // 로그인 페이지 접근 처리
   if (pathname === '/login') {
-    // ✅ 로그인 페이지에서는 리다이렉트 카운트 초기화
+    //   로그인 페이지에서는 리다이렉트 카운트 초기화
     clearRedirectCount(response)
 
     // 세션 만료 파라미터가 있으면 쿠키 강제 삭제
@@ -319,7 +319,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (sessionToken) {
     user = await authenticateUser(sessionToken)
 
-    // ✅ 세션 무효화 감지 (다른 기기 로그인 등)
+    //   세션 무효화 감지 (다른 기기 로그인 등)
     if (!user && sessionToken) {
       console.warn('[Middleware] 세션 무효화 감지 - 쿠키 삭제 및 강제 로그아웃')
 
@@ -340,7 +340,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
           maxAge: 0
         })
 
-        // ✅ 리다이렉트 카운트 증가
+        //   리다이렉트 카운트 증가
         incrementRedirectCount(redirectResponse, count)
 
         return redirectResponse
@@ -357,7 +357,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 
 
-  // ✅ 보호된 경로 체크
+  //   보호된 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
       const hadToken = !!sessionToken
@@ -381,13 +381,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         })
       }
 
-      // ✅ 리다이렉트 카운트 증가
+      //   리다이렉트 카운트 증가
       incrementRedirectCount(redirectResponse, count)
 
       return redirectResponse
     }
 
-    // ✅ 인증 성공 시 리다이렉트 카운트 초기화
+    //   인증 성공 시 리다이렉트 카운트 초기화
     clearRedirectCount(response)
   }
 

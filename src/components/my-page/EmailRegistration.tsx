@@ -1,4 +1,3 @@
-// src/components/mypage/EmailRegistration.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

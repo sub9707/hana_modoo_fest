@@ -29,14 +29,15 @@ export default function TabContent({ activeTab }: TabContentProps) {
             <EventsOverview />
           )}
 
-          {activeTab === 'map' && (
+          
+          {/* {activeTab === 'map' && (
             <div className="space-y-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">행사장 안내도</h2>
               <div className="text-gray-600">
                 <p>행사장 안내도 컨텐츠가 여기에 들어갑니다.</p>
               </div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </section>

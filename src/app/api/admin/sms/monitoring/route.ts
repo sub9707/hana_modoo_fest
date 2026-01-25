@@ -1,4 +1,3 @@
-// src/app/api/admin/sms/monitoring/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query, queryOne } from '@/lib/mysql/connection'
 import { createSensClient } from '@/lib/sens/client'

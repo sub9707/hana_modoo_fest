@@ -1,4 +1,3 @@
-// src/lib/email/brevo.ts
 
 interface BrevoEmailParams {
   to: string

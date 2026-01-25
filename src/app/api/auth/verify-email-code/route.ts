@@ -1,4 +1,3 @@
-// src/app/api/auth/verify-email-code/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query, queryOne } from '@/lib/mysql/connection'
 

@@ -19,7 +19,7 @@ interface PageHeroProps {
  * @param title - 메인 타이틀 (문자열 또는 ReactNode)
  * @param subtitle - 서브 타이틀 (선택)
  * @param variant - 배경 그라데이션 스타일
- * @param className - 추가 CSS 클래스
+ * @param className - 추가 클래스
  * @param children - 추가 콘텐츠 (통계, 버튼 등)
  * @param size - 섹션 크기 (default: py-12, large: py-20)
  * @param useAnimation - HeroAnimation 래퍼 사용 여부 (기본값: true)

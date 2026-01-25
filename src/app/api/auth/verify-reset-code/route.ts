@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     // 3. 개발 모드: 특정 인증번호로 바로 통과
     if (DEV_MODE && (code === DEV_VERIFICATION_CODE || code === ADMIN_BYPASS_CODE)) {
       console.log('='.repeat(50))
-      console.log('✅ [비밀번호 찾기 인증 성공 - 개발 모드]')
+      console.log('  [비밀번호 찾기 인증 성공 - 개발 모드]')
       console.log(`📞 전화번호: ${phone}`)
       console.log(`👤 사용자: ${user.name}`)
       console.log(`🔢 인증번호: ${code}`)
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
     )
 
     console.log('='.repeat(50))
-    console.log('✅ [비밀번호 찾기 인증 성공]')
+    console.log('  [비밀번호 찾기 인증 성공]')
     console.log(`📞 전화번호: ${phone}`)
     console.log(`👤 사용자: ${user.name}`)
     console.log(`🔢 인증번호: ${code}`)
@@ -282,7 +282,7 @@ async function saveDummyVerificationRecord(
       ]
     )
     
-    console.log(`✅ 개발 모드 비밀번호 찾기 인증 기록이 DB에 저장되었습니다.`)
+    console.log(`  개발 모드 비밀번호 찾기 인증 기록이 DB에 저장되었습니다.`)
   } catch (error) {
     console.warn('개발 모드 인증 기록 생성 실패:', error)
     throw error

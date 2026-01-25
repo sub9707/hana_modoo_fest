@@ -13,7 +13,7 @@ export default function EventsOverview() {
   useEffect(() => {
     async function loadBoothData() {
       try {
-        // 실제 환경에서는 import 경로 확인 필요
+        // 부스 데이터 임포트 ==> 정적 데이터로 저장해서 동적으로 불러오기~
         const data = await import('@/data/BoothData.json')
         setBoothData(data.default)
         setFilteredData(data.default)

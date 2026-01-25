@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import HeroSection from '@/components/home/HeroSection'
-import { SITE, DEFAULT_SEO } from '@/constants'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-// 뷰포트 밖이라 Lazy load 필요..
+// 뷰포트 밖이라 Lazy load 필요
 const Introduction = dynamic(() => import('@/components/home/Introduction'), {
   loading: () => <div className="min-h-80 bg-[#885ef9]" />
 })
@@ -20,35 +21,16 @@ const CampaignSection = dynamic(() => import('@/components/home/CampaignSection'
   loading: () => <div className="min-h-screen/2" />
 })
 
-
-export const metadata: Metadata = {
-  title: DEFAULT_SEO.title,
-  description: DEFAULT_SEO.description,
-  openGraph: {
-    title: DEFAULT_SEO.title,
-    description: DEFAULT_SEO.description,
-    url: SITE.url,
-    images: [
-      {
-        url: DEFAULT_SEO.ogImage,
-        width: DEFAULT_SEO.ogImageWidth,
-        height: DEFAULT_SEO.ogImageHeight,
-        alt: DEFAULT_SEO.ogImageAlt,
-      },
-    ],
-  },
-  icons: {
-    icon: DEFAULT_SEO.favicon,
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.home.title,
+  PAGE_SEO.home.description
+)
 
 
 export default async function HomePage() {
-
   return (
-    <div className='font-paper'>
+    <PageLayout>
       <div className="min-h-screen">
-        {/* 히어로 섹션 */}
         <HeroSection />
       </div>
       <div className="min-h-80">
@@ -66,6 +48,6 @@ export default async function HomePage() {
       <div>
         <CampaignSection />
       </div>
-    </div>
+    </PageLayout>
   )
 }

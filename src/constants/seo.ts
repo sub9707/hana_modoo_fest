@@ -26,11 +26,18 @@ export const createPageMetadata = (
     ogTitle?: string
     ogDescription?: string
     keywords?: string[]
+    noIndex?: boolean
   }
 ) => ({
   title,
   description: description || DEFAULT_SEO.description,
   keywords: options?.keywords || [...DEFAULT_SEO.keywords],
+  ...(options?.noIndex && {
+    robots: {
+      index: false,
+      follow: false,
+    },
+  }),
   openGraph: {
     title: options?.ogTitle || `${title} | ${SITE.fullName}`,
     description: options?.ogDescription || description || DEFAULT_SEO.description,
@@ -91,6 +98,10 @@ export const PAGE_SEO = {
     title: '사전참가 신청',
     description: `${SITE.fullName} 사전참가 신청 페이지입니다.`,
   },
+  registrationSuccess: {
+    title: '신청 완료',
+    description: `${SITE.fullName} 사전참가 신청이 완료되었습니다.`,
+  },
   gallery: {
     title: '갤러리',
     description: `${SITE.fullName}의 추억을 사진으로 만나보세요.`,
@@ -99,6 +110,14 @@ export const PAGE_SEO = {
     title: '로그인',
     description: `${SITE.fullName} 로그인`,
   },
+  register: {
+    title: '회원가입',
+    description: `${SITE.fullName} 회원가입`,
+  },
+  forgotPassword: {
+    title: '비밀번호 찾기',
+    description: '전화번호 인증을 통한 비밀번호 재설정',
+  },
   privacyPolicy: {
     title: '개인정보 처리방침',
     description: `${SITE.fullName}의 개인정보 처리방침입니다.`,
@@ -106,6 +125,34 @@ export const PAGE_SEO = {
   termsOfService: {
     title: '서비스 이용약관',
     description: `${SITE.fullName} 서비스 이용약관`,
+  },
+  deleteAccount: {
+    title: '회원탈퇴',
+    description: '회원탈퇴를 진행하세요',
+  },
+  changePassword: {
+    title: '비밀번호 변경',
+    description: '계정 보안을 위해 비밀번호를 변경하세요.',
+  },
+  changePasswordOptions: {
+    title: '비밀번호 변경 방법 선택',
+    description: '비밀번호 변경 방법을 선택하세요',
+  },
+  changePasswordWithEmail: {
+    title: '이메일 인증으로 비밀번호 변경',
+    description: '이메일 인증을 통해 비밀번호를 변경하세요',
+  },
+  unauthorized: {
+    title: '접근 권한 없음',
+    description: '접근 권한이 없는 페이지입니다.',
+  },
+  accountDeleted: {
+    title: '탈퇴 완료',
+    description: '회원탈퇴가 완료되었습니다.',
+  },
+  myPage: {
+    title: '마이페이지',
+    description: '내 정보 및 신청 내역을 확인하세요.',
   },
 } as const
 

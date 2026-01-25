@@ -1,4 +1,3 @@
-// src/components/forms/EmailBasedPasswordChangeForm.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

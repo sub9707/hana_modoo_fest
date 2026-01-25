@@ -1,4 +1,3 @@
-// src/app/api/auth/direct-register/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash, randomBytes } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'

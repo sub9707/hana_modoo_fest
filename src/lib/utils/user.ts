@@ -1,4 +1,3 @@
-// src/lib/utils/user.ts
 
 /**
  * 가입 방법 텍스트 반환

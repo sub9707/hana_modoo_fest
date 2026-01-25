@@ -244,7 +244,8 @@ export default function LoginForm({ redirectTo = '/' }: LoginFormProps) {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('naver')}
-                disabled={isLoading || socialLoading !== null}
+                disabled
+                // disabled={isLoading || socialLoading !== null}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium bg-[#03C75A] hover:bg-[#02B350] text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {socialLoading === 'naver' ? (

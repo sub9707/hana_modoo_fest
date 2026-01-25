@@ -236,9 +236,9 @@ export default function SocialRegistration({
       console.log('Result:', result)
 
       if (response.ok) {
-        console.log('✅ Registration successful')
+        console.log('  Registration successful')
         if (result.user && result.autoLogin) {
-          console.log('✅ Auto-login successful, setting user in context')
+          console.log('  Auto-login successful, setting user in context')
           login(result.user)
           const finalRedirect = originalRedirect && originalRedirect !== '/my-page' ? originalRedirect : '/'
           const redirectUrl = new URL(finalRedirect, window.location.origin)
@@ -341,7 +341,7 @@ export default function SocialRegistration({
             </div>
           </div>
           <div className="mt-3 text-xs text-green-700 bg-green-50 rounded px-2 py-1">
-            ✅ {providerInfo.name}에서 받은 정보는 자동으로 입력됩니다
+              {providerInfo.name}에서 받은 정보는 자동으로 입력됩니다
           </div>
         </div>
 

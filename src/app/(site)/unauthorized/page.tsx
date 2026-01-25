@@ -1,19 +1,18 @@
 import Link from 'next/link'
 import { ShieldX, ArrowLeft } from 'lucide-react'
 import { Metadata } from 'next'
+import PageLayout from '@/components/layout/PageLayout'
+import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-export const metadata: Metadata = {
-  title: '접근 권한 없음 | 모두하나대축제 2025',
-  description: '접근 권한이 없는 페이지입니다.',
-  robots:{
-    follow:false,
-    index:false
-  }
-}
+export const metadata: Metadata = createPageMetadata(
+  PAGE_SEO.unauthorized.title,
+  PAGE_SEO.unauthorized.description,
+  { noIndex: true }
+)
 
 export default function UnauthorizedPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <PageLayout variant="gray" className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div className="text-center">
@@ -40,6 +39,6 @@ export default function UnauthorizedPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   )
 }

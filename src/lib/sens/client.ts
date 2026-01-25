@@ -1,4 +1,3 @@
-// src/lib/sens/client.ts
 import crypto from 'crypto'
 
 interface SensConfig {

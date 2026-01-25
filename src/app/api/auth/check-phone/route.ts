@@ -1,4 +1,3 @@
-// src/app/api/auth/check-phone/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { queryOne } from '@/lib/mysql/connection'
 import { phoneCheckSchema } from '@/lib/validations/registration'

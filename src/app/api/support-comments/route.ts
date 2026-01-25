@@ -1,4 +1,3 @@
-// src/app/api/support-comments/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
@@ -40,7 +39,7 @@ export async function GET(request: NextRequest) {
       LIMIT ? OFFSET ?
     `, [user?.id || null, limit, offset])
 
-    // ✅ 문자열, 숫자 모두 처리하는 boolean 변환
+    //   문자열, 숫자 모두 처리하는 boolean 변환
     comments.forEach((comment: any) => {
       // '1', 1, true 모두 true로 변환
       // '0', 0, false, null, undefined 모두 false로 변환

@@ -13,7 +13,7 @@ const config = {
   multipleStatements: false,
 
   // 🚀 Vercel 비용 최적화된 연결 풀 설정
-  connectionLimit: 10, // ✅ 30 → 10으로 변경 (67% 비용 절감)
+  connectionLimit: 10, //   30 → 10으로 변경 (67% 비용 절감)
   queueLimit: 0,
   waitForConnections: true,
   
@@ -52,7 +52,7 @@ export async function query(
     // 🚀 개발 환경에서 느린 쿼리 로깅 (임계값 최적화)
     if (process.env.NODE_ENV === 'development') {
       const duration = Date.now() - startTime
-      if (duration > 150) { // ✅ 100ms → 150ms (덜 민감하게 조정)
+      if (duration > 150) { //   100ms → 150ms (덜 민감하게 조정)
         console.warn(`🐌 Slow query (${duration}ms):`, sql.substring(0, 100) + '...')
       }
     }
@@ -91,7 +91,7 @@ export async function transaction<T>(
 
     // 🚀 트랜잭션 타임아웃 최적화 (10초 → 5초)
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Transaction timeout')), 5000) // ✅ 10초 → 5초
+      setTimeout(() => reject(new Error('Transaction timeout')), 5000) //   10초 → 5초
     })
 
     const result = await Promise.race([
@@ -104,7 +104,7 @@ export async function transaction<T>(
     // 🚀 개발 환경에서 긴 트랜잭션 로깅 (기존 기능 유지)
     if (process.env.NODE_ENV === 'development') {
       const duration = Date.now() - startTime
-      if (duration > 300) { // ✅ 200ms → 300ms (덜 민감하게 조정)
+      if (duration > 300) { //   200ms → 300ms (덜 민감하게 조정)
         console.warn(`🐌 Long transaction (${duration}ms)`)
       }
     }
@@ -183,7 +183,7 @@ if (process.env.NODE_ENV === 'development') {
           poolMonitoringInterval = null
         }
       }
-    }, 300000) // ✅ 30초 → 5분 (300초)으로 변경 (90% 비용 절감)
+    }, 300000) //   30초 → 5분 (300초)으로 변경 (90% 비용 절감)
   }
 
   // 개발 서버 시작 시 모니터링 시작
@@ -212,7 +212,7 @@ export async function healthCheck(): Promise<boolean> {
     const duration = Date.now() - startTime
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ DB Health Check: ${duration}ms`)
+      console.log(`  DB Health Check: ${duration}ms`)
     }
 
     return true

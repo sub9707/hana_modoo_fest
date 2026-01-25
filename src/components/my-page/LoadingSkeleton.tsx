@@ -1,4 +1,3 @@
-// src/app/my-page/components/LoadingSkeleton.tsx
 export function LoadingSkeleton() {
   return (
     <div className="p-6 space-y-8 animate-pulse">
