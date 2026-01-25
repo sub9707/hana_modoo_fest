@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 
 interface HeaderCTAButtonProps {
@@ -17,6 +17,11 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
   const [isPending, startTransition] = useTransition()
   const [isClicked, setIsClicked] = useState(false)
 
+  // pathname이 변경되면 클릭 상태 리셋
+  useEffect(() => {
+    setIsClicked(false)
+  }, [pathname])
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
 
@@ -27,10 +32,6 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
     startTransition(() => {
       router.push(href)
     })
-
-    setTimeout(() => {
-      setIsClicked(false)
-    }, 5000)
   }
 
   // 로딩 중이거나 클릭된 상태
@@ -39,8 +40,8 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
 
   if (type === "primary") {
     const primaryStyle = `
-      inline-flex items-center justify-center gap-2 text-sm sm:text-lg px-2 sm:px-6 py-2 
-      rounded-lg font-semibold shadow-md transition-all duration-200 text-center 
+      inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm xl:text-base px-2 sm:px-4 xl:px-5 py-1.5 sm:py-2
+      rounded-lg font-semibold shadow-md transition-all duration-200 text-center whitespace-nowrap
       bg-gradient-to-r from-purple-200 via-blue-200 to-green-100 text-white border border-white
       ${isDisabled ? 'opacity-70 cursor-not-allowed' : 'hover:brightness-105 active:scale-95'}
     `
@@ -63,13 +64,13 @@ function HeaderCTAButton({ title, type = "primary", href }: HeaderCTAButtonProps
 
   // secondary type
   return (
-    <div className="inline-block bg-gradient-to-r from-purple-200 via-blue-200 to-green-100 p-[2px] rounded-lg shadow-md">
-      <Link 
-        href={href} 
+    <div className="inline-block bg-gradient-to-r from-purple-200 via-blue-200 to-green-100 p-[1.5px] rounded-lg shadow-md">
+      <Link
+        href={href}
         onClick={handleClick}
         className={`
-          inline-flex items-center justify-center gap-2 px-6 py-2 rounded-lg font-semibold 
-          transition-all duration-200 text-center bg-white text-gray-600
+          inline-flex items-center justify-center gap-1.5 px-3 xl:px-4 py-1.5 rounded-lg font-semibold
+          transition-all duration-200 text-center bg-white text-gray-600 text-sm whitespace-nowrap
           ${isDisabled ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-50 active:scale-95'}
         `}
         prefetch={true}

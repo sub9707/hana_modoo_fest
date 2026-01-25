@@ -71,6 +71,14 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
       }
     }
 
+    // 테스트 계정 체크
+    if (user.username === 'test_admin') {
+      return {
+        success: false,
+        error: '테스트 계정은 비밀번호를 변경할 수 없습니다.'
+      }
+    }
+
     // 현재 비밀번호 확인
     const currentPasswordHash = createHash('sha256')
       .update(data.currentPassword + user.password_salt)

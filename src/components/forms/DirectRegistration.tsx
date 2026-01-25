@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     User, Phone, Lock, Eye, EyeOff, Building, MapPin,
-    Check, X, Loader2, AlertTriangle, Shield, Mail, Clock, CheckCircle
+    Check, X, Loader2, AlertTriangle, Shield, Mail, Clock, CheckCircle, Info
 } from 'lucide-react'
 import { directRegistrationSchema, type DirectRegistrationData } from '@/lib/validations/registration'
 import { AddressSearchResult, type DuplicationCheckResponse } from '@/types/registration'
@@ -16,6 +16,7 @@ import Link from 'next/link'
 
 interface DirectRegistrationFormProps {
     onBack: () => void
+    isDemo?: boolean
 }
 
 interface EmailVerificationState {
@@ -26,7 +27,7 @@ interface EmailVerificationState {
     message: string
 }
 
-export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) {
+export function DirectRegistrationForm({ onBack, isDemo = false }: DirectRegistrationFormProps) {
     const router = useRouter()
     const { login } = useAuth()
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -388,6 +389,21 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">회원가입</h2>
                 <p className="text-gray-600">모두하나대축제에 참여하세요</p>
             </div>
+
+            {/* 데모 모드 안내 */}
+            {isDemo && (
+                <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                        <Info className="w-5 h-5 text-blue-500 mr-3 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-sm font-medium text-blue-800">데모 버전 안내</p>
+                            <p className="text-xs text-blue-700 mt-1">
+                                현재 데모 버전으로 운영 중이며, 회원가입이 제한되어 있습니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* 경품 관련 안내 */}
             <div className="mb-8 p-4 bg-gradient-to-r from-orange-50 to-pink-50 border border-orange-200 rounded-lg">
@@ -902,7 +918,7 @@ export function DirectRegistrationForm({ onBack }: DirectRegistrationFormProps) 
                     </button>
                     <button
                         type="submit"
-                        disabled={isSubmitting || !usernameCheck.available || !phoneCheck.available || !emailVerification.isVerified}
+                        disabled={isDemo || isSubmitting || !usernameCheck.available || !phoneCheck.available || !emailVerification.isVerified}
                         className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                     >
                         {isSubmitting ? (

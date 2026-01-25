@@ -39,16 +39,9 @@ export default function Header() {
   }
 
   // 사용자 이름 표시 함수
-  const getUserDisplayName = (maxLength = 3) => {
+  const getUserDisplayName = () => {
     if (!user) return ''
-
     const name = user.name || user.username || '사용자'
-
-    // 지정된 길이보다 길면 생략
-    if (name.length > maxLength) {
-      return name.substring(0, maxLength - 1) + '...'
-    }
-
     return name
   }
 
@@ -75,7 +68,7 @@ export default function Header() {
               </Link>
             </div>
 
-            <nav className="hidden md:hidden lg:flex items-center space-x-1" role="navigation" aria-label="주요 메뉴">
+            <nav className="hidden xl:flex items-center" role="navigation" aria-label="주요 메뉴">
               {MAIN_NAVIGATION.map((item) => {
                 const isActive = pathname === item.href
 
@@ -84,7 +77,7 @@ export default function Header() {
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      "px-3 py-2 text-md font-medium rounded-md transition-colors relative",
+                      "px-2 xl:px-3 py-2 text-sm xl:text-base font-medium rounded-md transition-colors relative whitespace-nowrap",
                       isActive
                         ? "text-blue-600 bg-blue-50"
                         : "text-slate-700 hover:text-blue-600"
@@ -100,37 +93,42 @@ export default function Header() {
               })}
             </nav>
 
-            <div className='flex items-center gap-6'>
-              <div className='flex items-center gap-4 ml-6 sm:ml-0'>
-                <HeaderCTAButton href={ROUTES.registration} type='primary' title='사전참가 신청' />
+            <div className='flex items-center gap-2 sm:gap-3'>
+              <HeaderCTAButton href={ROUTES.registration} type='primary' title='사전참가 신청' />
 
-                {/* 로그인 상태에 따른 분기 처리 */}
-                <div className='hidden lg:flex items-center gap-3'>
-                  {isLoadingAuth ? (
-                    <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
-                  ) : user ? (
-                    <>
-                      <Link
-                        href={ROUTES.myPage}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors"
-                      >
-                        <User className="h-4 w-4" />
-                        <span>{getUserDisplayName()}님</span>
-                      </Link>
-                      <div className="w-px h-4 bg-slate-300" />
-                      <LogoutButton type="link" variant="ghost" size="sm" />
-                    </>
-                  ) : (
-                    <HeaderCTAButton href={ROUTES.login} title='로그인/회원가입' type='secondary' />
-                  )}
+              {/* 로그인 상태에 따른 분기 처리 */}
+              {isLoadingAuth ? (
+                <div className="w-16 h-5 bg-gray-200 animate-pulse rounded" />
+              ) : user ? (
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Link
+                    href={ROUTES.myPage}
+                    className="flex items-center gap-1 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    <User className="h-4 w-4 flex-shrink-0" />
+                    <span className="max-w-[50px] sm:max-w-[80px] truncate">{getUserDisplayName()}</span>
+                    <span>님</span>
+                  </Link>
+                  <div className="w-px h-4 bg-slate-300" />
+                  <LogoutButton
+                    type="link"
+                    size="sm"
+                    showIcon={false}
+                    className="text-xs sm:text-sm"
+                  />
                 </div>
-
-                {/* <LanguageSelect /> */}
-              </div>
+              ) : (
+                <Link
+                  href={ROUTES.login}
+                  className="text-xs sm:text-sm text-slate-700 hover:text-blue-600 transition-colors"
+                >
+                  로그인
+                </Link>
+              )}
 
               {/* 모바일 메뉴 버튼 */}
               <button
-                className="lg:hidden p-2 rounded-md text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
+                className="xl:hidden p-2 rounded-md text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-colors"
                 onClick={handleMobileMenuToggle}
                 aria-label="메뉴 열기"
               >
@@ -145,7 +143,7 @@ export default function Header() {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+          <div className="xl:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="px-4 py-2 space-y-1">
               {MAIN_NAVIGATION.map((item) => {
                 const isActive = pathname === item.href

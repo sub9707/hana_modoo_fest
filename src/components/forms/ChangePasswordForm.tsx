@@ -9,7 +9,7 @@ import {
   getPasswordStrengthText,
   type PasswordStrengthResult 
 } from '@/lib/utils/password'
-import { Eye, EyeOff, Lock, Shield, CheckCircle, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Lock, Shield, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react'
 
 interface FormData {
   currentPassword: string
@@ -24,7 +24,11 @@ interface FormErrors {
   general?: string
 }
 
-export function ChangePasswordForm() {
+interface ChangePasswordFormProps {
+  isTestAccount?: boolean
+}
+
+export function ChangePasswordForm({ isTestAccount = false }: ChangePasswordFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
@@ -183,6 +187,21 @@ export function ChangePasswordForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 테스트 계정 경고 메시지 */}
+        {isTestAccount && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <AlertTriangle className="w-5 h-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">테스트 계정</p>
+                <p className="text-xs text-amber-700 mt-1">
+                  테스트 계정은 비밀번호를 변경할 수 없습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 일반 에러 메시지 */}
         {errors.general && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-start">
@@ -207,13 +226,13 @@ export function ChangePasswordForm() {
                 errors.currentPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
               placeholder="현재 비밀번호를 입력하세요"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('current')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             >
               {showPasswords.current ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -242,13 +261,13 @@ export function ChangePasswordForm() {
                 errors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
               placeholder="새 비밀번호를 입력하세요"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('new')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             >
               {showPasswords.new ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -308,13 +327,13 @@ export function ChangePasswordForm() {
                 errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
               }`}
               placeholder="새 비밀번호를 다시 입력하세요"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('confirm')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-              disabled={isPending}
+              disabled={isPending || isTestAccount}
             >
               {showPasswords.confirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
@@ -350,14 +369,14 @@ export function ChangePasswordForm() {
           <button
             type="button"
             onClick={() => router.back()}
-            disabled={isPending}
+            disabled={isPending || isTestAccount}
             className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             취소
           </button>
           <button
             type="submit"
-            disabled={isPending || !passwordStrength?.isStrong}
+            disabled={isPending || isTestAccount || !passwordStrength?.isStrong}
             className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isPending ? (

@@ -105,7 +105,7 @@ export default async function ChangePasswordPage() {
 
         {/* NextJS 15: Suspense를 활용한 비동기 로딩 */}
         <Suspense fallback={<ChangePasswordSkeleton />}>
-          <ChangePasswordForm />
+          <ChangePasswordForm isTestAccount={user.username === 'test_admin'} />
         </Suspense>
 
       </div>

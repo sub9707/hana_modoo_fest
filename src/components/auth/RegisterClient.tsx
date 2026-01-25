@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import SocialRegistration from '@/components/forms/SocialRegistration'
-import { AlertCircle, CheckCircle, UserPlus } from 'lucide-react'
+import { AlertCircle, CheckCircle, UserPlus, Info } from 'lucide-react'
 import { DirectRegistrationForm } from '@/components/forms/DirectRegistration'
 import Image from 'next/image'
 
@@ -20,6 +20,9 @@ interface SocialUserData {
   mobile?: string
   birthyear?: string
 }
+
+// 데모 모드 설정 (true: 회원가입 차단)
+const IS_DEMO_MODE = true
 
 export default function RegisterClient() {
   const router = useRouter()
@@ -97,25 +100,52 @@ export default function RegisterClient() {
         <p className="text-gray-600">가입 방식을 선택해주세요</p>
       </div>
 
+      {/* 데모 모드 안내 */}
+      {IS_DEMO_MODE && (
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <Info className="w-5 h-5 text-blue-500 mr-3 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-blue-800">데모 버전 안내</p>
+              <p className="text-xs text-blue-700 mt-1">
+                현재 데모 버전으로 운영 중이며, 회원가입이 제한되어 있습니다.
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                테스트 계정으로 로그인하여 서비스를 체험해보세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
         <button
-          onClick={() => handleMethodSelect('direct')}
-          className="w-full p-6 border-2 border-orange-500 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors group"
+          onClick={() => !IS_DEMO_MODE && handleMethodSelect('direct')}
+          disabled={IS_DEMO_MODE}
+          className={`w-full p-6 border-2 rounded-xl transition-colors group ${
+            IS_DEMO_MODE
+              ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
+              : 'border-orange-500 bg-orange-50 hover:bg-orange-100'
+          }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-orange-500 rounded-full">
+              <div className={`p-3 rounded-full ${IS_DEMO_MODE ? 'bg-gray-400' : 'bg-orange-500'}`}>
                 <UserPlus className="h-6 w-6 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="text-lg font-semibold text-gray-900">정보 입력으로 가입</h3>
-                <p className="text-sm text-gray-600">모든 정보를 입력하여 바로 가입</p>
+                <h3 className={`text-lg font-semibold ${IS_DEMO_MODE ? 'text-gray-500' : 'text-gray-900'}`}>
+                  정보 입력으로 가입
+                </h3>
+                <p className={`text-sm ${IS_DEMO_MODE ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {IS_DEMO_MODE ? '데모 버전에서는 이용할 수 없습니다' : '모든 정보를 입력하여 바로 가입'}
+                </p>
               </div>
             </div>
           </div>
         </button>
 
-        {isDevelopment && (
+        {isDevelopment && !IS_DEMO_MODE && (
           <button
             onClick={() => handleMethodSelect('social')}
             className="w-full p-6 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-colors group"
@@ -224,7 +254,7 @@ export default function RegisterClient() {
       {registrationStep === 'method' && renderMethodSelection()}
 
       {registrationStep === 'direct' && (
-        <DirectRegistrationForm onBack={handleBackToMethod} />
+        <DirectRegistrationForm onBack={handleBackToMethod} isDemo={IS_DEMO_MODE} />
       )}
 
       {registrationStep === 'social' && socialData && (
