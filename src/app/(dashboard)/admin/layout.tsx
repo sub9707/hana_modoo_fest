@@ -1,4 +1,3 @@
-import React from 'react'
 import type { Metadata } from 'next'
 import Sidebar from '@/components/admin/Sidebar'
 
@@ -19,10 +18,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex h-screen">
-        {/* 왼쪽 사이드바 */}
         <Sidebar />
-        
-        {/* 오른쪽 컨텐츠 영역 */}
         <main className="flex-1 overflow-y-auto">
           <div className="p-6">
             {children}

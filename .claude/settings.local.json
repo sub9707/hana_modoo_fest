@@ -5,7 +5,10 @@
       "Bash(grep:*)",
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(dir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)"
     ]
   }
 }

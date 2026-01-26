@@ -1,31 +1,38 @@
-// app/admin/users/page.tsx
-export const dynamic = "force-dynamic"
-
-import React from 'react'
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { requireAuth, requireRole } from '@/lib/mysql/server'
 import UserStats from '@/components/admin/UserManagement/UserStats'
 import UserSignupChart from '@/components/admin/UserManagement/UserSignUpChart'
 import UsersManagementClient from '@/components/admin/UserManagement/UserManagementClient'
 import { getAllUsers, getUserStatsExtended } from '@/lib/services/users-service'
+import { PageLoadingSpinner } from '@/components/admin/ui/LoadingSpinner'
+
+export const dynamic = 'force-dynamic'
+
+async function UsersContent() {
+  const [users, extendedStats] = await Promise.all([
+    getAllUsers(),
+    getUserStatsExtended()
+  ])
+
+  const { dailySignups, ...basicStats } = extendedStats
+
+  return (
+    <>
+      <UserStats stats={basicStats} />
+      <UserSignupChart data={dailySignups} />
+      <UsersManagementClient initialUsers={users} initialStats={basicStats} />
+    </>
+  )
+}
 
 export default async function UsersPage() {
   try {
-    // 인증 및 권한 확인
-    const currentUser = await requireAuth()
-    await requireRole('admin') // 관리자만 접근 가능
-    
-    // 서버에서 데이터 가져오기
-    const [users, extendedStats] = await Promise.all([
-      getAllUsers(),
-      getUserStatsExtended()
-    ])
-
-    const { dailySignups, ...basicStats } = extendedStats;
+    await requireAuth()
+    await requireRole('admin')
 
     return (
       <div className="space-y-6">
-        {/* 헤더 */}
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">회원 관리</h1>
@@ -35,20 +42,14 @@ export default async function UsersPage() {
           </div>
         </div>
 
-        {/* 통계 카드 */}
-        <UserStats stats={basicStats} />
-
-        {/* 일별 가입 추이 그래프 */}
-        <UserSignupChart data={dailySignups} />
-
-        {/* 클라이언트 컴포넌트로 위임 */}
-        <UsersManagementClient initialUsers={users} initialStats={basicStats} />
+        <Suspense fallback={<PageLoadingSpinner text="회원 정보를 불러오는 중..." />}>
+          <UsersContent />
+        </Suspense>
       </div>
     )
   } catch (error) {
     console.error('Admin users page error:', error)
-    
-    // 권한 없음 또는 인증 실패 시 리다이렉트
+
     if (error instanceof Error) {
       if (error.message === 'Authentication required') {
         redirect('/login')
@@ -56,8 +57,7 @@ export default async function UsersPage() {
         redirect('/')
       }
     }
-    
-    // 기타 에러
+
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">

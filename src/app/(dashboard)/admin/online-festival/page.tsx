@@ -1,22 +1,54 @@
-'use client'
-
-import { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/admin/online-festival/ui/tabs'
-
+import { Suspense } from 'react'
+import dynamic from 'next/dynamic'
+import { requireRole } from '@/lib/mysql/server'
 import { Users, Trophy, MessageSquare, PenTool, Gift } from 'lucide-react'
-import { RegistrationTab } from '@/components/admin/online-festival/RegistrationTab'
-import { QuizTab } from '@/components/admin/online-festival/QuizTab'
-import { SupportCommentsTab } from '@/components/admin/online-festival/SupportCommentsTab'
-import { WinnersTab } from '@/components/admin/online-festival/WinnersTab'
-import WritingTab from '@/components/admin/online-festival/WritingTab'
+import { TabLoadingSpinner } from '@/components/admin/ui/LoadingSpinner'
+import { OnlineFestivalTabs } from './OnlineFestivalTabs'
 
-export default function OnlineFestivalPage() {
-  const [activeTab, setActiveTab] = useState('registration')
+const RegistrationTab = dynamic(
+  () => import('@/components/admin/online-festival/RegistrationTab').then(m => ({ default: m.RegistrationTab })),
+  { loading: () => <TabLoadingSpinner /> }
+)
+
+const QuizTab = dynamic(
+  () => import('@/components/admin/online-festival/QuizTab').then(m => ({ default: m.QuizTab })),
+  { loading: () => <TabLoadingSpinner /> }
+)
+
+const SupportCommentsTab = dynamic(
+  () => import('@/components/admin/online-festival/SupportCommentsTab').then(m => ({ default: m.SupportCommentsTab })),
+  { loading: () => <TabLoadingSpinner /> }
+)
+
+const WinnersTab = dynamic(
+  () => import('@/components/admin/online-festival/WinnersTab').then(m => ({ default: m.WinnersTab })),
+  { loading: () => <TabLoadingSpinner /> }
+)
+
+const WritingTab = dynamic(
+  () => import('@/components/admin/online-festival/WritingTab'),
+  { loading: () => <TabLoadingSpinner /> }
+)
+
+export const metadata = {
+  title: '온라인 축제 관리 | 관리자',
+  description: '온라인 축제 이벤트를 관리합니다.'
+}
+
+const tabConfig = [
+  { value: 'registration', label: '사전접수', icon: Users },
+  { value: 'quiz', label: '퀴즈 이벤트', icon: Trophy },
+  { value: 'comments', label: '응원댓글', icon: MessageSquare },
+  { value: 'writings', label: '가족주제글짓기', icon: PenTool },
+  { value: 'winners', label: '랜덤이벤트', icon: Gift }
+] as const
+
+export default async function OnlineFestivalPage() {
+  await requireRole('admin')
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* 헤더 */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             온라인 축제 관리
@@ -26,52 +58,23 @@ export default function OnlineFestivalPage() {
           </p>
         </div>
 
-        {/* 탭 네비게이션 */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="registration" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              사전접수
-            </TabsTrigger>
-            <TabsTrigger value="quiz" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              퀴즈 이벤트
-            </TabsTrigger>
-            <TabsTrigger value="comments" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              응원댓글
-            </TabsTrigger>
-            <TabsTrigger value="writings" className="flex items-center gap-2">
-              <PenTool className="h-4 w-4" />
-              가족주제글짓기
-            </TabsTrigger>
-            <TabsTrigger value="winners" className="flex items-center gap-2">
-              <Gift className="h-4 w-4" />
-              랜덤이벤트
-            </TabsTrigger>
-          </TabsList>
-
-          {/* 탭 컨텐츠 */}
-          <TabsContent value="registration">
+        <OnlineFestivalTabs tabConfig={tabConfig}>
+          <Suspense fallback={<TabLoadingSpinner />}>
             <RegistrationTab />
-          </TabsContent>
-
-          <TabsContent value="quiz">
+          </Suspense>
+          <Suspense fallback={<TabLoadingSpinner />}>
             <QuizTab />
-          </TabsContent>
-
-          <TabsContent value="comments">
+          </Suspense>
+          <Suspense fallback={<TabLoadingSpinner />}>
             <SupportCommentsTab />
-          </TabsContent>
-
-          <TabsContent value="writings">
+          </Suspense>
+          <Suspense fallback={<TabLoadingSpinner />}>
             <WritingTab />
-          </TabsContent>
-
-          <TabsContent value="winners">
+          </Suspense>
+          <Suspense fallback={<TabLoadingSpinner />}>
             <WinnersTab />
-          </TabsContent>
-        </Tabs>
+          </Suspense>
+        </OnlineFestivalTabs>
       </div>
     </div>
   )
