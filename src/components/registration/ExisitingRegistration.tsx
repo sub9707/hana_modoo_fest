@@ -145,7 +145,6 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
         
         <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
           <div className="flex items-start space-x-2">
-            <span className="text-xl">🏠</span>
             <div className="flex-1">
               <div className="font-medium text-orange-800 mb-1">
                 [{registration.zip_code}] {registration.address}

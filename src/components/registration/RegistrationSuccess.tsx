@@ -140,7 +140,6 @@ export default function RegistrationSuccess({ user, registration }: Registration
                 </div>
                 
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                    <div className="text-7xl mb-8 animate-bounce">🎉</div>
                     <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-yellow-100 to-white">
                         신청 완료!
                     </h1>
@@ -329,9 +328,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-center space-x-3">
-                                        <span className="text-xl">💾</span>
-                                        <span>접수증 이미지 다운로드</span>
-                                        <span className="text-xl">✨</span>
+                                        <span>접수증 다운로드</span>
                                     </div>
                                 )}
                             </button>
@@ -347,7 +344,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
                         style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                     >
                         <h2 className="text-2xl font-bold mb-4" style={{ color: '#111827' }}>
-                            📋 안내 사항
+                            안내 사항
                         </h2>
                         <div className="space-y-4">
                             {[
