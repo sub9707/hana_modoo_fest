@@ -599,17 +599,21 @@ export interface DailySignupData {
   signups: string;
 }
 
-export async function getDailySignupStats(days: number = 30): Promise<DailySignupData[]> {
+export async function getDailySignupStats(startDate?: string, endDate?: string): Promise<DailySignupData[]> {
   try {
+    // 기본값: 2025년 11월 1일 ~ 11월 30일
+    const start = startDate || '2025-11-01';
+    const end = endDate || '2025-11-30';
+
     const results = await query(`
-      SELECT 
+      SELECT
         DATE(created_at) as date,
         COUNT(*) as signups
       FROM users
-      WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+      WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?
       GROUP BY DATE(created_at)
       ORDER BY date ASC
-    `, [days]);
+    `, [start, end]);
 
     return results.map(row => ({
       date: row.date,
@@ -628,7 +632,7 @@ export async function getUserStatsExtended(): Promise<UserStats & { dailySignups
   try {
     const [basicStats, dailySignups] = await Promise.all([
       getUserStats(),
-      getDailySignupStats(30)
+      getDailySignupStats() // 기본값: 2025년 11월
     ]);
 
     return {

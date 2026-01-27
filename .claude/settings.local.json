@@ -8,7 +8,8 @@
       "Bash(powershell -Command:*)",
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

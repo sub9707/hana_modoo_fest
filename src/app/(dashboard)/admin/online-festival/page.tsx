@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { requireRole } from '@/lib/mysql/server'
-import { Users, Trophy, MessageSquare, PenTool, Gift } from 'lucide-react'
 import { TabLoadingSpinner } from '@/components/admin/ui/LoadingSpinner'
 import { OnlineFestivalTabs } from './OnlineFestivalTabs'
 
@@ -35,14 +34,6 @@ export const metadata = {
   description: '온라인 축제 이벤트를 관리합니다.'
 }
 
-const tabConfig = [
-  { value: 'registration', label: '사전접수', icon: Users },
-  { value: 'quiz', label: '퀴즈 이벤트', icon: Trophy },
-  { value: 'comments', label: '응원댓글', icon: MessageSquare },
-  { value: 'writings', label: '가족주제글짓기', icon: PenTool },
-  { value: 'winners', label: '랜덤이벤트', icon: Gift }
-] as const
-
 export default async function OnlineFestivalPage() {
   await requireRole('admin')
 
@@ -58,7 +49,7 @@ export default async function OnlineFestivalPage() {
           </p>
         </div>
 
-        <OnlineFestivalTabs tabConfig={tabConfig}>
+        <OnlineFestivalTabs>
           <Suspense fallback={<TabLoadingSpinner />}>
             <RegistrationTab />
           </Suspense>

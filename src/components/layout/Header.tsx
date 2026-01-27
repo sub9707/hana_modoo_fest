@@ -15,8 +15,14 @@ import { MAIN_NAVIGATION, ROUTES } from '@/constants'
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const { user, isLoading: isLoadingAuth, error } = useAuth()
   const pathname = usePathname()
+
+  // 클라이언트 마운트 상태 (hydration 에러 방지)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     if (error) {
@@ -96,35 +102,41 @@ export default function Header() {
             <div className='flex items-center gap-2 sm:gap-3'>
               <HeaderCTAButton href={ROUTES.registration} type='primary' title='사전참가 신청' />
 
-              {/* 로그인 상태에 따른 분기 처리 */}
-              {isLoadingAuth ? (
-                <div className="w-16 h-5 bg-gray-200 animate-pulse rounded" />
-              ) : user ? (
-                <div className="flex items-center gap-2 sm:gap-3">
+              {/* 로그인 상태에 따른 분기 처리 - 데스크톱에서만 표시 */}
+              <div className="hidden xl:flex items-center">
+                {!isMounted || isLoadingAuth ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 h-5 bg-gray-200 animate-pulse rounded" />
+                    <div className="w-px h-4 bg-slate-200" />
+                    <div className="w-12 h-5 bg-gray-200 animate-pulse rounded" />
+                  </div>
+                ) : user ? (
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={ROUTES.myPage}
+                      className="flex items-center gap-1 px-2 py-1.5 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors whitespace-nowrap"
+                    >
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <span className="max-w-[80px] truncate">{getUserDisplayName()}</span>
+                      <span>님</span>
+                    </Link>
+                    <div className="w-px h-4 bg-slate-300" />
+                    <LogoutButton
+                      type="link"
+                      size="sm"
+                      showIcon={false}
+                      className="text-sm"
+                    />
+                  </div>
+                ) : (
                   <Link
-                    href={ROUTES.myPage}
-                    className="flex items-center gap-1 px-1.5 sm:px-2 py-1.5 text-xs sm:text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-md transition-colors whitespace-nowrap"
+                    href={ROUTES.login}
+                    className="text-sm text-slate-700 hover:text-blue-600 transition-colors"
                   >
-                    <User className="h-4 w-4 flex-shrink-0" />
-                    <span className="max-w-[50px] sm:max-w-[80px] truncate">{getUserDisplayName()}</span>
-                    <span>님</span>
+                    로그인
                   </Link>
-                  <div className="w-px h-4 bg-slate-300" />
-                  <LogoutButton
-                    type="link"
-                    size="sm"
-                    showIcon={false}
-                    className="text-xs sm:text-sm"
-                  />
-                </div>
-              ) : (
-                <Link
-                  href={ROUTES.login}
-                  className="text-xs sm:text-sm text-slate-700 hover:text-blue-600 transition-colors"
-                >
-                  로그인
-                </Link>
-              )}
+                )}
+              </div>
 
               {/* 모바일 메뉴 버튼 */}
               <button
@@ -166,7 +178,7 @@ export default function Header() {
 
               {/* 모바일 하단 메뉴 */}
               <div className="pt-2 border-t border-gray-200 space-y-1">
-                {isLoadingAuth ? (
+                {!isMounted || isLoadingAuth ? (
                   <div className="px-3 py-2">
                     <div className="w-24 h-5 bg-gray-200 animate-pulse rounded" />
                   </div>

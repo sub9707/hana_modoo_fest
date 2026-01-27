@@ -7,7 +7,7 @@ export default function RegistrationHero() {
   const formattedDeadline = getFormattedDeadline()
 
   return (
-    <section className="bg-gradient-to-r from-orange-400 to-festival-pink text-white py-16">
+    <section className="bg-gradient-to-r from-orange-400 to-pink-500 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
           사전참가 신청

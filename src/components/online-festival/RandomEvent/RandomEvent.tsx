@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import RouletteWheel from './RouletteWheel'
+import RouletteResultModal from './RouletteResultModal'
 import WinnerAnnouncement from './WinnerAnnouncement'
 import MyWinnings from './MyWinnings'
 import InfoCard from '@/components/common/InfoCard'
 import FestivalTabHeader from '../FestivalTabHeader'
 import { Prize } from '@/types/online-festival'
-import { RecentWinner } from '@/types/event'
-import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle, CheckCircle, User, LogIn, PackageX, Phone } from 'lucide-react'
+import { RecentWinner, RouletteResult } from '@/types/event'
+import { formatRelativeTime } from '@/lib/utils/date'
+import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle, CheckCircle, LogIn, PackageX, Phone } from 'lucide-react'
 
 // 상품명에 따른 이미지 매핑
 const PRIZE_IMAGE_MAP: Record<string, string> = {
@@ -41,22 +43,6 @@ function getPrizeImage(prizeName: string): string | null {
   return null
 }
 
-// 시간 차이 계산 함수
-function getTimeAgo(wonAt: string): string {
-  const now = new Date()
-  const wonDate = new Date(wonAt)
-  const diffMs = now.getTime() - wonDate.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-
-  if (diffMins < 1) return '방금 전'
-  if (diffMins < 60) return `${diffMins}분 전`
-
-  const diffHours = Math.floor(diffMins / 60)
-  if (diffHours < 24) return `${diffHours}시간 전`
-
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}일 전`
-}
 
 export default function RandomEvent() {
   const { user } = useAuth()
@@ -70,6 +56,9 @@ export default function RandomEvent() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [winningPrizeIndex, setWinningPrizeIndex] = useState(0)
+  const [rouletteResult, setRouletteResult] = useState<RouletteResult | null>(null)
+  const [showResultModal, setShowResultModal] = useState(false)
+  const pendingResultRef = useRef<RouletteResult | null>(null)
 
   // 테스트 앱: 이벤트 항상 진행 중
   const EVENT_ENDED = false
@@ -117,7 +106,7 @@ export default function RandomEvent() {
         // time_ago 속성 추가
         const winnersWithTimeAgo: RecentWinner[] = data.data.map((winner: any) => ({
           ...winner,
-          time_ago: getTimeAgo(winner.won_at)
+          time_ago: formatRelativeTime(winner.won_at)
         }))
         setRecentWinners(winnersWithTimeAgo)
       }
@@ -144,27 +133,18 @@ export default function RandomEvent() {
   }
 
   const spin = useCallback(async () => {
-    // 테스트 앱: 이벤트 종료 체크 제거
-    // if (EVENT_ENDED) {
-    //   setError('랜덤 이벤트가 종료되었습니다.')
-    //   return
-    // }
-
     if (!user) {
       setError('로그인이 필요합니다.')
       return
     }
 
-    // 테스트 앱: 일일 참여 제한 체크 제거
-    // if (hasParticipatedToday) {
-    //   setError('오늘은 이미 참여하셨습니다.')
-    //   return
-    // }
+    if (isSpinning || isLoading) return
 
-    if (isSpinning) return
-
-    setIsSpinning(true)
     setError(null)
+    pendingResultRef.current = null
+
+    // API 호출 중임을 표시 (버튼 비활성화)
+    setIsLoading(true)
 
     try {
       const response = await fetch('/api/event/roulette/spin', {
@@ -180,21 +160,39 @@ export default function RandomEvent() {
       const winningPrize = data.data.prize
       const prizeIndex = prizes.findIndex((p) => p.id === winningPrize.id)
 
-      setWinningPrizeIndex(prizeIndex)
+      // 먼저 결과와 인덱스를 저장
+      const result: RouletteResult = {
+        success: true,
+        prize: winningPrize,
+        winner_id: data.data.winner_id
+      }
+      pendingResultRef.current = result
+      setWinningPrizeIndex(prizeIndex >= 0 ? prizeIndex : 0)
 
-      setTimeout(() => {
-        setIsSpinning(false)
-        // 테스트 앱: 참여 제한 상태 업데이트 제거 - 계속 참여 가능
-        // setHasParticipatedToday(true)
-        // setCanParticipate(false)
-        setCanParticipate(true) // 항상 참여 가능 상태 유지
-        loadRecentWinners()
-      }, 5500)
+      // 그 다음 스피닝 시작 (이 시점에 winningPrizeIndex가 올바른 값)
+      setIsLoading(false)
+      setIsSpinning(true)
     } catch (err) {
-      setIsSpinning(false)
+      setIsLoading(false)
       setError(err instanceof Error ? err.message : '참여 중 오류가 발생했습니다.')
     }
-  }, [user, hasParticipatedToday, isSpinning, prizes, currentRotation, EVENT_ENDED])
+  }, [user, isSpinning, isLoading, prizes])
+
+  // 룰렛 애니메이션 완료 시 호출
+  const handleSpinComplete = useCallback(() => {
+    setIsSpinning(false)
+
+    // ref를 사용하므로 항상 최신 값 참조
+    if (pendingResultRef.current) {
+      setRouletteResult(pendingResultRef.current)
+      setShowResultModal(true)
+      pendingResultRef.current = null
+    }
+
+    // 테스트 앱: 참여 제한 상태 업데이트 제거 - 계속 참여 가능
+    setCanParticipate(true)
+    loadRecentWinners()
+  }, [])
 
   const handleRefresh = () => {
     loadInitialData()
@@ -291,6 +289,7 @@ export default function RandomEvent() {
                 canParticipate={canParticipate}
                 currentRotation={currentRotation}
                 onSpin={spin}
+                onSpinComplete={handleSpinComplete}
                 hasParticipatedToday={hasParticipatedToday}
                 serverLoad={serverLoad}
                 isLoading={isLoading}
@@ -409,6 +408,13 @@ export default function RandomEvent() {
           )}
         </div>
       )}
+
+      {/* 결과 모달 */}
+      <RouletteResultModal
+        result={rouletteResult}
+        isOpen={showResultModal}
+        onClose={() => setShowResultModal(false)}
+      />
     </div>
   )
 }

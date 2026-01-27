@@ -46,6 +46,7 @@ interface RouletteWheelProps {
   canParticipate: boolean
   currentRotation: number
   onSpin: () => void
+  onSpinComplete?: () => void
   hasParticipatedToday: boolean
   serverLoad: number
   isLoading: boolean
@@ -60,6 +61,7 @@ export default function RouletteWheel({
   canParticipate,
   currentRotation,
   onSpin,
+  onSpinComplete,
   hasParticipatedToday,
   serverLoad,
   isLoading,
@@ -70,11 +72,12 @@ export default function RouletteWheel({
   const [mustSpin, setMustSpin] = useState(false)
   const [prizeNumber, setPrizeNumber] = useState(0)
 
+  // isSpinning이 true가 될 때만 mustSpin을 true로 설정
   useEffect(() => {
-    if (isSpinning && !mustSpin) {
+    if (isSpinning) {
       setMustSpin(true)
     }
-  }, [isSpinning, mustSpin])
+  }, [isSpinning])
 
   const getButtonContent = () => {
     if (eventEnded) {
@@ -181,6 +184,7 @@ export default function RouletteWheel({
             data={wheelData}
             onStopSpinning={() => {
               setMustSpin(false)
+              onSpinComplete?.()
             }}
             outerBorderColor="#ffffff"
             outerBorderWidth={8}
@@ -190,7 +194,7 @@ export default function RouletteWheel({
             radiusLineWidth={2}
             fontSize={prizes.length <= 6 ? 45 : prizes.length <= 10 ? 40 : 35}
             textDistance={60}
-            spinDuration={0.5}
+            spinDuration={0.8}
           />
         </div>
 

@@ -2,21 +2,22 @@
 
 import { useState, Children, ReactNode } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/admin/online-festival/ui/tabs'
-import { LucideIcon } from 'lucide-react'
+import { Users, Trophy, MessageSquare, PenTool, Gift } from 'lucide-react'
 
-interface TabConfig {
-  value: string
-  label: string
-  icon: LucideIcon
-}
+const tabConfig = [
+  { value: 'registration', label: '사전접수', icon: Users },
+  { value: 'quiz', label: '퀴즈 이벤트', icon: Trophy },
+  { value: 'comments', label: '응원댓글', icon: MessageSquare },
+  { value: 'writings', label: '가족주제글짓기', icon: PenTool },
+  { value: 'winners', label: '랜덤이벤트', icon: Gift }
+] as const
 
 interface OnlineFestivalTabsProps {
-  tabConfig: readonly TabConfig[]
   children: ReactNode
 }
 
-export function OnlineFestivalTabs({ tabConfig, children }: OnlineFestivalTabsProps) {
-  const [activeTab, setActiveTab] = useState(tabConfig[0].value)
+export function OnlineFestivalTabs({ children }: OnlineFestivalTabsProps) {
+  const [activeTab, setActiveTab] = useState<string>(tabConfig[0].value)
   const childArray = Children.toArray(children)
 
   return (

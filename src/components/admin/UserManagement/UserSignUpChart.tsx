@@ -33,11 +33,7 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
     originalDate: item.date
   }));
 
-  console.log(chartData)
-
-  // 총 가입자 수 계산
   const totalSignups = data.reduce((sum, item) => sum + parseInt(item.signups), 0);
-  console.log(totalSignups)
   const avgSignups = data.length > 0 ? (totalSignups / data.length).toFixed(1) : 0;
 
   return (
@@ -45,7 +41,7 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
       <div className="flex justify-between items-center mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">일별 가입 추이</h3>
-          <p className="text-sm text-gray-600 mt-1">최근 30일간 신규 회원 가입 현황</p>
+          <p className="text-sm text-gray-600 mt-1">2025년 11월 신규 회원 가입 현황</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-gray-600">기간 내 총 가입</p>

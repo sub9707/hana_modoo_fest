@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Heart } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { formatRelativeTime } from '@/lib/utils/date'
 
 interface Comment {
   id: string
@@ -87,27 +88,6 @@ function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return '방금 전'
-    if (diffMins < 60) return `${diffMins}분 전`
-    if (diffHours < 24) return `${diffHours}시간 전`
-    if (diffDays < 7) return `${diffDays}일 전`
-    
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  // 🔍 디버깅: 렌더링 시 isLiked 값 확인
   const isLikedDisplay = comment.isLiked === true
 
   return (
@@ -116,7 +96,7 @@ function CommentItem({ comment, onLikeToggle }: CommentItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold text-gray-900">{comment.author_name}</span>
-            <span className="text-xs text-gray-400">{formatDate(comment.created_at)}</span>
+            <span className="text-xs text-gray-400">{formatRelativeTime(comment.created_at, { fallbackAfterDays: 7 })}</span>
           </div>
           <p className="text-gray-700 whitespace-pre-wrap break-words leading-relaxed">
             {comment.message}
