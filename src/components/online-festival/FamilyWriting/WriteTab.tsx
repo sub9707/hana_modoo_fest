@@ -64,7 +64,7 @@ export default function WriteTab({
 }: WriteTabProps) {
 
   // 이벤트 종료 상태
-  const EVENT_ENDED = true
+  const EVENT_ENDED = false
 
   if (!currentUser) {
     return (

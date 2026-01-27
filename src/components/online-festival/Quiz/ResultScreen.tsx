@@ -1,7 +1,7 @@
 'use client'
 
 import { memo } from 'react'
-import { RotateCcw, Trophy, Clock, Target, Gift, Sparkles } from 'lucide-react'
+import { RotateCcw, Gift } from 'lucide-react'
 
 interface ResultScreenProps {
   score: number
@@ -61,7 +61,6 @@ export const ResultScreen = memo(({
         {/* 점수 표시 */}
         <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
           <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
-            <Target className="w-8 h-8 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-800">{score}/{totalQuizzes}</div>
             <div className="text-sm text-green-600">정답 수</div>
           </div>
@@ -74,11 +73,9 @@ export const ResultScreen = memo(({
             <div className="flex items-center justify-center mb-4">
               <Gift className="w-6 h-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-bold text-orange-800">이벤트 참여 자격 획득!</h3>
-              <Sparkles className="w-6 h-6 text-orange-500 ml-2" />
             </div>
             <div className="text-center space-y-2 text-orange-700">
               <div className="flex items-center justify-center space-x-2">
-                <Target className="w-5 h-5" />
                 <p className="font-medium">만점을 달성하셨습니다!</p>
               </div>
               <p className="text-sm">추첨을 통해 100명에게 경품을 제공합니다.</p>
@@ -112,7 +109,6 @@ export const ResultScreen = memo(({
                 </>
               ) : (
                 <>
-                  <Gift className="w-5 h-5 mr-2" />
                   이벤트 참여하기
                 </>
               )}
@@ -124,7 +120,7 @@ export const ResultScreen = memo(({
         {!isPerfectScore && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-center">
             <p className="text-blue-700 text-sm">
-              💡 <strong>팁:</strong> 만점을 달성하면 추첨을 통해 경품을 받을 수 있는 기회가 주어집니다!
+              <strong>팁:</strong> 만점을 달성하면 추첨을 통해 경품을 받을 수 있는 기회가 주어집니다!
             </p>
           </div>
         )}
@@ -132,7 +128,7 @@ export const ResultScreen = memo(({
 
       {/* 퀴즈 이벤트 정보 */}
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">🎁 이벤트 안내</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">이벤트 안내</h3>
         <div className="space-y-2 text-gray-700 text-sm flex flex-col justify-center items-center">
           <div className="flex items-start space-x-2">
             <span className="text-green-500 font-bold">•</span>

@@ -154,6 +154,14 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
 
   // IntersectionObserver 설정
   useEffect(() => {
+    // 더 불러올 게 없으면 observer 필요 없음
+    if (!hasMore) {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+      return
+    }
+
     if (observerRef.current) {
       observerRef.current.disconnect()
     }
@@ -161,34 +169,76 @@ export default function CommentList({ refreshTrigger }: CommentListProps) {
     observerRef.current = new IntersectionObserver(
       (entries) => {
         const entry = entries[0]
-        
+
         if (entry.isIntersecting && hasMoreRef.current && !isLoadingRef.current) {
           loadComments()
         }
       },
       {
-        // 요소의 50%가 보일 때 트리거
-        threshold: 0.5,
-        // 하단 100px 전에 미리 로딩 시작
-        rootMargin: '0px 0px 100px 0px'
+        // 요소가 조금이라도 보이면 트리거 (0) + 여유 있게 (0.1)
+        threshold: [0, 0.1],
+        // 하단 200px 전에 미리 로딩 시작 (더 여유있게)
+        rootMargin: '0px 0px 200px 0px'
       }
     )
 
-    if (loadingRef.current) {
-      observerRef.current.observe(loadingRef.current)
-    }
+    // ref 연결 대기 후 observe
+    const timer = setTimeout(() => {
+      if (loadingRef.current && observerRef.current) {
+        observerRef.current.observe(loadingRef.current)
+      }
+    }, 100)
 
     return () => {
+      clearTimeout(timer)
       if (observerRef.current) {
         observerRef.current.disconnect()
       }
     }
-  }, [loadComments])
+  }, [loadComments, hasMore])
 
   // 초기 로드
   useEffect(() => {
     loadComments(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 스크롤 이벤트 백업 (IntersectionObserver 실패 대비)
+  useEffect(() => {
+    if (!hasMore) return
+
+    const handleScroll = () => {
+      // 이미 로딩 중이면 무시
+      if (isLoadingRef.current || !hasMoreRef.current) return
+
+      // 페이지 하단에서 300px 이내면 로딩
+      const scrollTop = window.scrollY
+      const windowHeight = window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+
+      if (scrollTop + windowHeight >= documentHeight - 300) {
+        loadComments()
+      }
+    }
+
+    // throttle 적용
+    let ticking = false
+    const throttledScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', throttledScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', throttledScroll)
+    }
+  }, [hasMore, loadComments])
 
   const handleLikeToggle = useCallback((commentId: string, isLiked: boolean, newLikes: number) => {
     startTransition(() => {

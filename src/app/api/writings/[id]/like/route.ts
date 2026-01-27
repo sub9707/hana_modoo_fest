@@ -2,10 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query, transaction } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(
   request: NextRequest,
-  context:  { params: any } 
+  context: { params: any }
 ) {
   try {
     const user = await getCurrentUser()
@@ -63,10 +64,11 @@ export async function POST(
 
         isLiked = false
       } else {
-        // 좋아요 추가
+        // 좋아요 추가 (id를 UUID로 직접 생성)
+        const likeId = uuidv4()
         await connection.execute(
-          `INSERT INTO writing_likes (user_id, writing_id) VALUES (?, ?)`,
-          [user.id, writingId]
+          `INSERT INTO writing_likes (id, user_id, writing_id) VALUES (?, ?, ?)`,
+          [likeId, user.id, writingId]
         )
 
         await connection.execute(

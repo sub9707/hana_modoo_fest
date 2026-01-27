@@ -213,9 +213,10 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
         } else if (currentTab === 'featured') {
           setFeaturedWritings(previousFeaturedWritings)
         }
-        
+
         // 에러 메시지 표시
-        if (data.error && data.error !== '좋아요 처리에 실패했습니다.') {
+        if (data.error) {
+          console.error('좋아요 에러:', data.error)
           alert(data.error)
         }
       }

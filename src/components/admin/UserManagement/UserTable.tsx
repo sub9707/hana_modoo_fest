@@ -7,6 +7,42 @@ import { User } from '@/types/auth'
 type SortField = 'name' | 'username' | 'company' | 'role' | 'created_at' | 'last_login_at'
 type SortOrder = 'asc' | 'desc'
 
+// 순수 함수들 - 컴포넌트 외부로 이동
+const getRoleDisplay = (role: string) => {
+  switch (role) {
+    case 'admin':
+      return { text: '관리자', color: 'bg-red-100 text-red-800', icon: Shield }
+    case 'editor':
+      return { text: '편집자', color: 'bg-orange-100 text-orange-800', icon: Edit }
+    case 'user':
+      return { text: '일반회원', color: 'bg-green-100 text-green-800', icon: Users }
+    default:
+      return { text: '일반회원', color: 'bg-gray-100 text-gray-800', icon: Users }
+  }
+}
+
+const getGenderDisplay = (gender: string) => {
+  switch (gender) {
+    case 'male':
+      return '남성'
+    case 'female':
+      return '여성'
+    case 'none':
+      return '비공개'
+    default:
+      return '비공개'
+  }
+}
+
+const formatDateTime = (dateTimeString?: string) => {
+  if (!dateTimeString) return '-'
+  const date = new Date(dateTimeString)
+  return date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 interface UserTableProps {
   users: User[]
   onViewUser: (user: User) => void
@@ -15,48 +51,13 @@ interface UserTableProps {
   sortOrder: SortOrder
 }
 
-export default function UserTable({ 
-  users, 
-  onViewUser, 
-  onSort, 
-  sortField, 
-  sortOrder 
+export default function UserTable({
+  users,
+  onViewUser,
+  onSort,
+  sortField,
+  sortOrder
 }: UserTableProps) {
-
-  const getRoleDisplay = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return { text: '관리자', color: 'bg-red-100 text-red-800', icon: Shield }
-      case 'editor':
-        return { text: '편집자', color: 'bg-orange-100 text-orange-800', icon: Edit }
-      case 'user':
-        return { text: '일반회원', color: 'bg-green-100 text-green-800', icon: Users }
-      default:
-        return { text: '일반회원', color: 'bg-gray-100 text-gray-800', icon: Users }
-    }
-  }
-
-  const getGenderDisplay = (gender: string) => {
-    switch (gender) {
-      case 'male':
-        return '남성'
-      case 'female':
-        return '여성'
-      case 'none':
-        return '비공개'
-      default:
-        return '비공개'
-    }
-  }
-
-  const formatDateTime = (dateTimeString?: string) => {
-    if (!dateTimeString) return '-'
-    const date = new Date(dateTimeString)
-    return date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    })
-  }
 
   const SortButton = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <button

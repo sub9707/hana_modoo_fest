@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import {
   LineChart,
   Line,
@@ -26,15 +27,21 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function UserSignupChart({ data }: UserSignupChartProps) {
-  // 날짜 포맷팅된 데이터
-  const chartData = data.map(item => ({
-    date: formatDate(item.date),
-    signups: parseInt(item.signups),
-    originalDate: item.date
-  }));
+  // 차트 데이터 메모이제이션 (Recharts는 새 배열 참조 시 전체 리렌더링)
+  const chartData = useMemo(() =>
+    data.map(item => ({
+      date: formatDate(item.date),
+      signups: parseInt(item.signups),
+      originalDate: item.date
+    })), [data])
 
-  const totalSignups = data.reduce((sum, item) => sum + parseInt(item.signups), 0);
-  const avgSignups = data.length > 0 ? (totalSignups / data.length).toFixed(1) : 0;
+  const { totalSignups, avgSignups } = useMemo(() => {
+    const total = data.reduce((sum, item) => sum + parseInt(item.signups), 0)
+    return {
+      totalSignups: total,
+      avgSignups: data.length > 0 ? (total / data.length).toFixed(1) : '0'
+    }
+  }, [data])
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">

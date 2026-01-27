@@ -5,25 +5,25 @@ import { useState, useEffect } from 'react'
 import { Trophy } from 'lucide-react'
 import type { RecentWinner } from '@/types/event'
 
+// 당첨자가 없을 때 표시할 기본 메시지들 (컴포넌트 외부 상수)
+const DEFAULT_MESSAGES = [
+  { text: '첫 번째 당첨자가 되어보세요!', icon: '' },
+  { text: '행운의 주인공을 기다리고 있어요!', icon: '' },
+  { text: '특별한 선물이 여러분을 기다려요!', icon: '' },
+  { text: '오늘의 운을 시험해보세요!', icon: '' },
+] as const
+
 interface WinnerAnnouncementProps {
   winners: RecentWinner[]
   className?: string
 }
 
-export default function WinnerAnnouncement({ 
-  winners, 
-  className = '' 
+export default function WinnerAnnouncement({
+  winners,
+  className = ''
 }: WinnerAnnouncementProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
-
-  // 당첨자가 없을 때 표시할 기본 메시지들
-  const defaultMessages = [
-    { text: '첫 번째 당첨자가 되어보세요!', icon: '' },
-    { text: '행운의 주인공을 기다리고 있어요!', icon: '' },
-    { text: '특별한 선물이 여러분을 기다려요!', icon: '' },
-    { text: '오늘의 운을 시험해보세요!', icon: '' },
-  ]
 
   useEffect(() => {
     if (winners.length === 0) return
@@ -48,16 +48,16 @@ export default function WinnerAnnouncement({
       setIsVisible(false)
       
       setTimeout(() => {
-        setCurrentIndex(prev => (prev + 1) % defaultMessages.length)
+        setCurrentIndex(prev => (prev + 1) % DEFAULT_MESSAGES.length)
         setIsVisible(true)
       }, 300)
     }, 3000) // 3초마다 변경
 
     return () => clearInterval(interval)
-  }, [winners.length, defaultMessages.length])
+  }, [winners.length, DEFAULT_MESSAGES.length])
 
   const currentWinner = winners[currentIndex]
-  const currentMessage = defaultMessages[currentIndex]
+  const currentMessage = DEFAULT_MESSAGES[currentIndex]
 
   return (
     <div className={`relative ${className}`}>
@@ -118,7 +118,7 @@ export default function WinnerAnnouncement({
 
         {/* 진행 표시기 */}
         <div className="flex justify-center mt-4 space-x-2">
-          {(winners.length > 0 ? winners : defaultMessages).map((_, index) => (
+          {(winners.length > 0 ? winners : DEFAULT_MESSAGES).map((_, index) => (
             <div
               key={index}
               className={`h-1 rounded-full transition-all duration-300 ${

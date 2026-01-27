@@ -2,6 +2,13 @@ import WritingCard from './WritingCard'
 import { WritingEntry, User, SortType, WritingTopic } from '@/types/writing'
 import { Pen } from 'lucide-react'
 
+// 정렬 옵션 상수 (컴포넌트 외부에서 한 번만 생성)
+const SORT_OPTIONS: { id: SortType; title: string }[] = [
+  { id: 'latest', title: '최신순' },
+  { id: 'popular', title: '인기순' },
+  { id: 'oldest', title: '오래된순' }
+]
+
 interface BrowseTabProps {
   browseWritings: WritingEntry[]
   writingTopics: WritingTopic[]
@@ -36,12 +43,6 @@ export default function BrowseTab({
     ...writingTopics.map(topic => ({ id: topic.title, title: topic.title }))
   ]
 
-  const sorts: { id: SortType; title: string }[] = [
-    { id: 'latest', title: '최신순' },
-    { id: 'popular', title: '인기순' },
-    { id: 'oldest', title: '오래된순' }
-  ]
-
   return (
     <div className="space-y-6">
       {/* 필터 */}
@@ -70,7 +71,7 @@ export default function BrowseTab({
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">정렬</label>
           <div className="flex flex-wrap gap-2">
-            {sorts.map((sort) => (
+            {SORT_OPTIONS.map((sort) => (
               <button
                 key={sort.id}
                 onClick={() => setBrowseSort(sort.id)}

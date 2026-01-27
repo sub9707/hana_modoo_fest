@@ -19,16 +19,21 @@ export default function QuizEvent() {
   // 이벤트 종료 상태
   const EVENT_ENDED = false
 
-  // 결과 등록 핸들러
+  // 결과 등록 핸들러 (데모 버전)
   const handleRegisterResult = async () => {
-    const result = await quiz.registerResult()
-    
-    if (result.success) {
-      setShowSuccessMessage(true)
-      setTimeout(() => setShowSuccessMessage(false), 3000)
-    } else {
-      alert(result.message)
-    }
+    // 데모 버전: 실제 DB 저장 대신 안내 메시지만 표시
+    alert('현재 데모 버전에서는 퀴즈 참여만 가능합니다.\n실제 이벤트에서는 참여 결과가 등록됩니다.')
+    return
+
+    // 실제 운영 시 아래 코드 사용
+    // const result = await quiz.registerResult()
+    //
+    // if (result.success) {
+    //   setShowSuccessMessage(true)
+    //   setTimeout(() => setShowSuccessMessage(false), 3000)
+    // } else {
+    //   alert(result.message)
+    // }
   }
 
   // 로딩 중
