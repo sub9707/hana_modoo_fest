@@ -57,9 +57,10 @@ export default function UsersManagementClient({
       if (!response.ok) {
         throw new Error('사용자 목록을 가져오는데 실패했습니다.')
       }
-      const updatedUsers = await response.json()
+      const result = await response.json()
+      const updatedUsers = result.data || []
       setUsers(updatedUsers)
-      
+
       const simpleStats = calculateSimpleStats(updatedUsers)
       setStats(prevStats => ({
         ...prevStats,
@@ -310,8 +311,8 @@ export default function UsersManagementClient({
 
       {/* 로딩 오버레이 */}
       {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40">
-          <div className="bg-white p-4 rounded-lg flex items-center">
+        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-40">
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center">
             <RefreshCw className="w-5 h-5 animate-spin mr-2" />
             처리 중...
           </div>

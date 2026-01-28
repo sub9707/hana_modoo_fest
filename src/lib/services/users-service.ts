@@ -599,11 +599,11 @@ export interface DailySignupData {
   signups: string;
 }
 
-export async function getDailySignupStats(startDate?: string, endDate?: string): Promise<DailySignupData[]> {
+export async function getDailySignupStats(): Promise<DailySignupData[]> {
   try {
-    // 기본값: 2025년 11월 1일 ~ 11월 30일
-    const start = startDate || '2025-11-01';
-    const end = endDate || '2025-11-30';
+    // 2025년 첫 가입자부터 현재까지
+    const start = '2025-01-01';
+    const end = new Date().toISOString().slice(0, 10);
 
     const results = await query(`
       SELECT

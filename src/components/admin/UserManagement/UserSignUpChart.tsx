@@ -48,7 +48,7 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
       <div className="flex justify-between items-center mb-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">일별 가입 추이</h3>
-          <p className="text-sm text-gray-600 mt-1">2025년 11월 신규 회원 가입 현황</p>
+          <p className="text-sm text-gray-600 mt-1">2025년 신규 회원 가입 현황</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-gray-600">기간 내 총 가입</p>
@@ -58,47 +58,53 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
       </div>
       
       <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis
-              dataKey="date"
-              stroke="#6b7280"
-              fontSize={12}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis
-              stroke="#6b7280"
-              fontSize={12}
-              allowDecimals={false}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-              }}
-              formatter={(value: number) => [value, '신규 가입']}
-              labelFormatter={(label: string, payload: any) => {
-                if (payload && payload.length > 0) {
-                  return `${payload[0].payload.originalDate} (${label})`;
-                }
-                return label;
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="signups"
-              stroke="#3B82F6"
-              strokeWidth={2}
-              dot={{ r: 4, fill: '#3B82F6' }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            2025년 가입 데이터가 없습니다.
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis
+                dataKey="date"
+                stroke="#6b7280"
+                fontSize={12}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis
+                stroke="#6b7280"
+                fontSize={12}
+                allowDecimals={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+                formatter={(value: number) => [value, '신규 가입']}
+                labelFormatter={(label: string, payload: any) => {
+                  if (payload && payload.length > 0) {
+                    return `${payload[0].payload.originalDate} (${label})`;
+                  }
+                  return label;
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="signups"
+                stroke="#3B82F6"
+                strokeWidth={2}
+                dot={{ r: 4, fill: '#3B82F6' }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
