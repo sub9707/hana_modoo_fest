@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import OrganizationHero from '@/components/organization/OrganizationHero'
 import VisionSection from '@/components/organization/VisionSection'
-import BusinessSection from '@/components/organization/BusinessSection'
 import OrganizationBanner from '@/components/organization/OrganizationBanner'
 import { organizationData } from '@/data/Organization'
 import PageLayout from '@/components/layout/PageLayout'
