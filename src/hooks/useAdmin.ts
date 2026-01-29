@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { Registration, Quiz, Comment, Writing, GalleryPhoto, Notice } from '@/types/admin'
+import { Registration, Quiz, Comment, GalleryPhoto, Notice } from '@/types/admin'
 import { User } from '@/types/auth'
 import { ApiResponse } from '@/types/common'
-import { useAbortController, useLoadingPrevention } from './utils'
+import { useAbortController } from './utils'
 
 interface PaginatedResponse<T> {
   items: T[]
