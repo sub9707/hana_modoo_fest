@@ -1,22 +1,14 @@
 import { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import HeroSection from '@/components/home/HeroSection'
+import Introduction from '@/components/home/Introduction'
+import ProgramCardSection from '@/components/home/ProgramCardSection'
+import CampaignOverview from '@/components/home/CampaignOverview'
+import JoinCampaignsSection from '@/components/home/JoinCampaignsSection'
 import PageLayout from '@/components/layout/PageLayout'
 import { PAGE_SEO, createPageMetadata } from '@/constants'
 
-// 뷰포트 밖이라 Lazy load 필요
-const Introduction = dynamic(() => import('@/components/home/Introduction'), {
-  loading: () => <div className="min-h-80 bg-[#885ef9]" />
-})
-const ProgramCardSection = dynamic(() => import('@/components/home/ProgramCardSection'), {
-  loading: () => <div className="min-h-screen/3" />
-})
-const CampaignOverview = dynamic(() => import('@/components/home/CampaignOverview'), {
-  loading: () => <div className="min-h-screen/2" />
-})
-const JoinCampaignsSection = dynamic(() => import('@/components/home/JoinCampaignsSection'), {
-  loading: () => <div className="min-h-screen/2" />
-})
+// CampaignSection은 클라이언트 컴포넌트이므로 dynamic import 유지
 const CampaignSection = dynamic(() => import('@/components/home/CampaignSection'), {
   loading: () => <div className="min-h-screen/2" />
 })
