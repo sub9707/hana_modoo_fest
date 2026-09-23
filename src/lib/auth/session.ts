@@ -22,6 +22,7 @@ export async function getUserFromSession(): Promise<User | null> {
               u.last_login_at, u.last_activity_at, u.created_at, u.updated_at
        FROM users u 
        WHERE u.session_token = ? 
+       AND u.deleted_at IS NULL
        AND (u.session_expires_at IS NULL OR u.session_expires_at > NOW())`,
       [sessionToken]
     )
@@ -61,6 +62,7 @@ export async function validateSessionToken(sessionToken: string): Promise<boolea
     const result = await queryOne(
       `SELECT id FROM users 
        WHERE session_token = ? 
+       AND deleted_at IS NULL
        AND (session_expires_at IS NULL OR session_expires_at > NOW())`,
       [sessionToken]
     )

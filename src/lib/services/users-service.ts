@@ -1,5 +1,8 @@
 // libs/users-service.ts
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
+import { randomUUID } from 'crypto'
+import { anonymizeUserRow, getNextAnonymizationSequence } from '@/lib/services/anonymization-service'
+import { DELETION_TYPE_ADMIN } from '@/lib/utils/anonymize'
 import { User, Role } from '@/types/auth'
 import crypto, { createHash } from 'crypto'
 
@@ -57,6 +60,7 @@ export async function getAllUsers(): Promise<User[]> {
         created_at, 
         updated_at
       FROM users 
+      WHERE deleted_at IS NULL
       ORDER BY created_at DESC
     `)
 
@@ -313,16 +317,24 @@ export async function deleteUser(userId: string): Promise<void> {
       }
     }
 
-    // 트랜잭션으로 관련 데이터와 함께 삭제
+    // 하드 삭제 대신 익명화(소프트 삭제).
+    // DELETE FROM users 를 하면 이 회원의 응원 댓글 / 가족 글쓰기 / 룰렛 당첨 기록이
+    // 함께 사라진다(FK 가 CASCADE 이거나, FK 가 없어 고아 행이 남더라도 목록 쿼리가
+    // INNER JOIN users 라 조용히 사라진다). 개인정보만 파기하고 콘텐츠는 보존한다.
     await transaction(async (connection) => {
-      // 세션 정보 정리
-      await connection.execute(
-        'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
-        [userId]
+      const sequence = await getNextAnonymizationSequence(connection)
+      await anonymizeUserRow(
+        connection,
+        {
+          id: userId,
+          name: existingUser.name,
+          birth_date: (existingUser.birth_date ?? null) as string | null,
+          signup_method: existingUser.signup_method ?? null
+        },
+        sequence,
+        randomUUID(),
+        DELETION_TYPE_ADMIN
       )
-
-      // 사용자 삭제
-      await connection.execute('DELETE FROM users WHERE id = ?', [userId])
     })
   } catch (error) {
     console.error('Error deleting user:', error)
@@ -338,7 +350,7 @@ export async function deleteUser(userId: string): Promise<void> {
  */
 export async function getAdminCount(): Promise<number> {
   try {
-    const result = await queryOne('SELECT COUNT(*) as count FROM users WHERE role = "admin"')
+    const result = await queryOne('SELECT COUNT(*) as count FROM users WHERE role = "admin" AND deleted_at IS NULL')
     return result.count
   } catch (error) {
     console.error('Error counting admins:', error)
@@ -396,10 +408,11 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
         created_at, 
         updated_at
       FROM users 
-      WHERE name LIKE ? 
+      WHERE deleted_at IS NULL
+        AND (name LIKE ? 
          OR username LIKE ? 
          OR company LIKE ? 
-         OR phone LIKE ?
+         OR phone LIKE ?)
       ORDER BY created_at DESC
     `, [`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`])
 
@@ -449,7 +462,7 @@ export async function getUsersByRole(role: Role): Promise<User[]> {
         created_at, 
         updated_at
       FROM users 
-      WHERE role = ?
+      WHERE deleted_at IS NULL AND role = ?
       ORDER BY created_at DESC
     `, [role])
 
@@ -502,7 +515,7 @@ export async function getUsersByDateRange(startDate: Date, endDate: Date): Promi
         created_at, 
         updated_at
       FROM users 
-      WHERE created_at BETWEEN ? AND ?
+      WHERE deleted_at IS NULL AND created_at BETWEEN ? AND ?
       ORDER BY created_at DESC
     `, [start, end])
 
@@ -610,7 +623,8 @@ export async function getDailySignupStats(): Promise<DailySignupData[]> {
         DATE(created_at) as date,
         COUNT(*) as signups
       FROM users
-      WHERE DATE(created_at) >= ? AND DATE(created_at) <= ?
+      WHERE deleted_at IS NULL
+        AND DATE(created_at) >= ? AND DATE(created_at) <= ?
       GROUP BY DATE(created_at)
       ORDER BY date ASC
     `, [start, end]);

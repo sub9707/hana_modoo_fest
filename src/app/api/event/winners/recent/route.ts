@@ -2,12 +2,7 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import type { ApiResponse, RecentWinner } from '@/types/event'
-
-const maskName = (name: string): string => {
-  if (name.length <= 1) return name
-  if (name.length === 2) return name[0] + '*'
-  return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
-}
+import { maskKoreanName } from '@/lib/utils/privacy'
 
 export async function GET() {
   try {
@@ -29,7 +24,7 @@ export async function GET() {
 
     const winners: RecentWinner[] = recentWinners.map((winner: any) => ({
       id: winner.id,
-      masked_name: maskName(winner.user_name),
+      masked_name: maskKoreanName(winner.user_name),
       prize_name: winner.prize_name,
       prize_icon: winner.prize_icon,
       prize_color: winner.prize_color,

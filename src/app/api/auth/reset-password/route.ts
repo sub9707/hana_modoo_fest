@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { maskPhone } from '@/lib/utils/privacy'
 import { z } from 'zod'
 import { createHash, randomBytes } from 'crypto'
 import { query, queryOne } from '@/lib/mysql/connection'
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     // 1. 사용자 존재 및 가입 방법 확인
     const user = await queryOne(
-      'SELECT id, name, signup_method, password_salt FROM users WHERE phone = ?',
+      'SELECT id, name, signup_method, password_salt FROM users WHERE phone = ? AND deleted_at IS NULL',
       [phone]
     )
 
@@ -185,13 +186,13 @@ async function logPasswordReset(
       [
         userId, // 사용자 자신이 재설정한 경우
         createHash('sha256').update(userId).digest('hex'),
-        `비밀번호 찾기를 통한 재설정 (전화번호: ${phone.substring(0, 3)}****${phone.substring(phone.length - 4)})`,
+        `비밀번호 찾기를 통한 재설정 (전화번호: ${maskPhone(phone)})`,
         JSON.stringify({
           action: 'password_reset',
           method: 'phone_verification',
           ip_address: clientIp,
           user_name: userName,
-          phone_masked: `${phone.substring(0, 3)}****${phone.substring(phone.length - 4)}`,
+          phone_masked: maskPhone(phone),
           timestamp: new Date().toISOString()
         })
       ]

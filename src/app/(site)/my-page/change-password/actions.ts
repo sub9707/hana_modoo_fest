@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { maskPhone } from '@/lib/utils/privacy'
 import { createHash, randomBytes } from 'crypto'
 import { queryOne, query } from '@/lib/mysql/connection'
 import { revalidateTag } from 'next/cache'
@@ -174,7 +175,7 @@ async function logPasswordChange(
             action: 'password_change',
             method: 'user_self_change',
             username: username,
-            phone_masked: `${phone.substring(0, 3)}****${phone.substring(phone.length - 4)}`,
+            phone_masked: maskPhone(phone),
             timestamp: new Date().toISOString(),
             user_agent: process.env.USER_AGENT || 'server-action'
           })

@@ -78,6 +78,15 @@ export async function loginAction(formData: FormData) {
             }
         }
 
+        // 탈퇴(익명화) 처리된 계정 차단
+        // 익명화 시 password_hash 를 무작위 값으로 덮어쓰므로 어차피 검증은 통과하지 않지만,
+        // 사용자에게 "비밀번호가 틀렸다"가 아니라 탈퇴 사유를 알려주기 위해 먼저 검사한다.
+        if (user.deleted_at) {
+            return {
+                error: '탈퇴 처리된 계정입니다. 개인정보 보관기간 만료로 회원정보가 파기되었습니다.'
+            }
+        }
+
         // 비밀번호 확인
         const hashedPassword = hashPassword(password, user.password_salt)
 
@@ -191,8 +200,9 @@ export async function getCurrentUserAction() {
             `SELECT id, name, username, company, gender, birth_date, phone, 
                     email, profile_image, role, signup_method,
                     created_at, last_login_at, last_activity_at, updated_at, session_expires_at
-             FROM users 
-             WHERE session_token = ?`,
+             FROM users
+             WHERE session_token = ?
+               AND deleted_at IS NULL`,
             [sessionToken]
         )
 

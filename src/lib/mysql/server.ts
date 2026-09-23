@@ -17,7 +17,7 @@ export async function getCurrentUser() {
       `SELECT id, name, company, username, gender, birth_date, phone, email, profile_image, 
               role, signup_method, created_at, last_login_at, last_activity_at, updated_at, 
               session_expires_at, address, address_detail, zip_code
-       FROM users WHERE session_token = ?`,
+       FROM users WHERE session_token = ? AND deleted_at IS NULL`,
       [sessionToken]
     )
 

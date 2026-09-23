@@ -149,7 +149,7 @@ async function handleOAuthCallback(
 
     // 1. SNS 계정으로 이미 가입된 사용자 확인
     const existingSocialUser = await queryOne(
-      'SELECT u.* FROM users u JOIN social_accounts sa ON u.id = sa.user_id WHERE sa.provider = ? AND sa.provider_id = ?',
+      'SELECT u.* FROM users u JOIN social_accounts sa ON u.id = sa.user_id WHERE sa.provider = ? AND sa.provider_id = ? AND u.deleted_at IS NULL',
       [provider, userResponse.userData.id]
     )
 
@@ -161,7 +161,7 @@ async function handleOAuthCallback(
     // 2. 동일한 이메일로 다른 방법으로 가입된 사용자 확인 (이메일이 있는 경우)
     if (userResponse.userData.email) {
       const existingEmailUser = await queryOne(
-        'SELECT id, signup_method FROM users WHERE email = ?',
+        'SELECT id, signup_method FROM users WHERE email = ? AND deleted_at IS NULL',
         [userResponse.userData.email]
       )
 
@@ -188,7 +188,7 @@ async function handleOAuthCallback(
       console.log(`Checking phone duplication for: ${normalizedPhone}`)
 
       const existingPhoneUser = await queryOne(
-        'SELECT id, signup_method FROM users WHERE phone = ?',
+        'SELECT id, signup_method FROM users WHERE phone = ? AND deleted_at IS NULL',
         [normalizedPhone]
       )
 

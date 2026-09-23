@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryOne } from '@/lib/mysql/connection'
 import { usernameCheckSchema } from '@/lib/validations/registration'
+import { ANONYMIZED_USERNAME_PREFIX } from '@/lib/utils/anonymize'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +25,14 @@ export async function POST(request: NextRequest) {
     ]
     
     if (forbiddenUsernames.includes(username.toLowerCase())) {
+      return NextResponse.json({
+        available: false,
+        message: '사용할 수 없는 사용자명입니다'
+      })
+    }
+
+    // 익명화(탈퇴) 계정의 더미 아이디 패턴(deleted_0001 ...)은 선점할 수 없다
+    if (username.toLowerCase().startsWith(ANONYMIZED_USERNAME_PREFIX)) {
       return NextResponse.json({
         available: false,
         message: '사용할 수 없는 사용자명입니다'

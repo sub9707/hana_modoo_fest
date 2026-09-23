@@ -165,7 +165,8 @@ async function authenticateUser(sessionToken: string): Promise<MiddlewareUser | 
          u.id, u.name, u.username, u.role, u.signup_method, u.email, u.profile_image,
          u.session_expires_at, u.last_activity_at
        FROM users u
-       WHERE u.session_token = ?`,
+       WHERE u.session_token = ?
+       AND u.deleted_at IS NULL`,
       [sessionToken]
     )
 
@@ -333,14 +334,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
         const redirectResponse = NextResponse.redirect(loginUrl)
 
-        // 쿠키 확실하게 삭제
+        // 쿠키 삭제
         redirectResponse.cookies.set('session-token', '', {
           ...getCookieOptions(),
           expires: new Date(0),
           maxAge: 0
         })
 
-        //   리다이렉트 카운트 증가
+        // 리다이렉트 카운트 증가
         incrementRedirectCount(redirectResponse, count)
 
         return redirectResponse
