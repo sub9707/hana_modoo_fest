@@ -89,15 +89,12 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
           <h3 className="text-lg font-bold text-gray-800 border-b pb-2">기본 정보</h3>
           
           {[
-            { label: '신청자', value: registration.user_name, icon: '👤' },
-            { label: '연락처', value: registration.user_phone, icon: '📞' },
-            { label: '참가유형', value: getParticipantTypeText(registration.participant_type), icon: '🏷️' }
+            { label: '신청자', value: registration.user_name },
+            { label: '연락처', value: registration.user_phone },
+            { label: '참가유형', value: getParticipantTypeText(registration.participant_type) }
           ].map((item, index) => (
             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <span>{item.icon}</span>
-                <span className="font-medium text-gray-700">{item.label}</span>
-              </div>
+              <span className="font-medium text-gray-700">{item.label}</span>
               <span className="text-gray-900">{item.value}</span>
             </div>
           ))}
@@ -109,7 +106,6 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
           
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center space-x-2">
-              <span>👥</span>
               <span className="font-medium text-gray-700">총 참가인원</span>
             </div>
             <span className="text-gray-900">{registration.companions + 1}명 (본인 포함)</span>
@@ -118,7 +114,6 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
           {registration.companion_details && (
             <div className="p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <span>📝</span>
                 <span className="font-medium text-gray-700">동반자 정보</span>
               </div>
               <p className="text-gray-900 text-sm whitespace-pre-wrap">
@@ -129,7 +124,6 @@ export default function ExistingRegistration({ user, registration }: ExistingReg
 
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center space-x-2">
-              <span>📅</span>
               <span className="font-medium text-gray-700">신청일시</span>
             </div>
             <span className="text-gray-900 text-sm">

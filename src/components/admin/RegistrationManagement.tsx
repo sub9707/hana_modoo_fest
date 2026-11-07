@@ -66,7 +66,7 @@ export default function RegistrationManagement() {
           <select
             value={registrationStatus}
             onChange={(e) => setRegistrationStatus(e.target.value as RegistrationStatus)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             <option value="preparing">접수 준비 중</option>
             <option value="active">접수 중</option>
@@ -76,7 +76,7 @@ export default function RegistrationManagement() {
           {/* 엑셀 추출 버튼 */}
           <button 
             onClick={handleExportExcel}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
           >
             <Download className="w-4 h-4 mr-2" />
             엑셀 추출
@@ -95,7 +95,7 @@ export default function RegistrationManagement() {
         
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">총 접수자</h3>
-          <p className="text-3xl font-bold text-blue-600">{filteredRegistrations.length}</p>
+          <p className="text-3xl font-bold text-orange-600">{filteredRegistrations.length}</p>
           <p className="text-sm text-gray-500 mt-1">전체 {registrations.length}명</p>
         </div>
         
@@ -117,7 +117,7 @@ export default function RegistrationManagement() {
               placeholder="이름, 이메일, 연락처로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             />
           </div>
           
@@ -127,7 +127,7 @@ export default function RegistrationManagement() {
             <select
               value={selectedProgram}
               onChange={(e) => setSelectedProgram(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             >
               {allPrograms.map(program => (
                 <option key={program} value={program}>{program}</option>
@@ -178,7 +178,7 @@ export default function RegistrationManagement() {
                     {registration.phone}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                    <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs">
                       {registration.companions}명
                     </span>
                   </td>

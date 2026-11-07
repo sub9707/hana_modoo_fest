@@ -245,15 +245,15 @@ export default function SocialRegistration({
           redirectUrl.searchParams.set('signup_success', 'true')
           router.push(redirectUrl.pathname + redirectUrl.search)
         } else {
-          console.log('⚠️ Auto-login failed, redirecting to login')
+          console.log('Auto-login failed, redirecting to login')
           router.push('/login?message=가입완료. 로그인해주세요.')
         }
       } else {
-        console.error('❌ Registration failed:', result)
+        console.error('Registration failed:', result)
         setError(result.error || '회원가입에 실패했습니다.')
       }
     } catch (error) {
-      console.error('❌ Network error:', error)
+      console.error('Network error:', error)
       setError('네트워크 오류가 발생했습니다')
     } finally {
       setIsLoading(false)
@@ -333,10 +333,10 @@ export default function SocialRegistration({
               <p className="font-semibold text-gray-900">{socialData.name || '이름 없음'}</p>
               <p className="text-sm text-gray-600">{socialData.email || '이메일 없음'}</p>
               <div className="text-xs text-gray-500 mt-1">
-                {socialData.mobile && <p>📞 {socialData.mobile}</p>}
-                {socialData.gender && <p>👤 {socialData.gender === 'M' ? '남성' : socialData.gender === 'F' ? '여성' : '기타'}</p>}
-                {socialData.birthyear && <p>🗓️ {socialData.birthyear}년생</p>}
-                {socialData.birthday && <p>🎂 {socialData.birthday} (월-일)</p>}
+                {socialData.mobile && <p>{socialData.mobile}</p>}
+                {socialData.gender && <p>{socialData.gender === 'M' ? '남성' : socialData.gender === 'F' ? '여성' : '기타'}</p>}
+                {socialData.birthyear && <p>{socialData.birthyear}년생</p>}
+                {socialData.birthday && <p>{socialData.birthday} (월-일)</p>}
               </div>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function SocialRegistration({
           {Object.values(missingInfo).some(missing => missing) && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h3 className="text-sm font-medium text-yellow-800 mb-3">
-                ⚠️ 추가 정보 입력 필요
+                추가 정보 입력 필요
               </h3>
               <div className="space-y-4">
                 {missingInfo.name && (
@@ -572,7 +572,7 @@ export default function SocialRegistration({
                 </label>
                 {form.formState.errors.agreedToTerms && (
                   <p className="mt-1 text-sm text-red-600 ml-7 font-medium">
-                    ⚠️ {form.formState.errors.agreedToTerms.message}
+                    {form.formState.errors.agreedToTerms.message}
                   </p>
                 )}
               </div>
@@ -610,7 +610,7 @@ export default function SocialRegistration({
                 </label>
                 {form.formState.errors.agreedToPrivacy && (
                   <p className="mt-1 text-sm text-red-600 ml-7 font-medium">
-                    ⚠️ {form.formState.errors.agreedToPrivacy.message}
+                    {form.formState.errors.agreedToPrivacy.message}
                   </p>
                 )}
               </div>

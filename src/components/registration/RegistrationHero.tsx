@@ -1,5 +1,5 @@
 import { getFormattedDeadline, getTimeUntilDeadline, isRegistrationClosed } from '@/lib/utils/registration-deadline'
-import { Clock, AlertCircle } from 'lucide-react'
+import { Clock } from 'lucide-react'
 
 export default function RegistrationHero() {
   const timeLeft = getTimeUntilDeadline()
@@ -38,32 +38,29 @@ export default function RegistrationHero() {
           </div>
         ) : (
           <div className="mb-8 max-w-2xl mx-auto">
-            <div className="bg-red-500/30 backdrop-blur-sm rounded-lg p-4 border-2 border-red-300">
-              <div className="flex items-center justify-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                <span className="font-bold text-lg">사전 접수가 마감되었습니다</span>
-              </div>
-            </div>
+            <p className="inline-block rounded-md bg-white px-5 py-2.5 font-bold text-red-600">
+              사전 접수가 마감되었습니다
+            </p>
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-            <div className="text-3xl mb-2">📅</div>
-            <div className="font-bold">2025. 10. 18 (토)</div>
-            <div className="opacity-90">11:00 - 17:00</div>
+        <dl className="grid grid-cols-1 md:grid-cols-3 max-w-3xl mx-auto border-y border-white/40 md:divide-x divide-white/40">
+          <div className="py-5 px-4">
+            <dt className="text-xs font-semibold tracking-widest opacity-80 mb-1">일시</dt>
+            <dd className="font-bold">2025. 10. 18 (토)</dd>
+            <dd className="opacity-90 text-sm">11:00 - 17:00</dd>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-            <div className="text-3xl mb-2">📍</div>
-            <div className="font-bold">여의도공원</div>
-            <div className="opacity-90">문화의마당</div>
+          <div className="py-5 px-4 border-t border-white/40 md:border-t-0">
+            <dt className="text-xs font-semibold tracking-widest opacity-80 mb-1">장소</dt>
+            <dd className="font-bold">여의도공원</dd>
+            <dd className="opacity-90 text-sm">문화의마당</dd>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4">
-            <div className="text-3xl mb-2">🎟️</div>
-            <div className="font-bold">참가비 무료</div>
-            <div className="opacity-90">{isClosed ? '현장 참여 가능' : '사전신청 권장'}</div>
+          <div className="py-5 px-4 border-t border-white/40 md:border-t-0">
+            <dt className="text-xs font-semibold tracking-widest opacity-80 mb-1">참가비</dt>
+            <dd className="font-bold">무료</dd>
+            <dd className="opacity-90 text-sm">{isClosed ? '현장 참여 가능' : '사전신청 권장'}</dd>
           </div>
-        </div>
+        </dl>
       </div>
     </section>
   )

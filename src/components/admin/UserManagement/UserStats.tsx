@@ -15,7 +15,7 @@ export default function UserStats({ stats }: UserStatsProps) {
     <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">전체 회원</h3>
-        <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+        <p className="text-3xl font-bold text-orange-600">{stats.total}</p>
       </div>
       
       <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -44,7 +44,7 @@ export default function UserStats({ stats }: UserStatsProps) {
       
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">신규 가입</h3>
-        <p className="text-3xl font-bold text-purple-600">{stats.newThisMonth}</p>
+        <p className="text-3xl font-bold text-gray-900">{stats.newThisMonth}</p>
         <p className="text-sm text-gray-500 mt-1">최근 1개월</p>
       </div>
     </div>

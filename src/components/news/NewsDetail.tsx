@@ -8,16 +8,7 @@ interface NewsDetailProps {
 }
 
 export default function NewsDetail({ news, onBack }: NewsDetailProps) {
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      '공지사항': 'bg-blue-100 text-blue-700',
-      '모집공고': 'bg-green-100 text-green-700',
-      '이벤트': 'bg-purple-100 text-purple-700',
-      '당첨자발표': 'bg-orange-100 text-orange-700',
-      '현장안내': 'bg-gray-100 text-gray-700',
-    }
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-700'
-  }
+  const getCategoryColor = (_category: string) => 'text-gray-500'
 
   const renderContent = () => {
     // 더 관대한 조건으로 변경
@@ -48,12 +39,12 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* 헤더 */}
       <div className="p-4 sm:p-6 border-b border-gray-200">
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 sm:mb-6 transition-colors duration-200"
+          className="flex items-center space-x-2 text-gray-600 hover:text-orange-600 mb-4 sm:mb-6 transition-colors duration-200"
         >
           <span className="text-lg">←</span>
           <span className="text-sm sm:text-base font-medium">목록으로 돌아가기</span>
@@ -63,11 +54,11 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
         <div className="block sm:hidden space-y-3 mb-4">
           <div className="flex items-center gap-2">
             {news.important && (
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              <span className="rounded border border-orange-300 px-1.5 py-0.5 text-xs font-semibold text-orange-600">
                 중요
               </span>
             )}
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(news.category)}`}>
+            <span className={`text-xs font-medium ${getCategoryColor(news.category)}`}>
               {news.category}
             </span>
           </div>
@@ -81,11 +72,11 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
         <div className="hidden sm:flex items-start justify-between mb-6 gap-3">
           <div className="flex items-center gap-3">
             {news.important && (
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              <span className="rounded border border-orange-300 px-1.5 py-0.5 text-xs font-semibold text-orange-600">
                 중요
               </span>
             )}
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(news.category)}`}>
+            <span className={`text-sm font-medium ${getCategoryColor(news.category)}`}>
               {news.category}
             </span>
           </div>
@@ -104,8 +95,8 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
       <div className="p-4 sm:p-6">
         {/* 요약 */}
         {news.summary && (
-          <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-6">
-            <p className="text-blue-800 font-medium text-sm sm:text-base leading-relaxed">
+          <div className="bg-gray-50 border border-gray-200 p-3 sm:p-4 rounded-md mb-6">
+            <p className="text-gray-700 font-medium text-sm sm:text-base leading-relaxed">
               {news.summary}
             </p>
           </div>

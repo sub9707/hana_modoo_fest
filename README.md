@@ -23,7 +23,7 @@
 | **폼/검증** | React Hook Form, Zod |
 | **전역 상태관리** | React Context API |
 | **데이터베이스** | MySQL (mysql2 커넥션 풀) |
-| **캐싱** | Redis (Rate Limiting, 세션) |
+| **요청 제한** | MySQL 기록 기반 (사용자별 쿨다운, IP별 시도 횟수) |
 | **인증** | 자체 세션 + OAuth 2.0 (네이버, 카카오) |
 | **외부 API** | Kakao Maps, Brevo(이메일), NCP SENS(SMS) |
 | **에디터** | Tiptap (Rich Text Editor) |
@@ -165,7 +165,7 @@ const pool = mysql.createPool({
 - 네이버 OAuth 2.0
 
 **보안 계층**
-- Redis 기반 Rate Limiting (API별 요청 제한)
+- MySQL 기록 기반 요청 제한 (사용자별 쿨다운, IP별 시도 횟수 집계)
 - SMS 인증 코드 발송 (NCP SENS)
 - 이메일 인증 코드 발송 (Brevo API)
 - 세션 토큰 기반 인증 (`httpOnly` 쿠키)
@@ -268,7 +268,11 @@ interface ApiResponse<T> {
 
 ### 1. 룰렛 이벤트 동시성 제어
 - **문제:** 동시에 여러 사용자가 룰렛 스핀 시 상품 재고 초과 문제
-- **해결:** Redis 기반 동시성 제어, 서버에서 먼저 결과 결정 후 클라이언트 애니메이션
+- **해결:** MySQL 트랜잭션 안에서 남은 수량이 0보다 클 때만 차감하는 조건부 UPDATE를 실행하고, 바뀐 행이 없으면(`affectedRows === 0`) 롤백해 재고보다 많이 지급되지 않도록 처리. 결과는 서버에서 먼저 정하고 클라이언트는 애니메이션만 재생
+  ```sql
+  UPDATE prizes SET current_quantity = current_quantity - 1
+  WHERE id = ? AND current_quantity > 0
+  ```
 
 ### 2. 대규모 폼 성능
 - **문제:** 등록 폼 필드, 실시간 검증 시 잦은 리렌더링

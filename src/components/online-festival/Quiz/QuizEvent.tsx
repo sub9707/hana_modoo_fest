@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Notice from '@/components/ui/Notice'
 import { useQuiz } from '@/hooks/useQuiz'
 import { useAuth } from '@/contexts/AuthContext'
-import { AlertCircle, MessageSquareQuote, CheckCircle } from 'lucide-react'
+import { MessageSquareQuote, CheckCircle } from 'lucide-react'
 import styles from './QuizEvent.module.css'
 import { QuizCard } from './QuizCard'
 import { ResultScreen } from './ResultScreen'
@@ -80,20 +81,10 @@ export default function QuizEvent() {
       {/* 이벤트 종료 안내 배너 */}
       {EVENT_ENDED && (
         <div className="max-w-4xl mx-auto mb-8">
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 rounded-xl p-6">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-bold text-orange-900 mb-2 text-lg">퀴즈 이벤트 종료</h3>
-                <p className="text-orange-800 text-sm mb-2">
-                  모두하나대축제 2025 퀴즈 이벤트가 종료되었습니다.
-                </p>
-                <p className="text-orange-700 text-sm">
-                  당첨자 발표는 별도로 안내드릴 예정입니다. 많은 관심과 참여 감사드립니다.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Notice title="퀴즈 이벤트 종료">
+            <p>모두하나대축제 2025 퀴즈 이벤트가 종료되었습니다.</p>
+            <p>당첨자 발표는 별도로 안내드릴 예정입니다. 많은 관심과 참여 감사드립니다.</p>
+          </Notice>
         </div>
       )}
 

@@ -43,7 +43,7 @@ export default function TermsOfServiceContent() {
 
 
       {/* 제1조: 목적 */}
-      <section id="section1" className="border-l-4 border-blue-500 pl-6">
+      <section id="section1" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제1조 (목적)
         </h2>
@@ -54,7 +54,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제2조: 정의 */}
-      <section id="section2" className="border-l-4 border-green-500 pl-6">
+      <section id="section2" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제2조 (정의)
         </h2>
@@ -80,7 +80,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제3조: 약관의 효력 및 변경 */}
-      <section id="section3" className="border-l-4 border-purple-500 pl-6">
+      <section id="section3" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제3조 (약관의 효력 및 변경)
         </h2>
@@ -99,9 +99,8 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제4조: 회원가입 - 핵심! */}
-      <section id="section4" className="border-l-4 border-orange-500 pl-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-          <UserCheck className="w-7 h-7 mr-3 text-orange-600" />
+      <section id="section4" className="pt-10 border-t border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제4조 (회원가입)
         </h2>
         <div className="space-y-3 text-gray-700">
@@ -148,7 +147,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제5조: 회원정보의 변경 */}
-      <section id="section5" className="border-l-4 border-red-500 pl-6">
+      <section id="section5" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제5조 (회원정보의 변경)
         </h2>
@@ -167,7 +166,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제6조: 회원 탈퇴 및 자격 상실 */}
-      <section id="section6" className="border-l-4 border-gray-500 pl-6">
+      <section id="section6" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제6조 (회원 탈퇴 및 자격 상실)
         </h2>
@@ -187,7 +186,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제7조: 서비스의 제공 */}
-      <section id="section7" className="border-l-4 border-indigo-500 pl-6">
+      <section id="section7" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제7조 (서비스의 제공)
         </h2>
@@ -204,7 +203,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제8조: 회원의 의무 */}
-      <section id="section8" className="border-l-4 border-amber-500 pl-6">
+      <section id="section8" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제8조 (회원의 의무)
         </h2>
@@ -222,9 +221,8 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제9조: 개인정보 보호 */}
-      <section id="section9" className="border-l-4 border-pink-500 pl-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-          <Shield className="w-7 h-7 mr-3 text-pink-600" />
+      <section id="section9" className="pt-10 border-t border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제9조 (개인정보 보호)
         </h2>
         <div className="space-y-3 text-gray-700">
@@ -248,7 +246,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제10조: 경품 제공 */}
-      <section id="section10" className="border-l-4 border-rose-500 pl-6">
+      <section id="section10" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제10조 (경품 제공)
         </h2>
@@ -267,9 +265,8 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제11조: 책임 제한 */}
-      <section id="section11" className="border-l-4 border-yellow-500 pl-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-          <AlertTriangle className="w-7 h-7 mr-3 text-yellow-600" />
+      <section id="section11" className="pt-10 border-t border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제11조 (책임 제한)
         </h2>
         <div className="space-y-3 text-gray-700">
@@ -288,7 +285,7 @@ export default function TermsOfServiceContent() {
       </section>
 
       {/* 제12조: 분쟁 해결 */}
-      <section id="section12" className="border-l-4 border-teal-500 pl-6">
+      <section id="section12" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제12조 (분쟁 해결)
         </h2>

@@ -76,7 +76,7 @@ export function WeatherBannerForm() {
             step="0.1"
             value={settings.temperature}
             onChange={(e) => handleTemperatureChange(parseFloat(e.target.value) || 0)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:border-transparent"
             placeholder="예: 22"
           />
         </div>
@@ -113,7 +113,7 @@ export function WeatherBannerForm() {
             </label>
             <button
               onClick={resetToDefaultMessage}
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700 font-medium"
             >
               <RotateCcw className="w-4 h-4" />
               기본 문구로 되돌리기
@@ -123,7 +123,7 @@ export function WeatherBannerForm() {
             type="text"
             value={settings.customMessage || ''}
             onChange={(e) => handleMessageChange(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:border-transparent"
             placeholder="안내 문구를 입력하세요"
             maxLength={100}
           />
@@ -132,9 +132,9 @@ export function WeatherBannerForm() {
           </p>
         </div>
 
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-          <h4 className="font-semibold text-yellow-800 mb-2">미리보기</h4>
-          <div className="flex items-center space-x-2 text-yellow-900">
+        <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+          <h4 className="font-semibold text-gray-900 mb-2">미리보기</h4>
+          <div className="flex items-center space-x-2 text-gray-700">
             <span className="text-xl">{selectedWeather?.emoji}</span>
             <span className="font-medium">
               행사 당일 날씨: {selectedWeather?.label}, 기온 {settings.temperature}°C | 미세먼지: {
@@ -148,7 +148,7 @@ export function WeatherBannerForm() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? (
               <>

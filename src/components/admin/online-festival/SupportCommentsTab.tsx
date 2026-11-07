@@ -234,7 +234,7 @@ export function SupportCommentsTab() {
             <CardTitle className="text-sm font-medium">총 참여자 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{(participantTotal || 0).toLocaleString()}</div>
+            <div className="text-2xl font-bold text-orange-600">{(participantTotal || 0).toLocaleString()}</div>
             <p className="text-xs text-gray-500 mt-1">중복 제거된 인원</p>
           </CardContent>
         </Card>
@@ -251,7 +251,7 @@ export function SupportCommentsTab() {
             <CardTitle className="text-sm font-medium">평균 댓글 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-gray-900">
               {participantTotal > 0 ? ((commentTotal || 0) / participantTotal).toFixed(1) : '0'}
             </div>
             <p className="text-xs text-gray-500 mt-1">참여자당 평균</p>

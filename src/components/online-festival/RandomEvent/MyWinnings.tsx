@@ -2,7 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Trophy, Calendar, Gift, TrendingUp, RotateCcw, Dices, X } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface MyParticipationRecord {
@@ -94,198 +94,113 @@ export default function MyWinnings() {
     })
   }
 
-  // 결과 표시 함수 - prize_type으로 정확하게 판단
-    const getResultDisplay = (record: MyParticipationRecord) => {
-      // 실제 당첨 여부: is_winner가 true이고 prize_type이 'none'이 아닌 경우
-      const isRealWinner = record.is_winner && record.prize_type !== 'none'
-      console.log(record)
-    
-    // 꽝인 경우 (prize_type이 'none'이거나 is_winner가 false)
-    if (!isRealWinner) {
-      return {
-        icon: <X className="w-6 h-6" />,
-        name: '아쉬워요',
-        description: '다음 기회에 도전하세요',
-        color: '#9CA3AF'
-      }
-    }
-
-    // 실제 상품 당첨인 경우
-    return {
-      icon: record.prize_icon ? record.prize_icon : <Gift className="w-6 h-6" />,
-      name: record.prize_name || '상품',
-      description: record.prize_description || '',
-      color: record.prize_color || '#F59E0B'
-    }
-  }
-
-  // 실제 당첨 여부 확인 헬퍼 함수
+  // 실제 당첨 여부: is_winner가 true이고 prize_type이 'none'이 아닌 경우
   const isRealPrizeWinner = (record: MyParticipationRecord): boolean => {
     return record.is_winner && record.prize_type !== 'none'
   }
 
+  const stats = participationData?.stats
+  const statItems = stats
+    ? [
+        { label: '총 참여', value: stats.total_participations },
+        { label: '상품 당첨', value: stats.prize_wins },
+        { label: '꽝', value: stats.consolation_wins },
+      ]
+    : []
+
   return (
-    <div className="mt-12 bg-white/80 rounded-3xl p-8 border border-white/20 backdrop-blur-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 flex items-center">
-          <RotateCcw className="w-6 h-6 mr-3 text-festival-orange" />
-          내 참여 내역
-        </h3>
+    <section className="mt-12 bg-white rounded-lg border border-gray-200 p-6 md:p-8">
+      <header className="flex items-center justify-between mb-6">
+        <h3 className="text-xl md:text-2xl font-bold text-gray-900">내 참여 내역</h3>
         <button
           onClick={fetchMyParticipations}
           disabled={isLoading}
-          className="inline-flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 hover:text-festival-orange transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:border-orange-300 hover:text-orange-600 transition-colors disabled:opacity-50"
         >
-          <RotateCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>새로고침</span>
+          <RotateCcw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          새로고침
         </button>
-      </div>
+      </header>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-xl">
-          <p className="text-red-700">{error}</p>
-        </div>
+        <p className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
       {isLoading ? (
-        <div className="text-center py-8">
-          <div className="inline-flex items-center space-x-2 text-gray-500">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-festival-orange"></div>
-            <span>참여 내역을 불러오는 중...</span>
-          </div>
-        </div>
+        <p className="py-10 text-center text-sm text-gray-500">참여 내역을 불러오는 중...</p>
       ) : participationData ? (
         <>
-          {/* 통계 정보 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <TrendingUp className="w-5 h-5 text-blue-600 mr-2" />
-                <span className="text-sm font-medium text-blue-800">총 참여</span>
+          {/* 통계 */}
+          <dl className="grid grid-cols-3 divide-x divide-gray-200 rounded-lg border border-gray-200 mb-6">
+            {statItems.map((item) => (
+              <div key={item.label} className="px-4 py-5 text-center">
+                <dt className="text-sm text-gray-500 mb-1">{item.label}</dt>
+                <dd className="text-2xl font-bold text-gray-900 tabular-nums">
+                  {item.value}
+                  <span className="ml-0.5 text-base font-medium text-gray-500">회</span>
+                </dd>
               </div>
-              <div className="text-2xl font-bold text-blue-900">
-                {participationData.stats.total_participations}회
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-2xl p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Gift className="w-5 h-5 text-green-600 mr-2" />
-                <span className="text-sm font-medium text-green-800">상품 당첨</span>
-              </div>
-              <div className="text-2xl font-bold text-green-900">
-                {participationData.stats.prize_wins}회
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Calendar className="w-5 h-5 text-orange-600 mr-2" />
-                <span className="text-sm font-medium text-orange-800">꽝</span>
-              </div>
-              <div className="text-2xl font-bold text-orange-900">
-                {participationData.stats.consolation_wins}회
-              </div>
-            </div>
-          </div>
+            ))}
+          </dl>
 
           {/* 참여 내역 테이블 */}
           {participationData.records.length > 0 ? (
             <div className="overflow-x-auto">
-              <div className="bg-white/60 rounded-2xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50/80">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          결과
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          참여일
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          참여시간
-                        </th>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-gray-500">
+                    <th className="px-4 py-3 font-medium">결과</th>
+                    <th className="px-4 py-3 font-medium">참여일</th>
+                    <th className="px-4 py-3 font-medium">참여시간</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {participationData.records.map((record) => {
+                    const isPrizeWinner = isRealPrizeWinner(record)
+
+                    return (
+                      <tr key={record.id}>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          {isPrizeWinner ? (
+                            <div>
+                              <span className="mr-2 inline-block rounded bg-orange-50 px-1.5 py-0.5 text-xs font-semibold text-orange-700">당첨</span>
+                              <span className="font-semibold text-gray-900">{record.prize_name || '상품'}</span>
+                              {record.prize_description && (
+                                <p className="mt-0.5 text-xs text-gray-500 truncate">{record.prize_description}</p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-500">꽝</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-gray-900 tabular-nums">
+                          {formatParticipationDate(record.participation_date)}
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap text-gray-500 tabular-nums">
+                          {formatDate(record.participated_at)}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200/50">
-                      {participationData.records.map((record) => {
-                        const result = getResultDisplay(record)
-                        const isPrizeWinner = isRealPrizeWinner(record)
-                        
-                        return (
-                          <tr key={record.id} className="hover:bg-white/40 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center space-x-4">
-                                <div 
-                                  className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-                                  style={{ backgroundColor: `${result.color}20` }}
-                                >
-                                  {result.icon}
-                                </div>
-                                <div className="min-w-0">
-                                  <div className={`font-semibold ${isPrizeWinner ? 'text-green-700' : 'text-gray-600'}`}>
-                                    {result.name}
-                                  </div>
-                                  <div className="text-sm text-gray-600 truncate">
-                                    {result.description}
-                                  </div>
-                                  {isPrizeWinner && (
-                                    <div className="text-xs text-green-600 font-medium mt-1">
-                                      당첨
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {formatParticipationDate(record.participation_date)}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-600">
-                                {formatDate(record.participated_at)}
-                              </div>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Dices className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <div className="text-lg font-medium text-gray-700 mb-2">
-                아직 참여 내역이 없습니다
-              </div>
-              <div className="text-gray-500">
-                룰렛을 돌려서 행운의 상품을 받아보세요
-              </div>
+            <div className="py-12 text-center">
+              <p className="font-medium text-gray-700 mb-1">아직 참여 내역이 없습니다</p>
+              <p className="text-sm text-gray-500">룰렛을 돌려서 행운의 상품을 받아보세요</p>
             </div>
           )}
 
-          {/* 안내 메시지 */}
           {participationData.records.length > 0 && (
-            <div className="mt-6 p-4 bg-blue-50/60 rounded-2xl">
-              <div className="flex items-start space-x-3">
-                <div className="text-blue-500 mt-0.5">ℹ️</div>
-                <div className="text-sm text-blue-700">
-                  <p className="font-medium mb-1">참여 내역 안내</p>
-                  <ul className="space-y-1 text-blue-600">
-                    <li>• 기프티콘은 가입된 전화번호로 전달됩니다</li>
-                    <li>• 상품 관련 문의는 고객센터로 연락해주세요</li>
-                    <li>• 하루 1회만 참여 가능합니다</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            <ul className="mt-6 space-y-1 border-t border-gray-100 pt-4 text-xs text-gray-500 list-disc pl-4">
+              <li>기프티콘은 가입된 전화번호로 전달됩니다</li>
+              <li>상품 관련 문의는 고객센터로 연락해주세요</li>
+              <li>하루 1회만 참여 가능합니다</li>
+            </ul>
           )}
         </>
       ) : null}
-    </div>
+    </section>
   )
 }

@@ -12,7 +12,15 @@ import FestivalTabHeader from '../FestivalTabHeader'
 import { Prize } from '@/types/online-festival'
 import { RecentWinner, RouletteResult } from '@/types/event'
 import { formatRelativeTime } from '@/lib/utils/date'
-import { Gift, RefreshCw, AlertTriangle, Clock, AlertCircle, CheckCircle, LogIn, PackageX, Phone } from 'lucide-react'
+import { Gift, RefreshCw } from 'lucide-react'
+import Notice from '@/components/ui/Notice'
+
+const EVENT_GUIDE = [
+  { title: '참여 횟수', desc: '하루 1회 참여 가능합니다' },
+  { title: '참여 자격', desc: '로그인한 회원만 참여 가능합니다' },
+  { title: '상품 소진', desc: '상품 소진 시 해당 상품은 제외됩니다' },
+  { title: '기프티콘 전달', desc: '가입된 전화번호로 전달됩니다' },
+]
 
 // 상품명에 따른 이미지 매핑
 const PRIZE_IMAGE_MAP: Record<string, string> = {
@@ -212,9 +220,9 @@ export default function RandomEvent() {
       >
         {/* 테스트 앱 안내 */}
         {!EVENT_ENDED && (
-          <div className="inline-block px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-700 font-medium">
-              ⚙️ 테스트 앱: 일일 참여 제한 없이 지속적으로 참여 가능합니다
+          <div className="inline-block px-4 py-2 border border-gray-200 rounded-md">
+            <p className="text-sm text-gray-600">
+              테스트 앱: 일일 참여 제한 없이 지속적으로 참여 가능합니다
             </p>
           </div>
         )}
@@ -233,44 +241,28 @@ export default function RandomEvent() {
       {/* 이벤트 종료 안내 배너 */}
       {EVENT_ENDED && (
         <div className="max-w-4xl mx-auto mb-8">
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 rounded-xl p-6">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-bold text-orange-900 mb-2 text-lg">랜덤 이벤트 종료</h3>
-                <p className="text-orange-800 text-sm mb-2">
-                  모두하나대축제 2025 랜덤 이벤트가 종료되었습니다.
-                </p>
-                <p className="text-orange-700 text-sm">
-                  당첨 내역은 '나의 당첨 내역' 탭에서 확인하실 수 있으며, 기프티콘은 가입된 전화번호로 전달됩니다.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Notice title="랜덤 이벤트 종료">
+            <p>모두하나대축제 2025 랜덤 이벤트가 종료되었습니다.</p>
+            <p>당첨 내역은 '나의 당첨 내역' 탭에서 확인하실 수 있으며, 기프티콘은 가입된 전화번호로 전달됩니다.</p>
+          </Notice>
         </div>
       )}
 
       {/* 에러 메시지 */}
       {error && (
         <div className="max-w-2xl mx-auto mb-6">
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-xl">
-            <div className="flex items-center">
-              <AlertTriangle className="w-5 h-5 text-red-400 mr-3" />
-              <p className="text-red-700 font-medium">{error}</p>
-            </div>
-          </div>
+          <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
         </div>
       )}
 
       {EVENT_ENDED ? (
         <div className="max-w-4xl mx-auto space-y-8">
           {/* 종료 안내 카드 */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 text-center border border-white/20 shadow-lg">
-            <CheckCircle className="w-20 h-20 text-gray-400 mx-auto mb-6" />
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+          <div className="bg-white rounded-lg border border-gray-200 p-10 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               랜덤 이벤트가 종료되었습니다
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600">
               많은 분들의 참여 감사드립니다. 당첨된 기프티콘은 가입하신 전화번호로 전송됩니다.
             </p>
           </div>
@@ -307,57 +299,26 @@ export default function RandomEvent() {
               />
 
               {/* 참여 안내 */}
-              <InfoCard
-                title="이벤트 안내"
-                icon={Clock}
-                iconColor="text-orange-500"
-                variant="gradient"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3 p-3 bg-orange-50/50 rounded-lg">
-                    <Clock className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">참여 횟수</div>
-                      <div className="text-gray-700 text-sm">하루 1회 참여 가능합니다</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-3 bg-blue-50/50 rounded-lg">
-                    <LogIn className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">참여 자격</div>
-                      <div className="text-gray-700 text-sm">로그인한 회원만 참여 가능합니다</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-3 bg-purple-50/50 rounded-lg">
-                    <PackageX className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">상품 소진</div>
-                      <div className="text-gray-700 text-sm">상품 소진 시 해당 상품은 제외됩니다</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-3 p-3 bg-green-50/50 rounded-lg">
-                    <Phone className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">기프티콘 전달</div>
-                      <div className="text-gray-700 text-sm">가입된 전화번호로 전달됩니다</div>
-                    </div>
-                  </div>
-                </div>
+              <InfoCard title="이벤트 안내">
+                <ol className="space-y-4">
+                  {EVENT_GUIDE.map((item, i) => (
+                    <li key={item.title} className="flex items-start gap-3">
+                      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white tabular-nums">
+                        {i + 1}
+                      </span>
+                      <div className="text-sm">
+                        <p className="font-semibold text-gray-900">{item.title}</p>
+                        <p className="text-gray-600">{item.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
               </InfoCard>
             </div>
           </div>
 
           {/* 상품 안내 */}
-          <InfoCard
-            title="상품 안내"
-            icon={Gift}
-            iconColor="text-orange-500"
-            variant="glow"
-            className="mt-12"
-          >
+          <InfoCard title="상품 안내" className="mt-12">
             {prizes.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {prizes.map((prize) => {
@@ -366,10 +327,10 @@ export default function RandomEvent() {
                   return (
                     <div
                       key={prize.id}
-                      className="group bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                      className="rounded-lg border border-gray-100 p-4 text-center"
                     >
                       {prizeImage ? (
-                        <div className="relative w-16 h-16 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <div className="relative w-16 h-16 mx-auto mb-3">
                           <Image
                             src={prizeImage}
                             alt={prize.name}
@@ -378,7 +339,7 @@ export default function RandomEvent() {
                           />
                         </div>
                       ) : (
-                        <div className="relative w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                        <div className="relative w-16 h-16 mx-auto mb-3 flex items-center justify-center bg-gray-50 rounded-lg">
                           <Gift className="w-8 h-8 text-gray-400" />
                         </div>
                       )}
@@ -386,10 +347,8 @@ export default function RandomEvent() {
                       {prize.description && (
                         <div className="text-xs text-gray-600 mb-2">{prize.description}</div>
                       )}
-                      <div className="mt-2 px-2 py-1 bg-orange-50 rounded-full">
-                        <div className="text-xs font-medium text-orange-700">
-                          남은 수량: {prize.current_quantity}개
-                        </div>
+                      <div className="mt-2 text-xs text-gray-500 tabular-nums">
+                        남은 수량 <span className="font-semibold text-orange-600">{prize.current_quantity}</span>개
                       </div>
                     </div>
                   )

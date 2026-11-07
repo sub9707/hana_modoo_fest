@@ -88,7 +88,7 @@ export default function KakaoMap({
           yAnchor={2.3}
         >
           <div className="map-label">
-            🎪 모두하나대축제
+            모두하나대축제
           </div>
         </CustomOverlayMap>
         <ZoomControl position={"RIGHT"} />

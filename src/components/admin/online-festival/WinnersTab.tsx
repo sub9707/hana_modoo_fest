@@ -244,12 +244,12 @@ export function WinnersTab() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 flex items-center">
-              <Users className="w-4 h-4 mr-2 text-blue-600" />
+              <Users className="w-4 h-4 mr-2 text-orange-600" />
               총 참여 수
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-orange-600">
               {rouletteStats?.total_participations?.toLocaleString() || 0}회
             </div>
             <p className="text-xs text-gray-500 mt-1">
@@ -300,7 +300,7 @@ export function WinnersTab() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">상품별 당첨 통계</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {prizeStats.prize_breakdown.map((prize, index) => (
-              <Card key={index} className="border-l-4" style={{ borderLeftColor: '#3B82F6' }}>
+              <Card key={index}>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">{prize.prize_name}</CardTitle>
                 </CardHeader>
@@ -323,7 +323,7 @@ export function WinnersTab() {
             <CardTitle className="text-sm font-medium">총 당첨자 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-orange-600">
               {prizeStats?.total_winners?.toLocaleString() || 0}
             </div>
           </CardContent>

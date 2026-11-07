@@ -302,7 +302,7 @@ export function TiptapEditor({
             disabled={disabled}
             title="링크 추가"
           >
-            🔗 링크
+            링크
           </button>
         </div>
 

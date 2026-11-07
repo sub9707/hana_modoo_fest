@@ -186,7 +186,7 @@ export default function NewsList({
         <p className="text-red-600 mb-4">뉴스를 불러오는 중 오류가 발생했습니다.</p>
         <button 
           onClick={handleRetry}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
         >
           다시 시도
         </button>
@@ -196,17 +196,17 @@ export default function NewsList({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">
+      <div className="flex items-end justify-between border-b border-gray-200 pb-4">
+        <h2 className="text-2xl font-bold text-gray-900">
           {searchResultHeader}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm text-gray-500">
           총 {totalCount.toLocaleString()}개의 글
         </p>
       </div>
 
       {importantNews.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {importantNews.map((newsItem) => (
             <NewsCard
               key={`important-${newsItem.id}`}
@@ -217,7 +217,7 @@ export default function NewsList({
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {regularNews.map((newsItem) => (
           <NewsCard 
             key={`regular-${newsItem.id}`}
@@ -248,7 +248,6 @@ export default function NewsList({
 
       {!loading && uniqueNews.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">📰</div>
           <p className="text-gray-500 text-lg mb-4">
             {searchParams.search 
               ? '검색 결과가 없습니다.'

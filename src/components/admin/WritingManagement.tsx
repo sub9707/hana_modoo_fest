@@ -35,7 +35,7 @@ function WritingModal({ writing, isOpen, onClose, onToggleSelected }: WritingMod
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">작성자</label>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-medium text-sm">
                   {writing.author[0]}
                 </div>
                 <span className="text-gray-900">{writing.author}</span>
@@ -50,7 +50,7 @@ function WritingModal({ writing, isOpen, onClose, onToggleSelected }: WritingMod
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">주제</label>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+              <span className="px-2 py-1 bg-orange-100 text-orange-800 text-sm rounded-full">
                 {writing.topic}
               </span>
             </div>
@@ -191,7 +191,7 @@ export default function WritingManagement() {
         <h2 className="text-2xl font-bold text-gray-900">가족주제 글짓기 관리</h2>
         <button 
           onClick={handleExportExcel}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
         >
           <Download className="w-4 h-4 mr-2" />
           통계 엑셀 추출
@@ -202,7 +202,7 @@ export default function WritingManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">전체 작품</h3>
-          <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+          <p className="text-3xl font-bold text-orange-600">{stats.total}</p>
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -223,7 +223,7 @@ export default function WritingManagement() {
         
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">총 좋아요</h3>
-          <p className="text-3xl font-bold text-pink-600">{stats.totalLikes.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-gray-900">{stats.totalLikes.toLocaleString()}</p>
           <p className="text-sm text-gray-500 mt-1">
             평균 {stats.total > 0 ? Math.round(stats.totalLikes / stats.total) : 0}개
           </p>
@@ -241,7 +241,7 @@ export default function WritingManagement() {
               placeholder="제목, 내용, 작성자로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             />
           </div>
           
@@ -251,7 +251,7 @@ export default function WritingManagement() {
             <select
               value={selectedTopic}
               onChange={(e) => setSelectedTopic(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             >
               {allTopics.map(topic => (
                 <option key={topic} value={topic}>{topic}</option>
@@ -263,7 +263,7 @@ export default function WritingManagement() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             {sortOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -310,7 +310,7 @@ export default function WritingManagement() {
                 <div className="flex space-x-4 flex-1">
                   {/* 순위/프로필 */}
                   <div className="flex flex-col items-center space-y-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                    <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-medium text-sm">
                       {writing.author[0]}
                     </div>
                     <span className="text-xs text-gray-500">#{index + 1}</span>
@@ -333,7 +333,7 @@ export default function WritingManagement() {
                         <User className="w-3 h-3 mr-1" />
                         {writing.author}
                       </span>
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
                         {writing.topic}
                       </span>
                       <span className="flex items-center">
@@ -367,7 +367,7 @@ export default function WritingManagement() {
                 <div className="flex items-center space-x-2 ml-4">
                   <button
                     onClick={() => handleViewWriting(writing)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
                     title="상세 보기"
                   >
                     <Eye className="w-4 h-4" />
@@ -393,7 +393,6 @@ export default function WritingManagement() {
         {/* 결과 없음 메시지 */}
         {filteredAndSortedWritings.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">📝</div>
             <p className="text-gray-500">
               {writings.length === 0 
                 ? '등록된 글이 없습니다.' 

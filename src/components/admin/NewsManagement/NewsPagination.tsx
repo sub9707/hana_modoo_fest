@@ -75,7 +75,7 @@ export function NewsPagination({ currentPage, totalPages, total }: NewsPaginatio
             disabled={page === '...' || page === currentPage || isPending}
             className={`px-3 py-2 border rounded-md ${
               page === currentPage
-                ? 'bg-blue-600 text-white border-blue-600'
+                ? 'bg-orange-600 text-white border-orange-600'
                 : page === '...'
                 ? 'border-gray-300 cursor-default'
                 : 'border-gray-300 hover:bg-gray-50'

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { User, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { menuItems } from '@/config/menuConfig'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
@@ -70,65 +70,59 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-white shadow-lg h-screen overflow-y-auto flex flex-col">
-      {/* 헤더 - 클릭 가능한 로고 */}
-      <div 
+    <aside className="w-60 bg-white border-r border-gray-200 h-screen overflow-y-auto flex flex-col">
+      {/* 로고 */}
+      <button
+        type="button"
         onClick={handleLogoClick}
-        className="p-6 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="px-6 py-5 border-b border-gray-200 text-left hover:bg-gray-50 transition-colors"
       >
-        <h1 className="text-xl font-bold text-gray-900">백오피스 관리</h1>
-        <p className="text-sm text-gray-500 mt-1">모두하나대축제</p>
-      </div>
-      
-      {/* 네비게이션 메뉴 - flex-1로 공간 차지 */}
-      <nav className="px-4 py-6 flex-1">
+        <p className="text-xs font-semibold tracking-wide text-orange-600">모두하나대축제</p>
+        <h1 className="text-lg font-bold text-gray-900 mt-0.5">관리자</h1>
+      </button>
+
+      {/* 네비게이션 */}
+      <nav className="px-3 py-4 flex-1 space-y-0.5">
         {menuItems.map((item) => {
-          const isActive = activeMenu === item.id || 
+          const isActive = activeMenu === item.id ||
             (item.submenu && item.submenu.some(sub => sub.id === activeMenu))
-          
+
           return (
-            <div key={item.id} className="mb-2">
-              {/* 메인 메뉴 버튼 */}
+            <div key={item.id}>
               <button
                 onClick={() => handleMenuClick(item.id)}
-                className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 text-left text-sm rounded-md transition-colors ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm' 
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-orange-50 text-orange-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center">
-                  <item.icon className={`w-5 h-5 mr-3 ${
-                    isActive ? 'text-blue-600' : 'text-gray-500'
-                  }`} />
-                  <span className="font-medium">{item.title}</span>
-                </div>
-                {/* 서브메뉴가 있는 경우 화살표 표시 */}
+                <span className="flex items-center">
+                  <item.icon className={`w-4 h-4 mr-3 ${isActive ? 'text-orange-600' : 'text-gray-400'}`} />
+                  {item.title}
+                </span>
                 {item.submenu && (
-                  <svg 
-                    className={`w-4 h-4 transition-transform ${
-                      openSubmenu === item.id ? 'rotate-90' : ''
-                    } ${isActive ? 'text-blue-600' : 'text-gray-400'}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform ${openSubmenu === item.id ? 'rotate-90' : ''} text-gray-400`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 )}
               </button>
-              
-              {/* 서브메뉴 */}
+
               {item.submenu && openSubmenu === item.id && (
-                <div className="ml-8 mt-2 space-y-1">
+                <div className="ml-7 mt-0.5 mb-1 space-y-0.5">
                   {item.submenu.map((subItem) => (
                     <button
                       key={subItem.id}
                       onClick={() => handleSubmenuClick(subItem.id)}
-                      className={`w-full text-left px-4 py-2 text-sm rounded-md transition-colors ${
-                        activeMenu === subItem.id 
-                          ? 'bg-blue-50 text-blue-700 font-medium border-l-2 border-blue-500' 
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                        activeMenu === subItem.id
+                          ? 'text-orange-700 font-semibold'
+                          : 'text-gray-500 hover:text-gray-900'
                       }`}
                     >
                       {subItem.title}
@@ -141,78 +135,35 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* 하단 영역 */}
-      <div className="border-t border-gray-200 bg-gray-50">
-        {/* 관리자 프로필 카드 */}
-        <div className="p-4">
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            {isLoading ? (
-              /* 로딩 상태 */
-              <div className="flex items-center space-x-3">
-                <Loader2 className="w-8 h-8 text-gray-400 animate-spin flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                </div>
-              </div>
-            ) : user ? (
-              /* 사용자 정보 표시 */
-              <div className="flex items-center space-x-3">
-                {/* 프로필 아이콘 또는 이미지 */}
-                {user.profile_image ? (
-                  <img 
-                    src={user.profile_image} 
-                    alt="Profile" 
-                    className="w-8 h-8 rounded-full flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
-                    {user.name ? user.name[0].toUpperCase() : user.username[0].toUpperCase()}
-                  </div>
-                )}
-                
-                {/* 프로필 정보 */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">
-                    {user.name || user.username || '이름 없음'}
-                  </p>
-                  <p className="text-xs text-blue-600 font-medium">
-                    {getRoleDisplay(user.role)}
-                  </p>
-                  {user.company && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {user.company}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* 사용자 정보 없음 */
-              <div className="flex items-center space-x-3">
-                <User className="w-8 h-8 text-gray-400 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">
-                    인증 필요
-                  </p>
-                  <p className="text-xs text-red-600 font-medium">
-                    로그인해주세요
-                  </p>
-                </div>
-              </div>
-            )}
+      {/* 하단: 사용자 정보 */}
+      <div className="border-t border-gray-200 p-4 space-y-3">
+        {isLoading ? (
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+            <span className="text-sm text-gray-400">불러오는 중</span>
           </div>
-        </div>
+        ) : user ? (
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-900 truncate">
+              {user.name || user.username || '이름 없음'}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {getRoleDisplay(user.role)}{user.company ? ` · ${user.company}` : ''}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm font-semibold text-gray-900">인증 필요</p>
+            <p className="text-xs text-red-600">로그인해주세요</p>
+          </div>
+        )}
 
-        {/* 로그아웃 버튼 */}
-        <div className="p-4">
-          <Link
-          href={'/'}
-            className="w-full flex items-center justify-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            이벤트 페이지로
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="block w-full rounded-md border border-gray-300 px-3 py-2 text-center text-sm text-gray-700 hover:border-orange-300 hover:text-orange-600 transition-colors"
+        >
+          사이트로 돌아가기
+        </Link>
       </div>
     </aside>
   )

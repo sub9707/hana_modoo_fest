@@ -123,7 +123,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
               type="text"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 ${
                 errors.name ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
               }`}
               placeholder="이름을 입력하세요"
@@ -145,7 +145,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
               type="tel"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 ${
                 errors.phone ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
               }`}
               placeholder="010-0000-0000"
@@ -167,7 +167,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
               type="text"
               value={formData.company}
               onChange={(e) => handleInputChange('company', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 ${
                 errors.company ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
               }`}
               placeholder="회사명을 입력하세요"
@@ -188,7 +188,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
             <select
               value={formData.gender}
               onChange={(e) => handleInputChange('gender', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             >
               <option value="male">남성</option>
               <option value="female">여성</option>
@@ -205,7 +205,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
               type="date"
               value={formData.birth_date}
               onChange={(e) => handleInputChange('birth_date', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300 ${
                 errors.birth_date ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
               }`}
             />
@@ -225,7 +225,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
             <select
               value={formData.role}
               onChange={(e) => handleInputChange('role', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             >
               <option value="user">일반 사용자</option>
               <option value="editor">편집자</option>
@@ -246,7 +246,7 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors disabled:opacity-50"
             >
               <Save className="w-4 h-4 mr-2" />
               {loading ? '저장 중...' : '저장'}

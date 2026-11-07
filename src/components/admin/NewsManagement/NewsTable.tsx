@@ -41,7 +41,6 @@ export function NewsTable({ items, onEdit }: NewsTableProps) {
   if (items.length === 0) {
     return (
       <div className="text-center py-16 bg-white rounded-lg border border-gray-200">
-        <div className="text-8xl mb-6">📝</div>
         <h3 className="text-xl font-semibold text-gray-900 mb-3">등록된 공지사항이 없습니다</h3>
         <p className="text-gray-500 mb-6">첫 번째 공지사항을 작성해보세요.</p>
         <div className="text-sm text-gray-400">
@@ -55,7 +54,7 @@ export function NewsTable({ items, onEdit }: NewsTableProps) {
     <>
       <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+          <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 제목
@@ -86,7 +85,7 @@ export function NewsTable({ items, onEdit }: NewsTableProps) {
               >
                 <td className="px-6 py-4">
                   <div className="max-w-xs">
-                    <div className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 transition-colors">
+                    <div className="text-sm font-semibold text-gray-900 truncate hover:text-orange-600 transition-colors">
                       {item.title}
                     </div>
                     {item.summary && (
@@ -97,7 +96,7 @@ export function NewsTable({ items, onEdit }: NewsTableProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                  <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
                     {item.category}
                   </span>
                 </td>
@@ -120,14 +119,14 @@ export function NewsTable({ items, onEdit }: NewsTableProps) {
                   <div className="flex space-x-3" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleView(item)}
-                      className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                      className="text-orange-600 hover:text-orange-800 transition-colors font-medium"
                       disabled={isPending}
                     >
                       보기
                     </button>
                     <button
                       onClick={() => onEdit(item)}
-                      className="text-indigo-600 hover:text-indigo-800 transition-colors font-medium"
+                      className="text-orange-600 hover:text-orange-800 transition-colors font-medium"
                       disabled={isPending}
                     >
                       수정

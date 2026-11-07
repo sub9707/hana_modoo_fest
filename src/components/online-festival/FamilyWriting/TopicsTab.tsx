@@ -1,7 +1,8 @@
 'use client'
 
 import { WritingTopic } from '@/types/writing'
-import { PenTool, Clock, AlertCircle } from 'lucide-react'
+import Notice from '@/components/ui/Notice'
+import { PenTool, Clock } from 'lucide-react'
 
 interface TopicsTabProps {
   writingTopics: WritingTopic[]
@@ -16,20 +17,10 @@ export default function TopicsTab({ writingTopics, onTopicSelect }: TopicsTabPro
     <div className="max-w-4xl mx-auto space-y-8">
       {/* 이벤트 종료 안내 */}
       {EVENT_ENDED && (
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 rounded-xl p-6">
-          <div className="flex items-start space-x-3">
-            <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="font-bold text-orange-900 mb-2 text-lg">글짓기 이벤트 종료</h3>
-              <p className="text-orange-800 text-sm mb-2">
-                모두하나대축제 2025 가족 이야기 글짓기 이벤트가 종료되었습니다.
-              </p>
-              <p className="text-orange-700 text-sm">
-                새로운 글 작성은 불가능하지만, 작성된 글들은 '둘러보기' 탭에서 계속 확인하실 수 있습니다.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Notice title="글짓기 이벤트 종료">
+            <p>모두하나대축제 2025 가족 이야기 글짓기 이벤트가 종료되었습니다.</p>
+            <p>새로운 글 작성은 불가능하지만, 작성된 글들은 '둘러보기' 탭에서 계속 확인하실 수 있습니다.</p>
+          </Notice>
       )}
 
       {/* 주제 안내 */}

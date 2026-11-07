@@ -34,7 +34,7 @@ export default function SearchAndFilters({
             placeholder="이름, 사용자명, 회사, 연락처로 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           />
         </div>
         
@@ -44,7 +44,7 @@ export default function SearchAndFilters({
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             {roleOptions.map(role => (
               <option key={role} value={role}>{role}</option>
@@ -56,7 +56,7 @@ export default function SearchAndFilters({
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
         >
           {dateOptions.map(option => (
             <option key={option} value={option}>{option}</option>

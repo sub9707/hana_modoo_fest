@@ -143,11 +143,11 @@ export function PrizeProbabilityManager({ onUpdate }: PrizeProbabilityManagerPro
   const isProbabilityValid = totalProb <= 100
 
   return (
-    <Card className="border-2 border-indigo-200">
+    <Card className="border-2 border-orange-200">
       <CardHeader className="cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Settings className="h-5 w-5 text-indigo-600" />
+            <Settings className="h-5 w-5 text-orange-600" />
             <CardTitle className="text-lg">상품 확률 설정</CardTitle>
           </div>
           <Button
@@ -186,10 +186,10 @@ export function PrizeProbabilityManager({ onUpdate }: PrizeProbabilityManagerPro
 
           {/* 확률 합계 표시 */}
           <div className="grid grid-cols-2 gap-4">
-            <div className={`p-4 rounded-lg ${isProbabilityValid ? 'bg-blue-50 border-2 border-blue-500' : 'bg-red-50 border-2 border-red-500'}`}>
+            <div className={`p-4 rounded-lg ${isProbabilityValid ? 'bg-orange-50 border-2 border-orange-500' : 'bg-red-50 border-2 border-red-500'}`}>
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-sm">상품 확률 합계:</span>
-                <span className={`text-xl font-bold ${isProbabilityValid ? 'text-blue-700' : 'text-red-700'}`}>
+                <span className={`text-xl font-bold ${isProbabilityValid ? 'text-orange-700' : 'text-red-700'}`}>
                   {typeof totalProb === 'number' ? totalProb.toFixed(2) : '0.00'}%
                 </span>
               </div>
@@ -227,7 +227,7 @@ export function PrizeProbabilityManager({ onUpdate }: PrizeProbabilityManagerPro
                 .map(prize => (
                   <div 
                     key={prize.id} 
-                    className="flex items-center gap-4 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-indigo-300 transition-colors"
+                    className="flex items-center gap-4 p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-orange-300 transition-colors"
                   >
                     <div className="flex items-center gap-3 flex-1">
                       <span className="text-2xl">{prize.icon}</span>
@@ -292,7 +292,7 @@ export function PrizeProbabilityManager({ onUpdate }: PrizeProbabilityManagerPro
             <Button
               onClick={handleSave}
               disabled={!isProbabilityValid || loading || saving || prizes.length === 0}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50"
+              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white disabled:opacity-50"
             >
               <Save className="h-4 w-4 mr-2" />
               {saving ? '저장 중...' : '저장'}

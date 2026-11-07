@@ -194,7 +194,6 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                             boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.4)'
                                         }}
                                     >
-                                        <span className="text-2xl">✓</span>
                                         <span>접수 완료</span>
                                     </div>
                                 </div>
@@ -265,7 +264,6 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                     style={{ backgroundColor: '#fef3c7', border: '2px dashed #f59e0b' }}
                                 >
                                     <div className="flex items-start space-x-3">
-                                        <span className="text-2xl">📦</span>
                                         <div className="flex-1">
                                             <div className="font-bold mb-2" style={{ color: '#92400e' }}>
                                                 경품 배송지
@@ -287,7 +285,6 @@ export default function RegistrationSuccess({ user, registration }: Registration
                                         style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac' }}
                                     >
                                         <div className="flex items-start space-x-3">
-                                            <span className="text-2xl">💬</span>
                                             <div className="flex-1">
                                                 <div className="font-bold mb-2" style={{ color: '#166534' }}>
                                                     특별 요청사항

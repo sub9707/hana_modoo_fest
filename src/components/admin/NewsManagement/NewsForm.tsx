@@ -57,7 +57,6 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                     {item ? '공지사항 수정' : '공지사항 작성'}
                 </h2>
                 <div className="text-sm text-gray-500 flex items-center">
-                    <span className="mr-2">📝</span>
                     글자수: {getTextLength(editorContent)}자
                 </div>
             </div>
@@ -65,7 +64,6 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
             {error && (
                 <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
                     <div className="flex items-center">
-                        <span className="text-red-500 mr-2">⚠️</span>
                         {error}
                     </div>
                 </div>
@@ -83,7 +81,7 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                             name="title"
                             defaultValue={item?.title}
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all"
                             disabled={isPending}
                             placeholder="공지사항 제목을 입력하세요"
                         />
@@ -97,7 +95,7 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                             name="category"
                             defaultValue={item?.category}
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all"
                             disabled={isPending}
                         >
                             <option value="">카테고리 선택</option>
@@ -118,7 +116,7 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                         name="summary"
                         defaultValue={item?.summary}
                         placeholder="공지사항 요약을 입력하세요 (선택사항)"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all"
                         disabled={isPending}
                         maxLength={200}
                     />
@@ -137,7 +135,6 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                                 disabled={isPending}
                             />
                             <label className="text-sm font-medium text-gray-900 flex items-center">
-                                <span className="mr-2">🚨</span>
                                 중요 공지사항으로 설정
                                 <span className="ml-2 text-xs text-gray-500">(목록 상단에 표시)</span>
                             </label>
@@ -162,7 +159,6 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                     />
                     {!editorContent.trim() && (
                         <p className="text-red-500 text-sm mt-2 flex items-center">
-                            <span className="mr-1">⚠️</span>
                             내용을 입력해주세요.
                         </p>
                     )}
@@ -173,7 +169,7 @@ export function NewsForm({ item, categories, onSuccess, onCancel }: NewsFormProp
                     <button
                         type="submit"
                         disabled={isPending || !editorContent.trim()}
-                        className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all transform active:scale-[0.98]"
+                        className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all transform active:scale-[0.98]"
                     >
                         {isPending ? (
                             <span className="flex items-center justify-center">

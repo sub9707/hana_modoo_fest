@@ -40,9 +40,8 @@ export default function PrivacyPolicyContent() {
             </nav>
 
             {/* 1. 개인정보의 수집 및 이용목적 */}
-            <section id="section1" className="border-l-4 border-orange-500 pl-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <UserCheck className="w-7 h-7 mr-3 text-orange-600" />
+            <section id="section1" className="pt-10 border-t border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     1. 개인정보의 수집 및 이용목적
                 </h2>
 
@@ -80,9 +79,8 @@ export default function PrivacyPolicyContent() {
             </section>
 
             {/* 2. 수집하는 개인정보 항목 */}
-            <section id="section2" className="border-l-4 border-green-500 pl-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <Eye className="w-7 h-7 mr-3 text-green-600" />
+            <section id="section2" className="pt-10 border-t border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     2. 수집하는 개인정보 항목
                 </h2>
 
@@ -132,14 +130,13 @@ export default function PrivacyPolicyContent() {
             </section>
 
             {/* 3. 개인정보의 보유 및 이용기간 */}
-            <section id="section3" className="border-l-4 border-purple-500 pl-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <Lock className="w-7 h-7 mr-3 text-purple-600" />
+            <section id="section3" className="pt-10 border-t border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     3. 개인정보의 보유 및 이용기간
                 </h2>
 
                 <div className="space-y-4">
-                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">원칙</h3>
                         <p className="text-gray-700">
                             개인정보는 <strong>이벤트 종료 및 경품 발송 완료 후 90일 이내에 지체없이 파기</strong>합니다.
@@ -149,11 +146,11 @@ export default function PrivacyPolicyContent() {
                 </div>
             </section>
             {/* 4. 개인정보의 제3자 제공 */}
-            <section id="section4" className="border-l-4 border-red-500 pl-6" >
+            <section id="section4" className="pt-10 border-t border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     4. 개인정보의 제3자 제공
                 </h2>
-                <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <p className="text-gray-700">
                         회사는 <strong>원칙적으로 개인정보를 외부에 제공하지 않습니다.</strong>
                         다만, 다음의 경우에는 예외로 합니다.
@@ -164,19 +161,19 @@ export default function PrivacyPolicyContent() {
                         <li>경품 배송을 위한 택배업체 제공 (수령인 정보에 한함)</li>
                     </ul>
                 </div>
-            </section >
+            </section>
 
             {/* 5. 개인정보처리 위탁 */}
-            <section id="section5" className="border-l-4 border-orange-500 pl-6" >
+            <section id="section5" className="pt-10 border-t border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     5. 개인정보처리 위탁
                 </h2>
                 <div className="space-y-4">
-                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">현재 위탁업체</h3>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
-                                <thead className="bg-orange-100">
+                                <thead className="bg-gray-100">
                                     <tr>
                                         <th className="text-left p-3 font-semibold">수탁업체</th>
                                         <th className="text-left p-3 font-semibold">위탁업무</th>
@@ -194,12 +191,11 @@ export default function PrivacyPolicyContent() {
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* 6. 개인정보의 파기절차 및 방법 */}
-            <section id="section6" className="border-l-4 border-gray-500 pl-6" >
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <Trash2 className="w-7 h-7 mr-3 text-gray-600" />
+            <section id="section6" className="pt-10 border-t border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     6. 개인정보의 파기절차 및 방법
                 </h2>
 
@@ -223,16 +219,16 @@ export default function PrivacyPolicyContent() {
                         </ul>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* 7. 정보주체의 권리·의무 및 행사방법 */}
-            <section id="section7" className="border-l-4 border-indigo-500 pl-6" >
+            <section id="section7" className="pt-10 border-t border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     7. 정보주체의 권리·의무 및 행사방법
                 </h2>
 
                 <div className="space-y-4">
-                    <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">개인정보 관련 권리</h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                             <li><strong>열람권:</strong> 개인정보 처리현황을 확인할 권리</li>
@@ -242,7 +238,7 @@ export default function PrivacyPolicyContent() {
                         </ul>
                     </div>
 
-                    <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                         <h3 className="text-lg font-semibold text-gray-800 mb-3">권리 행사 방법</h3>
                         <p className="text-gray-700 mb-3">
                             아래 연락처로 서면, 전화, 이메일을 통해 요청하실 수 있습니다.
@@ -259,15 +255,15 @@ export default function PrivacyPolicyContent() {
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* 8. 개인정보 보호책임자 */}
-            <section id="section8" className="border-l-4 border-teal-500 pl-6" >
+            <section id="section8" className="pt-10 border-t border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     8. 개인정보 보호책임자
                 </h2>
 
-                <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-3">개인정보 처리 위탁업무 담당자</h3>
@@ -280,15 +276,15 @@ export default function PrivacyPolicyContent() {
                         </div>
                     </div>
                 </div>
-            </section >
+            </section>
 
             {/* 9. 개인정보 처리방침 변경 */}
-            <section id="section9" className="border-l-4 border-pink-500 pl-6" >
+            <section id="section9" className="pt-10 border-t border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     9. 개인정보 처리방침 변경
                 </h2>
 
-                <div className="bg-pink-50 rounded-lg p-4 border border-pink-200">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <p className="text-gray-700 mb-3">
                         이 개인정보 처리방침은 <strong>2025년 9월 29일</strong>부터 적용됩니다.
                     </p>
@@ -297,7 +293,7 @@ export default function PrivacyPolicyContent() {
                         개인정보 처리방침이 변경되는 경우 최소 7일 전에 공지사항을 통해 사전 공지해 드립니다.
                     </p>
                 </div>
-            </section >
+            </section>
         </div >
     )
 }

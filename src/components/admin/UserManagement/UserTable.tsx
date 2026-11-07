@@ -62,21 +62,21 @@ export default function UserTable({
   const SortButton = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <button
       onClick={() => onSort(field)}
-      className="flex items-center space-x-1 hover:text-blue-600 transition-colors group"
+      className="flex items-center space-x-1 hover:text-orange-600 transition-colors group"
     >
       <span>{children}</span>
       <div className="flex flex-col">
         <ChevronUp 
           className={`w-3 h-3 ${
             sortField === field && sortOrder === 'asc' 
-              ? 'text-blue-600' 
+              ? 'text-orange-600' 
               : 'text-gray-300 group-hover:text-gray-400'
           }`} 
         />
         <ChevronDown 
           className={`w-3 h-3 -mt-1 ${
             sortField === field && sortOrder === 'desc' 
-              ? 'text-blue-600' 
+              ? 'text-orange-600' 
               : 'text-gray-300 group-hover:text-gray-400'
           }`} 
         />
@@ -127,13 +127,13 @@ export default function UserTable({
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
+                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-medium flex-shrink-0">
                         {user.name[0]}
                       </div>
                       <div className="ml-4">
                         <button
                           onClick={() => onViewUser(user)}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                          className="text-sm font-medium text-orange-600 hover:text-orange-800 hover:underline transition-colors"
                         >
                           {user.name}
                         </button>

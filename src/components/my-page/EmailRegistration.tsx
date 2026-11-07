@@ -180,7 +180,7 @@ export default function EmailRegistration({ currentEmail, onSuccess }: EmailRegi
             <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-bold text-red-900 mb-1">
-                ⚠️ 중요: 최초 1회만 등록 가능합니다
+                중요: 최초 1회만 등록 가능합니다
               </p>
               <ul className="text-xs text-red-800 space-y-1">
                 <li>• 한 번 등록한 이메일은 <strong>수정 불가능</strong>합니다</li>
@@ -302,7 +302,7 @@ export default function EmailRegistration({ currentEmail, onSuccess }: EmailRegi
         {/* 안내사항 */}
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
           <p className="text-xs text-amber-800 font-medium mb-2">
-            📌 안내사항
+            안내사항
           </p>
           <ul className="text-xs text-amber-700 space-y-1">
             <li>• 인증번호는 5분간 유효합니다</li>

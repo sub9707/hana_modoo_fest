@@ -232,12 +232,12 @@ export default function PreRegistration() {
       </div>
 
       {/* 주의사항 */}
-      <div className="mt-12 p-6 bg-yellow-50/80 rounded-2xl border-l-4 border-yellow-400">
-        <h4 className="font-semibold text-yellow-800 mb-2">안내사항</h4>
-        <ul className="text-sm text-yellow-700 space-y-1">
-          <li>• 사전접수는 10월 17일(금) 17시까지 가능합니다</li>
-          <li>• 개인정보는 축제 운영 목적으로만 사용되며, 종료 후 안전하게 폐기됩니다</li>
-          <li>• 기상 악화 시 축제 일정이 변경될 수 있습니다</li>
+      <div className="mt-12 rounded-lg border border-gray-200 bg-gray-50 px-6 py-5">
+        <h4 className="font-bold text-gray-900 mb-2">안내사항</h4>
+        <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
+          <li>사전접수는 10월 17일(금) 17시까지 가능합니다</li>
+          <li>개인정보는 축제 운영 목적으로만 사용되며, 종료 후 안전하게 폐기됩니다</li>
+          <li>기상 악화 시 축제 일정이 변경될 수 있습니다</li>
         </ul>
       </div>
     </div>

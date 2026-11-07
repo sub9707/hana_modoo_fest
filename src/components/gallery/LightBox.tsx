@@ -52,7 +52,6 @@ export default function Lightbox({ photo, onClose }: LightboxProps) {
         <div className="flex-1 flex items-center justify-center mb-4">
           <div className="max-w-full max-h-[70vh] bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center aspect-video">
             <div className="text-center text-gray-500">
-              <div className="text-6xl mb-4">📸</div>
               <div className="text-xl">{photo.title}</div>
             </div>
           </div>
@@ -68,7 +67,7 @@ export default function Lightbox({ photo, onClose }: LightboxProps) {
                   {photo.category}
                 </span>
                 <span>{photo.year}년</span>
-                {photo.photographer && <span>📷 {photo.photographer}</span>}
+                {photo.photographer && <span>{photo.photographer}</span>}
               </div>
             </div>
           </div>
@@ -79,16 +78,13 @@ export default function Lightbox({ photo, onClose }: LightboxProps) {
           <div className="flex items-center justify-between">
             <div className="flex space-x-3">
               <button className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                <span>💗</span>
                 <span>좋아요</span>
               </button>
               <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                <span>📤</span>
                 <span>공유</span>
               </button>
             </div>
             <button className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-              <span>📥</span>
               <span>다운로드</span>
             </button>
           </div>

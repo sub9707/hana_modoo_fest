@@ -55,7 +55,7 @@ export function NewsFilter({ categories }: NewsFilterProps) {
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             placeholder="제목, 내용 검색..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           />
         </div>
 
@@ -66,7 +66,7 @@ export function NewsFilter({ categories }: NewsFilterProps) {
           <select
             value={filters.category}
             onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             <option value="">전체</option>
             {categories.map(category => (
@@ -82,7 +82,7 @@ export function NewsFilter({ categories }: NewsFilterProps) {
           <select
             value={filters.important}
             onChange={(e) => setFilters(prev => ({ ...prev, important: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             <option value="">전체</option>
             <option value="true">중요</option>

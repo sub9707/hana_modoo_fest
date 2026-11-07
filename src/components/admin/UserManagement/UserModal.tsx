@@ -65,7 +65,7 @@ export default function UserModal({
 
   const getSignupMethodDisplay = (method: string) => {
     switch (method) {
-      case 'phone': return { text: '전화번호 가입', icon: Phone, color: 'bg-blue-100 text-blue-800' }
+      case 'phone': return { text: '전화번호 가입', icon: Phone, color: 'bg-orange-100 text-orange-800' }
       case 'naver': return { text: '네이버 로그인', icon: Globe, color: 'bg-green-100 text-green-800' }
       case 'kakao': return { text: '카카오 로그인', icon: Globe, color: 'bg-yellow-100 text-yellow-800' }
       default: return { text: '일반 가입', icon: UserIcon, color: 'bg-gray-100 text-gray-800' }
@@ -289,7 +289,7 @@ export default function UserModal({
             <div className="lg:col-span-2 space-y-6">
               {/* 프로필 섹션 */}
               <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-md">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold text-xl">
                   {user.name[0]}
                 </div>
                 <div className="flex-1">
@@ -401,7 +401,7 @@ export default function UserModal({
               <button
                 onClick={() => setShowEditModal(true)}
                 disabled={loading}
-                className="w-full flex items-center justify-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center px-3 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors disabled:opacity-50"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 정보 수정
@@ -458,10 +458,10 @@ export default function UserModal({
 
               {/* 소셜 로그인 사용자에게는 안내 메시지 */}
               {isSocialUser && (
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <div className="bg-orange-50 border border-orange-200 rounded-md p-3">
                   <div className="flex items-center">
-                    <Globe className="w-4 h-4 text-blue-600 mr-2" />
-                    <p className="text-sm text-blue-800">
+                    <Globe className="w-4 h-4 text-orange-600 mr-2" />
+                    <p className="text-sm text-orange-800">
                       소셜 로그인 사용자는 비밀번호 관리가 불필요합니다.
                     </p>
                   </div>
@@ -481,7 +481,7 @@ export default function UserModal({
               <div className="text-xs text-gray-500 mt-4">
                 <p>※ 초기화된 비밀번호는 가입자의 전화번호(- 제외)로 초기화됩니다.</p>
                 {isSocialUser && (
-                  <p className="text-blue-600 mt-2">※ 소셜 로그인 계정은 해당 플랫폼에서 관리됩니다.</p>
+                  <p className="text-orange-600 mt-2">※ 소셜 로그인 계정은 해당 플랫폼에서 관리됩니다.</p>
                 )}
               </div>
             </div>

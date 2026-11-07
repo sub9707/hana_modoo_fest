@@ -230,7 +230,7 @@ export default function RegistrationForm({ user }: RegistrationFormProps) {
         <div className="border-b border-gray-200 pb-4">
           <h3 className="text-xl font-bold text-gray-800 mb-2">경품 수령 주소 *</h3>
           <p className="text-sm text-orange-600 font-medium">
-            ⚠️ 행사 경품을 받을 주소입니다. 정확히 입력해주세요!
+            행사 경품을 받을 주소입니다. 정확히 입력해주세요!
           </p>
         </div>
 

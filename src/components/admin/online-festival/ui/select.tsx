@@ -56,7 +56,7 @@ export function SelectTrigger({ children, className = '', isOpen, setIsOpen, onV
       className={`
         w-full flex items-center justify-between px-3 py-2 text-left
         border border-gray-300 rounded-md bg-white text-sm
-        hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500
         ${className}
       `}
       {...props}

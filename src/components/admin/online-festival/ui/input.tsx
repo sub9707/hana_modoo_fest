@@ -9,7 +9,7 @@ export function Input({ className = '', ...props }: InputProps) {
     <input
       className={`
         w-full px-3 py-2 border border-gray-300 rounded-md text-sm
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-500
         disabled:bg-gray-50 disabled:cursor-not-allowed
         ${className}
       `}

@@ -157,7 +157,7 @@ export function QuizTab() {
             <CardTitle className="text-sm font-medium">총 참여자 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{(totalCount || 0).toLocaleString()}</div>
+            <div className="text-2xl font-bold text-orange-600">{(totalCount || 0).toLocaleString()}</div>
           </CardContent>
         </Card>
       </div>

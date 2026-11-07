@@ -77,7 +77,7 @@ function NoticeModal({ notice, isOpen, onClose, onSave }: NoticeModalProps) {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
                 placeholder="공지사항 제목을 입력하세요"
               />
             </div>
@@ -86,7 +86,7 @@ function NoticeModal({ notice, isOpen, onClose, onSave }: NoticeModalProps) {
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
               >
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -102,7 +102,7 @@ function NoticeModal({ notice, isOpen, onClose, onSave }: NoticeModalProps) {
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={12}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
               placeholder="공지사항 내용을 입력하세요..."
             />
             <p className="text-sm text-gray-500 mt-1">
@@ -118,7 +118,7 @@ function NoticeModal({ notice, isOpen, onClose, onSave }: NoticeModalProps) {
                 id="isPublished"
                 checked={formData.isPublished}
                 onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                className="mr-2 w-4 h-4 text-blue-600"
+                className="mr-2 w-4 h-4 text-orange-600"
               />
               <label htmlFor="isPublished" className="text-sm font-medium text-gray-700">
                 즉시 발행
@@ -142,7 +142,7 @@ function NoticeModal({ notice, isOpen, onClose, onSave }: NoticeModalProps) {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
             >
               {notice ? '수정' : '작성'} 완료
             </button>
@@ -223,7 +223,7 @@ export default function NoticesManagement() {
         <h2 className="text-2xl font-bold text-gray-900">공지사항 관리</h2>
         <button 
           onClick={() => setShowModal(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           공지사항 작성
@@ -234,7 +234,7 @@ export default function NoticesManagement() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">전체 공지</h3>
-          <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+          <p className="text-3xl font-bold text-orange-600">{stats.total}</p>
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -249,7 +249,7 @@ export default function NoticesManagement() {
         
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">총 조회수</h3>
-          <p className="text-3xl font-bold text-purple-600">{stats.totalViews.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-gray-900">{stats.totalViews.toLocaleString()}</p>
           <p className="text-sm text-gray-500 mt-1">
             평균 {stats.published > 0 ? Math.round(stats.totalViews / stats.published) : 0}회
           </p>
@@ -267,7 +267,7 @@ export default function NoticesManagement() {
               placeholder="제목이나 내용으로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             />
           </div>
           
@@ -277,7 +277,7 @@ export default function NoticesManagement() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
             >
               {categories.map(category => (
                 <option key={category} value={category}>{category}</option>
@@ -289,7 +289,7 @@ export default function NoticesManagement() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
           >
             {statusOptions.map(status => (
               <option key={status} value={status}>{status}</option>
@@ -313,7 +313,7 @@ export default function NoticesManagement() {
                   {/* 제목과 상태 */}
                   <div className="flex items-center space-x-3 mb-2">
                     <h4 className="text-lg font-medium text-gray-900">{notice.title}</h4>
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                    <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded">
                       {notice.category}
                     </span>
                     <span className={`px-2 py-1 text-xs font-medium rounded ${
@@ -361,7 +361,7 @@ export default function NoticesManagement() {
                   {/* 편집 */}
                   <button
                     onClick={() => handleEditNotice(notice)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
                     title="편집"
                   >
                     <Edit className="w-4 h-4" />

@@ -94,7 +94,7 @@ export const QuizCard = memo(function QuizCard({
 
         {showResult && (
           <div className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
-            <h4 className="font-semibold text-purple-800 mb-2">💡 설명</h4>
+            <h4 className="font-semibold text-purple-800 mb-2">설명</h4>
             <p className="text-purple-700">{quiz.explanation}</p>
           </div>
         )}

@@ -226,7 +226,7 @@ export function RegistrationTab() {
             <CardTitle className="text-sm font-medium text-gray-600">총 신청자</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{totalCount.toLocaleString()}명</div>
+            <div className="text-2xl font-bold text-orange-600">{totalCount.toLocaleString()}명</div>
           </CardContent>
         </Card>
 
@@ -235,7 +235,7 @@ export function RegistrationTab() {
             <CardTitle className="text-sm font-medium text-gray-600">총 참가예정인원</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-gray-900">
               {totalParticipants.toLocaleString()}명
             </div>
           </CardContent>

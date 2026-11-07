@@ -52,7 +52,7 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
         </div>
         <div className="text-right">
           <p className="text-sm text-gray-600">기간 내 총 가입</p>
-          <p className="text-2xl font-bold text-blue-600">{totalSignups}명</p>
+          <p className="text-2xl font-bold text-orange-600">{totalSignups}명</p>
           <p className="text-xs text-gray-500 mt-1">일평균 {avgSignups}명</p>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function UserSignupChart({ data }: UserSignupChartProps) {
                 dataKey="signups"
                 stroke="#3B82F6"
                 strokeWidth={2}
-                dot={{ r: 4, fill: '#3B82F6' }}
+                dot={{ r: 4, fill: '#f97316' }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>

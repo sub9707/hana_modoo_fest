@@ -66,7 +66,6 @@ export default function GalleryGrid() {
             <div className="aspect-square relative overflow-hidden">
               <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">📸</div>
                   <div className="text-sm">이미지</div>
                 </div>
               </div>

@@ -120,7 +120,7 @@ export function MyPageContent({ user }: MyPageContentProps) {
                 <li>• <strong className="text-orange-900">최초 1회만 등록 가능</strong>하므로 신중하게 입력해주세요</li>
               </ul>
               <p className="text-xs text-orange-700 bg-orange-100 p-2 rounded border border-orange-200">
-                ⚠️ 한 번 등록한 이메일은 수정할 수 없습니다. 정확한 이메일을 입력해주세요.
+                한 번 등록한 이메일은 수정할 수 없습니다. 정확한 이메일을 입력해주세요.
               </p>
             </div>
           </div>

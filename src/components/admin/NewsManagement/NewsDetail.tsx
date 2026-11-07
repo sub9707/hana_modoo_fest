@@ -36,7 +36,7 @@ export function NewsDetail({ item, onClose, onEdit }: NewsDetailProps) {
                         {onEdit && (
                             <button
                                 onClick={() => onEdit(currentItem)}
-                                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                             >
                                 수정
                             </button>
@@ -55,7 +55,7 @@ export function NewsDetail({ item, onClose, onEdit }: NewsDetailProps) {
                         {/* 게시글 헤더 */}
                         <div className="border-b border-gray-200 pb-8 mb-8">
                             <div className="flex flex-wrap items-center gap-3 text-sm mb-6">
-                                <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                <span className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
                                     {currentItem.category}
                                 </span>
                                 {currentItem.important && (
@@ -76,9 +76,9 @@ export function NewsDetail({ item, onClose, onEdit }: NewsDetailProps) {
                             </h1>
 
                             {currentItem.summary && (
-                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border-l-4 border-blue-500 mb-4">
+                                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-4">
                                     <p className="text-lg text-gray-700 italic leading-relaxed">
-                                        💡 {currentItem.summary}
+                                        {currentItem.summary}
                                     </p>
                                 </div>
                             )}
@@ -98,7 +98,6 @@ export function NewsDetail({ item, onClose, onEdit }: NewsDetailProps) {
                                     </span>
                                     {currentItem.updatedAt && currentItem.updatedAt !== currentItem.createdAt && (
                                         <span className="flex items-center">
-                                            <span className="mr-1">🔄</span>
                                             수정: {new Date(currentItem.updatedAt).toLocaleDateString('ko-KR', {
                                                 year: 'numeric',
                                                 month: 'long',
@@ -132,7 +131,6 @@ export function NewsDetail({ item, onClose, onEdit }: NewsDetailProps) {
                             <div className="flex items-center justify-between">
                                 <div className="text-sm text-gray-500">
                                     <span className="flex items-center">
-                                        <span className="mr-1">🏷️</span>
                                         이 공지사항은 <strong>{currentItem.category}</strong>&nbsp; 카테고리에 속합니다.
                                     </span>
                                 </div>

@@ -55,7 +55,7 @@ export default function UploadGuide() {
               </div>
               
               <div className="bg-red-50 p-3 rounded-lg">
-                <div className="font-semibold text-red-800 mb-1">❌ 주의사항</div>
+                <div className="font-semibold text-red-800 mb-1">주의사항</div>
                 <ul className="space-y-1 text-red-700">
                   <li>• 개인정보가 노출된 사진</li>
                   <li>• 블러 처리되지 않은 아동 사진</li>
@@ -68,9 +68,9 @@ export default function UploadGuide() {
         </div>
         
         {/* 저작권 및 초상권 안내 */}
-        <div className="mt-8 p-6 bg-yellow-50 border-l-4 border-yellow-400">
-          <h4 className="font-bold text-yellow-800 mb-3">📋 저작권 및 초상권 안내</h4>
-          <div className="text-yellow-700 space-y-2 text-sm">
+        <div className="mt-8 rounded-lg border border-gray-200 bg-gray-50 px-6 py-5">
+          <h4 className="font-bold text-gray-900 mb-3">저작권 및 초상권 안내</h4>
+          <div className="text-gray-600 space-y-2 text-sm">
             <p>• 업로드된 사진은 모두하나대축제 홍보 및 아카이브 목적으로 활용됩니다.</p>
             <p>• 사진 속 인물의 초상권 동의를 받고 업로드해주세요.</p>
             <p>• 아동이 포함된 사진은 얼굴 모자이크 처리를 권장합니다.</p>

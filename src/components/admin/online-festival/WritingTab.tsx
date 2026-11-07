@@ -157,7 +157,7 @@ export default function WritingTab() {
             <CardTitle className="text-sm font-medium">전체 작품 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{(totalCount || 0).toLocaleString()}</div>
+            <div className="text-2xl font-bold text-orange-600">{(totalCount || 0).toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -176,7 +176,7 @@ export default function WritingTab() {
             <CardTitle className="text-sm font-medium">총 좋아요</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-pink-600">
+            <div className="text-2xl font-bold text-gray-900">
               {writings.reduce((sum, w) => sum + w.likes_count, 0).toLocaleString()}
             </div>
           </CardContent>
@@ -186,7 +186,7 @@ export default function WritingTab() {
             <CardTitle className="text-sm font-medium">평균 좋아요</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-gray-900">
               {totalCount > 0
                 ? (writings.reduce((sum, w) => sum + w.likes_count, 0) / totalCount).toFixed(1)
                 : '0'}
@@ -232,9 +232,9 @@ export default function WritingTab() {
       </Card>
 
       {/* 안내 메시지 */}
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-orange-50 border-orange-200">
         <CardContent className="pt-6">
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-orange-700">
             <strong>우수작품 자동 선정:</strong> 각 주제별로 좋아요를 1개 이상 받은 작품 중 상위 10개가 자동으로 우수작품으로 선정됩니다.
           </p>
         </CardContent>
@@ -272,7 +272,7 @@ export default function WritingTab() {
                         <td className="px-4 py-3 text-sm">{writing.name}</td>
                         <td className="px-4 py-3 text-sm">{writing.phone}</td>
                         <td className="px-4 py-3 text-sm">
-                          <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                          <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
                             {getTopicLabel(writing.topic)}
                           </span>
                         </td>
@@ -280,7 +280,7 @@ export default function WritingTab() {
                           {writing.title}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <span className="font-semibold text-pink-600">{writing.likes_count}</span>
+                          <span className="font-semibold text-gray-900">{writing.likes_count}</span>
                         </td>
                         <td className="px-4 py-3 text-sm">
                           {writing.is_featured ? (
@@ -373,7 +373,7 @@ export default function WritingTab() {
                 </div>
                 
                 <div>
-                  <span className="inline-block px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800">
+                  <span className="inline-block px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-700">
                     {getTopicLabel(selectedWriting.topic)}
                   </span>
                   {selectedWriting.is_featured && (

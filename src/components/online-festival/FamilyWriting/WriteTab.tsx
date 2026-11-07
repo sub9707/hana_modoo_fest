@@ -1,7 +1,8 @@
 'use client'
 
 import { WritingTopic } from '@/types/writing'
-import { Clock, PenTool, AlertCircle, Lock, Pen, CheckCircle } from 'lucide-react'
+import Notice from '@/components/ui/Notice'
+import { Clock, PenTool, Lock, Pen, CheckCircle } from 'lucide-react'
 
 interface CooldownState {
   canWrite: boolean
@@ -99,20 +100,10 @@ export default function WriteTab({
       <div className="space-y-6">
         {/* 이벤트 종료 안내 */}
         {EVENT_ENDED && (
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-orange-400 rounded-xl p-6">
-            <div className="flex items-start space-x-3">
-              <AlertCircle className="w-6 h-6 text-orange-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h3 className="font-bold text-orange-900 mb-2 text-lg">글짓기 이벤트 종료</h3>
-                <p className="text-orange-800 text-sm mb-2">
-                  모두하나대축제 2025 가족 이야기 글짓기 이벤트가 종료되었습니다.
-                </p>
-                <p className="text-orange-700 text-sm">
-                  지금까지 작성해주신 소중한 글들은 '둘러보기' 탭에서 계속 확인하실 수 있으며, 공감하기 기능은 계속 이용 가능합니다.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Notice title="글짓기 이벤트 종료">
+            <p>모두하나대축제 2025 가족 이야기 글짓기 이벤트가 종료되었습니다.</p>
+            <p>지금까지 작성해주신 소중한 글들은 '둘러보기' 탭에서 계속 확인하실 수 있으며, 공감하기 기능은 계속 이용 가능합니다.</p>
+          </Notice>
         )}
 
         {isSubmitted && (
@@ -190,7 +181,7 @@ export default function WriteTab({
                 className="flex items-center space-x-2 px-6 py-3 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-600/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 {EVENT_ENDED 
-                  ? <><AlertCircle className="w-4 h-4" /><span>이벤트 종료</span></>
+                  ? <span>이벤트 종료</span>
                   : !cooldown.canWrite 
                     ? <><Clock className="w-4 h-4" /><span>{formatTime(cooldown.remainingSeconds)}</span></>
                     : <><PenTool className="w-4 h-4" /><span>글 제출하기</span></>
