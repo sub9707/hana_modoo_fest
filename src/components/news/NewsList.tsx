@@ -5,7 +5,7 @@ import NewsCard from './NewsCard'
 import NewsDetail from './NewsDetail'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { useInfiniteNews } from '@/hooks/useInfiniteNews'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { NewsSearchParams, NewsItem } from '@/types/Board'
 
 interface NewsListProps {
@@ -61,12 +61,12 @@ export default function NewsList({
     return { importantNews: important, regularNews: regular }
   }, [uniqueNews])
 
-  const intersectionConfig = useMemo(() => ({
-    onIntersect: loadMore,
-    enabled: !loading && hasMore && !selectedNews
-  }), [loadMore, loading, hasMore, selectedNews])
-
-  const { targetRef } = useIntersectionObserver(intersectionConfig)
+  const targetRef = useInfiniteScroll({
+    hasMore,
+    isLoading: loading,
+    onLoadMore: loadMore,
+    enabled: !selectedNews
+  })
 
   const manageCacheSize = useCallback(() => {
     if (NEWS_DETAIL_CACHE.size > CACHE_MAX_SIZE) {

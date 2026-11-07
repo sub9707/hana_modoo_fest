@@ -3,15 +3,6 @@
  */
 
 /**
- * 캠페인 통계 폴백 값 (API 실패 시 사용)
- */
-export const FALLBACK_STATS = {
-  preregistration_count: 1247,
-  comment_count: 1786,
-  writing_count: 103,
-} as const
-
-/**
  * 캠페인 통계 레이블
  */
 export const CAMPAIGN_STAT_LABELS = {
@@ -63,5 +54,4 @@ export const API_TIMEOUTS = {
   short: 3000,
 } as const
 
-export type FallbackStats = typeof FALLBACK_STATS
 export type CampaignStatLabels = typeof CAMPAIGN_STAT_LABELS

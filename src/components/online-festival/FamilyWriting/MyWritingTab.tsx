@@ -1,4 +1,4 @@
-import { User, Lock, Pen } from 'lucide-react'
+import { Lock, Pen } from 'lucide-react'
 import { WritingEntry, User as UserType, TabType } from '@/types/writing'
 import WritingCard from './WritingCard'
 
@@ -7,6 +7,7 @@ interface MyWritingsTabProps {
   currentUser: UserType | null
   loading: boolean
   myHasMore: boolean
+  sentinelRef: (node: Element | null) => void
   setCurrentTab: (tab: any) => void  // any로 설정하여 타입 충돌 회피
 }
 
@@ -15,6 +16,7 @@ export default function MyWritingsTab({
   currentUser,
   loading,
   myHasMore,
+  sentinelRef,
   setCurrentTab
 }: MyWritingsTabProps) {
   if (!currentUser) {
@@ -32,9 +34,6 @@ export default function MyWritingsTab({
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-          <User className="w-8 h-8 text-blue-600" />
-        </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{currentUser.name}님의 글</h3>
         <p className="text-gray-600">작성하신 글들을 확인해보세요</p>
       </div>
@@ -51,17 +50,15 @@ export default function MyWritingsTab({
           />
         ))}
         
+        {/* 무한 스크롤 감지용 */}
+        {myHasMore && <div ref={sentinelRef} aria-hidden="true" className="h-px" />}
+
         {loading && (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-            <div className="text-gray-500 mt-2">로딩 중...</div>
-          </div>
+          <p className="py-8 text-center text-sm text-gray-500">불러오는 중...</p>
         )}
-        
-        {!myHasMore && myWritings.length > 0 && (
-          <div className="text-center py-8">
-            <div className="text-gray-500">모든 글을 확인했습니다.</div>
-          </div>
+
+        {!myHasMore && !loading && myWritings.length > 0 && (
+          <p className="py-8 text-center text-sm text-gray-400">모든 글을 확인했습니다</p>
         )}
       </div>
 

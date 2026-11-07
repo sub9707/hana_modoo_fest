@@ -10,130 +10,130 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
   const [featuredTopic, setFeaturedTopic] = useState('all')
   const [browseHasMore, setBrowseHasMore] = useState(true)
   const [myHasMore, setMyHasMore] = useState(true)
-  const [browsePage, setBrowsePage] = useState(1)
-  const [myPage, setMyPage] = useState(1)
   const [totalWritings, setTotalWritings] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [browseLoading, setBrowseLoading] = useState(false)
+  const [myLoading, setMyLoading] = useState(false)
   const [likingWritings, setLikingWritings] = useState<Set<string>>(new Set())
 
-  const isLoadingRef = useRef(false)
+  // 다음 요청 페이지 / 최신 요청 번호 (필터가 바뀌면 이전 응답은 버린다)
+  const browseNextPageRef = useRef(1)
+  const browseRequestIdRef = useRef(0)
+  const browseLoadingRef = useRef(false)
+  const myNextPageRef = useRef(1)
+  const myRequestIdRef = useRef(0)
+  const myLoadingRef = useRef(false)
+
+  const appendUnique = (prev: WritingEntry[], incoming: WritingEntry[]) => {
+    const seen = new Set(prev.map(w => w.id))
+    return [...prev, ...incoming.filter(w => !seen.has(w.id))]
+  }
 
   const loadBrowseWritings = useCallback(async (reset = false) => {
-    if (isLoadingRef.current) return
-    isLoadingRef.current = true
-    setLoading(true)
+    if (!reset && browseLoadingRef.current) return
+
+    const requestId = ++browseRequestIdRef.current
+    const page = reset ? 1 : browseNextPageRef.current
+    browseLoadingRef.current = true
+    setBrowseLoading(true)
 
     try {
-      const page = reset ? 1 : browsePage
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '10',
         sort: browseSort,
         topic: browseTopic
       })
-
       const response = await fetch(`/api/writings?${params}`)
       const data = await response.json()
+      if (requestId !== browseRequestIdRef.current) return
 
       if (data.success) {
-        
-        if (reset) {
-          setBrowseWritings(data.data.writings)
-          setBrowsePage(2)
-        } else {
-          setBrowseWritings(prev => [...prev, ...data.data.writings])
-          setBrowsePage(prev => prev + 1)
-        }
+        const incoming: WritingEntry[] = data.data.writings
+        setBrowseWritings(prev => (reset ? incoming : appendUnique(prev, incoming)))
         setBrowseHasMore(data.data.pagination.hasMore)
-        setTotalWritings(data.data.pagination.totalCount)
+        setTotalWritings(Number(data.data.pagination.totalCount) || 0)
+        browseNextPageRef.current = page + 1
+      } else {
+        setBrowseHasMore(false)
       }
     } catch (error) {
       console.error('Error loading browse writings:', error)
+      if (requestId === browseRequestIdRef.current) setBrowseHasMore(false)
     } finally {
-      setLoading(false)
-      isLoadingRef.current = false
+      if (requestId === browseRequestIdRef.current) {
+        browseLoadingRef.current = false
+        setBrowseLoading(false)
+      }
     }
-  }, [browsePage, browseSort, browseTopic])
+  }, [browseSort, browseTopic])
 
   const loadFeaturedWritings = useCallback(async () => {
-    if (isLoadingRef.current) return
-    isLoadingRef.current = true
-
     try {
-      const params = new URLSearchParams({
-        topic: featuredTopic
-      })
-
+      const params = new URLSearchParams({ topic: featuredTopic })
       const response = await fetch(`/api/writings/featured?${params}`)
       const data = await response.json()
-
       if (data.success) {
         setFeaturedWritings(data.data.writings)
       }
     } catch (error) {
       console.error('Error loading featured writings:', error)
-    } finally {
-      isLoadingRef.current = false
     }
   }, [featuredTopic])
 
   const loadMyWritings = useCallback(async (reset = false) => {
-    if (isLoadingRef.current || !currentUser) return
-    isLoadingRef.current = true
-    setLoading(true)
+    if (!currentUser) return
+    if (!reset && myLoadingRef.current) return
+
+    const requestId = ++myRequestIdRef.current
+    const page = reset ? 1 : myNextPageRef.current
+    myLoadingRef.current = true
+    setMyLoading(true)
 
     try {
-      const page = reset ? 1 : myPage
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '10'
-      })
-
+      const params = new URLSearchParams({ page: page.toString(), limit: '10' })
       const response = await fetch(`/api/writings/my?${params}`)
       const data = await response.json()
+      if (requestId !== myRequestIdRef.current) return
 
       if (data.success) {
-        if (reset) {
-          setMyWritings(data.data.writings)
-          setMyPage(2)
-        } else {
-          setMyWritings(prev => [...prev, ...data.data.writings])
-          setMyPage(prev => prev + 1)
-        }
+        const incoming: WritingEntry[] = data.data.writings
+        setMyWritings(prev => (reset ? incoming : appendUnique(prev, incoming)))
         setMyHasMore(data.data.pagination.hasMore)
+        myNextPageRef.current = page + 1
+      } else {
+        setMyHasMore(false)
       }
     } catch (error) {
       console.error('Error loading my writings:', error)
+      if (requestId === myRequestIdRef.current) setMyHasMore(false)
     } finally {
-      setLoading(false)
-      isLoadingRef.current = false
+      if (requestId === myRequestIdRef.current) {
+        myLoadingRef.current = false
+        setMyLoading(false)
+      }
     }
-  }, [currentUser, myPage])
+  }, [currentUser])
 
-  // 탭 변경 시 데이터 로드
+  // 탭/필터 변경 시 처음부터 다시 로드
   useEffect(() => {
-    if (currentTab === 'browse') {
-      setBrowsePage(1)
-      setBrowseWritings([])
-      loadBrowseWritings(true)
-    }
-  }, [currentTab, browseSort, browseTopic])
+    if (currentTab !== 'browse') return
+    setBrowseHasMore(true)
+    loadBrowseWritings(true)
+  }, [currentTab, loadBrowseWritings])
 
   useEffect(() => {
     if (currentTab === 'featured') {
       loadFeaturedWritings()
     }
-  }, [currentTab, featuredTopic])
+  }, [currentTab, loadFeaturedWritings])
 
   useEffect(() => {
-    if (currentTab === 'my' && currentUser) {
-      setMyPage(1)
-      setMyWritings([])
-      loadMyWritings(true)
-    }
-  }, [currentTab, currentUser])
+    if (currentTab !== 'my' || !currentUser) return
+    setMyHasMore(true)
+    loadMyWritings(true)
+  }, [currentTab, currentUser, loadMyWritings])
 
-  // 🚀 낙관적 업데이트를 적용한 좋아요 토글
+  // 낙관적 업데이트를 적용한 좋아요 토글
   const handleLike = async (writingId: string) => {
     if (!currentUser) {
       alert('로그인이 필요합니다.')
@@ -159,7 +159,7 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
       // 좋아요 처리 중 표시
       setLikingWritings(prev => new Set(prev).add(writingId))
 
-      // 🚀 즉시 UI 업데이트 (낙관적 업데이트)
+      // 즉시 UI 업데이트 (낙관적 업데이트)
       const updateWritings = (writings: WritingEntry[]) => {
         return writings.map(writing => {
           if (writing.id === writingId) {
@@ -240,22 +240,10 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
     }
   }
 
-  // 필터 변경 핸들러들
-  const handleBrowseSortChange = useCallback((sort: SortType) => {
-    setBrowseSort(sort)
-    setBrowsePage(1)
-    setBrowseWritings([])
-  }, [])
-
-  const handleBrowseTopicChange = useCallback((topic: string) => {
-    setBrowseTopic(topic)
-    setBrowsePage(1)
-    setBrowseWritings([])
-  }, [])
-
-  const handleFeaturedTopicChange = useCallback((topic: string) => {
-    setFeaturedTopic(topic)
-  }, [])
+  // 필터 변경: 상태만 바꾸면 위 effect 가 처음부터 다시 불러온다
+  const handleBrowseSortChange = useCallback((sort: SortType) => setBrowseSort(sort), [])
+  const handleBrowseTopicChange = useCallback((topic: string) => setBrowseTopic(topic), [])
+  const handleFeaturedTopicChange = useCallback((topic: string) => setFeaturedTopic(topic), [])
 
   return {
     // 상태
@@ -267,18 +255,15 @@ export function useWritingData(currentUser: User | null, currentTab: TabType) {
     featuredTopic,
     browseHasMore,
     myHasMore,
-    browsePage,
-    myPage,
     totalWritings,
-    loading,
-    likingWritings, // 🚀 새로 추가
+    browseLoading,
+    myLoading,
+    likingWritings,
     
     // setter 함수들
     setBrowseSort: handleBrowseSortChange,
     setBrowseTopic: handleBrowseTopicChange,
     setFeaturedTopic: handleFeaturedTopicChange,
-    setBrowsePage,
-    setMyPage,
     
     // API 함수들
     loadBrowseWritings,

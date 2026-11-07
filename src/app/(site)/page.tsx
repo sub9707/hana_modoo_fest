@@ -13,6 +13,9 @@ const CampaignSection = dynamic(() => import('@/components/home/CampaignSection'
   loading: () => <div className="min-h-screen/2" />
 })
 
+// 캠페인 통계가 DB 값을 반영하도록 60초마다 재생성
+export const revalidate = 60
+
 export const metadata: Metadata = createPageMetadata(
   PAGE_SEO.home.title,
   PAGE_SEO.home.description

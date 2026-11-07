@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import QuickBar from '@/components/layout/QuickBar'
 import ScrollToTop from '@/components/common/ScrollToTop'
+import AdminFloatingButton from '@/components/common/AdminFloatingButton'
 import { SITE, FESTIVAL, DEFAULT_SEO, CONTACT } from '@/constants'
 
 export const metadata: Metadata = {
@@ -64,6 +65,7 @@ export default function SiteLayout({
             </div>
 
             <QuickBar />
+            <AdminFloatingButton />
 
             {/* 구조화 데이터 */}
             <Script

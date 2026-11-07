@@ -48,14 +48,14 @@ export async function GET(request: NextRequest) {
     switch (sort) {
       case 'popular':
       case 'likes':
-        orderBy = 'w.likes_count DESC, w.created_at DESC'
+        orderBy = 'w.likes_count DESC, w.created_at DESC, w.id DESC'
         break
       case 'oldest':
-        orderBy = 'w.created_at ASC'
+        orderBy = 'w.created_at ASC, w.id ASC'
         break
       case 'latest':
       default:
-        orderBy = 'w.created_at DESC'
+        orderBy = 'w.created_at DESC, w.id DESC'
         break
     }
 

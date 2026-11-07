@@ -16,9 +16,10 @@ export async function GET(request: NextRequest) {
     const user = await getCurrentUser()
     
     // 정렬 조건
-    let orderBy = 'sc.created_at DESC'
+    // id 를 마지막 기준으로 넣어 같은 시각/같은 좋아요 수일 때도 페이지 간 순서가 고정되게 한다
+    let orderBy = 'sc.created_at DESC, sc.id DESC'
     if (sortBy === 'popular') {
-      orderBy = 'sc.likes DESC, sc.created_at DESC'
+      orderBy = 'sc.likes DESC, sc.created_at DESC, sc.id DESC'
     }
 
     // 좋아요 정보를 한 번의 쿼리로 조회
@@ -46,9 +47,17 @@ export async function GET(request: NextRequest) {
       comment.isLiked = Boolean(Number(comment.isLiked))
     })
 
+    const [{ total }] = await query(`
+      SELECT COUNT(*) AS total
+      FROM support_comments sc
+      JOIN users u ON sc.user_id = u.id
+    `)
+    const totalCount = Number(total) || 0
+
     return NextResponse.json({
       comments,
-      hasMore: comments.length === limit,
+      totalCount,
+      hasMore: offset + comments.length < totalCount,
       processingTime: Date.now() - startTime
     })
 

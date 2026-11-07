@@ -47,10 +47,9 @@ export type { DefaultSeo, PageSeo } from './seo'
 
 // UI 상수
 export {
-  FALLBACK_STATS,
   CAMPAIGN_STAT_LABELS,
   HERO_TEXT,
   CAMPAIGN_SECTION_TEXT,
   API_TIMEOUTS,
 } from './ui'
-export type { FallbackStats, CampaignStatLabels } from './ui'
+export type { CampaignStatLabels } from './ui'

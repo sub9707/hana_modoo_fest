@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       FROM writings w
       JOIN users u ON w.user_id = u.id
       WHERE w.user_id = ?
-      ORDER BY w.created_at DESC
+      ORDER BY w.created_at DESC, w.id DESC
       LIMIT ? OFFSET ?
     `, [user.id, limit, offset])
 

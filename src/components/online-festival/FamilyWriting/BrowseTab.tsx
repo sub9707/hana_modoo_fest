@@ -17,8 +17,9 @@ interface BrowseTabProps {
   totalWritings: number
   loading: boolean
   browseHasMore: boolean
+  sentinelRef: (node: Element | null) => void
   currentUser: User | null
-  likingWritings: Set<string> // 🚀 새로 추가
+  likingWritings: Set<string>
   setBrowseSort: (sort: SortType) => void
   setBrowseTopic: (topic: string) => void
   onLike: (writingId: string) => void
@@ -32,8 +33,9 @@ export default function BrowseTab({
   totalWritings,
   loading,
   browseHasMore,
+  sentinelRef,
   currentUser,
-  likingWritings, // 🚀 새로 추가
+  likingWritings,
   setBrowseSort,
   setBrowseTopic,
   onLike
@@ -46,7 +48,7 @@ export default function BrowseTab({
   return (
     <div className="space-y-6">
       {/* 필터 */}
-      <div className="bg-white/60 rounded-2xl p-4 md:p-6 space-y-4">
+      <div className="rounded-lg border border-gray-200 bg-white p-4 md:p-6 space-y-4">
         {/* 주제 필터 */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">주제</label>
@@ -57,7 +59,7 @@ export default function BrowseTab({
                 onClick={() => setBrowseTopic(topic.id)}
                 className={`px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   browseTopic === topic.id
-                    ? 'bg-pink-600 text-white'
+                    ? 'bg-orange-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -88,13 +90,10 @@ export default function BrowseTab({
         </div>
       </div>
 
-      {/* 통계 */}
-      <div className="text-center p-4 bg-white/50 rounded-2xl mb-8">
-        <div className="text-2xl md:text-3xl font-bold text-pink-600 mb-2">
-          {totalWritings}
-        </div>
-        <div className="text-sm md:text-base text-gray-600">총 작품수</div>
-      </div>
+      {/* 개수 */}
+      <p className="border-b border-gray-200 pb-4 text-sm text-gray-500">
+        총 <span className="font-semibold text-gray-900 tabular-nums">{totalWritings.toLocaleString()}</span>개의 작품
+      </p>
 
       {/* 작품 목록 */}
       <div className="space-y-6">
@@ -104,21 +103,19 @@ export default function BrowseTab({
             entry={entry}
             currentUser={currentUser}
             onLike={onLike}
-            isLiking={likingWritings.has(entry.id)} // 🚀 새로 추가
+            isLiking={likingWritings.has(entry.id)}
           />
         ))}
         
+        {/* 무한 스크롤 감지용 */}
+        {browseHasMore && <div ref={sentinelRef} aria-hidden="true" className="h-px" />}
+
         {loading && (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-            <div className="text-gray-500 mt-2">로딩 중...</div>
-          </div>
+          <p className="py-8 text-center text-sm text-gray-500">불러오는 중...</p>
         )}
-        
-        {!browseHasMore && browseWritings.length > 0 && (
-          <div className="text-center py-8">
-            <div className="text-gray-500">모든 글을 확인했습니다.</div>
-          </div>
+
+        {!browseHasMore && !loading && browseWritings.length > 0 && (
+          <p className="py-8 text-center text-sm text-gray-400">모든 글을 확인했습니다</p>
         )}
       </div>
 

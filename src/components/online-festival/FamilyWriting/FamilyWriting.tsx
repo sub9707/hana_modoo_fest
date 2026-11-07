@@ -9,7 +9,7 @@ import { useWritingTopics } from '@/hooks/writing/useWritingTopics'
 import { useCooldown } from '@/hooks/writing/useCooldown'
 import { useWritingForm } from '@/hooks/writing/useWritingForm'
 import { useWritingData } from '@/hooks/writing/useWritingData'
-import { useInfiniteScroll } from '@/hooks/writing/useInfiniteScroll'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 
 // 컴포넌트 임포트
 import TabNavigation from './TabNavigation'
@@ -50,8 +50,9 @@ export default function FamilyWriting() {
     browseHasMore,
     myHasMore,
     totalWritings,
-    loading,
-    likingWritings, // 🚀 새로 추가
+    browseLoading,
+    myLoading,
+    likingWritings,
     setBrowseSort,
     setBrowseTopic,
     setFeaturedTopic,
@@ -60,15 +61,18 @@ export default function FamilyWriting() {
     handleLike
   } = useWritingData(currentUser, currentTab)
 
-  // 무한 스크롤 훅
-  useInfiniteScroll({
-    currentTab,
-    currentUser,
-    browseHasMore,
-    myHasMore,
-    loading,
-    loadBrowseWritings,
-    loadMyWritings
+  // 무한 스크롤: 각 목록 끝의 sentinel 이 보이면 다음 페이지
+  const browseSentinelRef = useInfiniteScroll({
+    enabled: currentTab === 'browse',
+    hasMore: browseHasMore,
+    isLoading: browseLoading,
+    onLoadMore: () => loadBrowseWritings()
+  })
+  const mySentinelRef = useInfiniteScroll({
+    enabled: currentTab === 'my' && !!currentUser,
+    hasMore: myHasMore,
+    isLoading: myLoading,
+    onLoadMore: () => loadMyWritings()
   })
 
   // 이벤트 핸들러
@@ -140,10 +144,11 @@ export default function FamilyWriting() {
           browseSort={browseSort}
           browseTopic={browseTopic}
           totalWritings={totalWritings}
-          loading={loading}
+          loading={browseLoading}
           browseHasMore={browseHasMore}
+          sentinelRef={browseSentinelRef}
           currentUser={currentUser}
-          likingWritings={likingWritings} // 🚀 새로 추가
+          likingWritings={likingWritings}
           setBrowseSort={setBrowseSort}
           setBrowseTopic={setBrowseTopic}
           onLike={handleLike}
@@ -156,7 +161,7 @@ export default function FamilyWriting() {
           writingTopics={writingTopics}
           featuredTopic={featuredTopic}
           currentUser={currentUser}
-          likingWritings={likingWritings} // 🚀 새로 추가
+          likingWritings={likingWritings}
           setFeaturedTopic={setFeaturedTopic}
           onLike={handleLike}
         />
@@ -166,8 +171,9 @@ export default function FamilyWriting() {
         <MyWritingsTab
           myWritings={myWritings}
           currentUser={currentUser}
-          loading={loading}
+          loading={myLoading}
           myHasMore={myHasMore}
+          sentinelRef={mySentinelRef}
           setCurrentTab={setCurrentTab}
         />
       )}

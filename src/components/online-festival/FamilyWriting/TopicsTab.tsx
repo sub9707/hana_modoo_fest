@@ -19,7 +19,7 @@ export default function TopicsTab({ writingTopics, onTopicSelect }: TopicsTabPro
       {EVENT_ENDED && (
         <Notice title="글짓기 이벤트 종료">
             <p>모두하나대축제 2025 가족 이야기 글짓기 이벤트가 종료되었습니다.</p>
-            <p>새로운 글 작성은 불가능하지만, 작성된 글들은 '둘러보기' 탭에서 계속 확인하실 수 있습니다.</p>
+            <p>새로운 글 작성은 불가능하지만, 작성된 글들은 ‘둘러보기’ 탭에서 계속 확인하실 수 있습니다.</p>
           </Notice>
       )}
 
