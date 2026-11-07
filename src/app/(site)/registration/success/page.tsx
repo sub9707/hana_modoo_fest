@@ -14,7 +14,7 @@ export const metadata: Metadata = createPageMetadata(
 )
 
 interface PageProps {
-  searchParams: { id?: string }
+  searchParams: Promise<{ id?: string }>
 }
 
 export default async function RegistrationSuccessPage({ searchParams }: PageProps) {

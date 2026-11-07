@@ -18,12 +18,12 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     message?: string
     session_expired?: string
     callbackUrl?: string
     redirect?: string
-  }
+  }>
 }
 
 export default async function LoginPage({ searchParams }: PageProps) {
