@@ -24,6 +24,7 @@
 | **전역 상태관리** | React Context API |
 | **데이터베이스** | MySQL (mysql2 커넥션 풀) |
 | **요청 제한** | MySQL 기록 기반 (사용자별 쿨다운, IP별 시도 횟수) |
+| **캐시** | Redis (행사 기간에만 사용: 하루 1회 참여 여부, 쿨다운. 행사 후 데모 버전에서 제거) |
 | **인증** | 자체 세션 + OAuth 2.0 (네이버, 카카오) |
 | **외부 API** | Kakao Maps, Brevo(이메일), NCP SENS(SMS) |
 | **에디터** | Tiptap (Rich Text Editor) |
