@@ -44,11 +44,11 @@ async function main() {
   }
 
   const conn = await mysql.createConnection({
-    host: process.env.NEXT_PUBLIC_MYSQL_HOST,
-    port: parseInt(process.env.NEXT_PUBLIC_MYSQL_PORT || '3306', 10),
-    user: process.env.NEXT_PUBLIC_MYSQL_USER,
-    password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD,
-    database: process.env.NEXT_PUBLIC_MYSQL_DATABASE,
+    host: (process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST),
+    port: parseInt((process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT) || '3306', 10),
+    user: (process.env.MYSQL_USER ?? process.env.NEXT_PUBLIC_MYSQL_USER),
+    password: (process.env.MYSQL_PASSWORD ?? process.env.NEXT_PUBLIC_MYSQL_PASSWORD),
+    database: (process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE),
     multipleStatements: false
   })
 
