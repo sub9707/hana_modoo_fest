@@ -2,11 +2,11 @@ import mysql from 'mysql2/promise'
 
 // 🚀 Vercel 최적화된 연결 설정
 const config = {
-  host: process.env.NEXT_PUBLIC_MYSQL_HOST || 'localhost',
-  port: process.env.NEXT_PUBLIC_MYSQL_PORT ? parseInt(process.env.NEXT_PUBLIC_MYSQL_PORT, 10) : 3306,
-  user: process.env.NEXT_PUBLIC_MYSQL_USER || 'root',
-  password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD || '',
-  database: process.env.NEXT_PUBLIC_MYSQL_DATABASE || 'modohana_festival',
+  host: (process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST) || 'localhost',
+  port: (process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT) ? parseInt((process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT), 10) : 3306,
+  user: (process.env.MYSQL_USER ?? process.env.NEXT_PUBLIC_MYSQL_USER) || 'root',
+  password: (process.env.MYSQL_PASSWORD ?? process.env.NEXT_PUBLIC_MYSQL_PASSWORD) || '',
+  database: (process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE) || 'modohana_festival',
   charset: 'utf8mb4',
   timezone: '+09:00',
   dateStrings: true,

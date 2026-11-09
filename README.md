@@ -1,304 +1,117 @@
-# 하나모두 대축제 - 포트폴리오
+# 2025 모두하나대축제 온라인 참여 플랫폼
 
-## 프로젝트 개요
+> 한부모가족 축제의 사전접수, 온라인 이벤트(퀴즈, 룰렛, 응원 댓글, 글짓기), 공지, 관리자 화면
 
-**프로젝트명:** 2025 하나모두 대축제 웹 플랫폼
+![메인 화면](screenshots/01-main.webp)
 
-**유형:** 풀스택 웹 애플리케이션 (프론트엔드 + 백엔드 API + 관리자 대시보드)
+## 1. 개요
 
-**개발 기간:** 2025년
+| 항목 | 내용 |
+|---|---|
+| 기간 | 2025.09 ~ 10 (약 1개월) |
+| 주최, 주관 | 서울특별시 / 서울특별시한부모가족지원센터 |
+| 참여 | 개발 1명 |
+| 담당 | 프론트엔드, 백엔드, 배포 |
+| 기술 | Next.js 15, React 19, TypeScript, Tailwind CSS 4, React Hook Form, Zod, MySQL, Naver OAuth, Brevo(이메일), Vercel |
+| 링크 | [데모](https://hana-modoo-fest.vercel.app/), [상세 설명](https://subdevpi.mywire.org/portfolio/모두하나대축제) |
 
-**배포 환경:** Vercel (pro) + 외부 DB (가비아)
+이 저장소는 행사 종료 후 정리한 데모 버전입니다. 행사 기간에 쓰던 Redis는 데모 버전에서 뺐습니다.
 
-> 온/오프라인 축제 참여, 사전등록, 온라인 이벤트(퀴즈, 룰렛, 응원글, 글쓰기), 뉴스/공지, 관리자 대시보드까지 포함하는 종합 축제 플랫폼
+## 2. 화면
 
----
+| 사전참가 신청 | 온라인 축제 (룰렛) |
+|---|---|
+| <img src="screenshots/02-register.webp" width="100%"> | <img src="screenshots/03-roulette.webp" width="100%"> |
+| 로그인 정보로 신청자 정보를 채우고 참가 유형, 동반자 수 입력 | 하루 한 번 참여하는 경품 이벤트 |
 
-## 기술 스택
+| 응원 댓글 | 관리자 경품 이벤트 |
+|---|---|
+| <img src="screenshots/04-comments.webp" width="100%"> | <img src="screenshots/05-admin-roulette.webp" width="100%"> |
+| 200자 응원 메시지, 좋아요, 정렬 | 상품별 확률을 넣으면 꽝 확률은 나머지로 자동 계산 |
 
-| 분류 | 기술 |
-|------|------|
-| **프레임워크** | Next.js 15 (App Router), React 19, TypeScript |
-| **스타일링** | Tailwind CSS 4, Framer Motion |
-| **폼/검증** | React Hook Form, Zod |
-| **전역 상태관리** | React Context API |
-| **데이터베이스** | MySQL (mysql2 커넥션 풀) |
-| **요청 제한** | MySQL 기록 기반 (사용자별 쿨다운, IP별 시도 횟수) |
-| **캐시** | Redis (행사 기간에만 사용: 하루 1회 참여 여부, 쿨다운. 행사 후 데모 버전에서 제거) |
-| **인증** | 자체 세션 + OAuth 2.0 (네이버, 카카오) |
-| **외부 API** | Kakao Maps, Brevo(이메일), NCP SENS(SMS) |
-| **에디터** | Tiptap (Rich Text Editor) |
-| **차트** | Recharts |
-| **번들러** | Turbopack |
-| **배포** | Vercel |
+## 3. 주요 기능
 
----
+- 회원가입, 로그인: 이메일 인증 가입, 네이버 로그인, 비밀번호 찾기
+- 사전참가 신청: 여러 단계로 나눈 신청 폼, 주소 검색 연동, 신청 후 참가증 확인
+- 온라인 축제: 퀴즈, 룰렛 경품 이벤트, 응원 댓글, 가족 주제 글짓기
+- 공지와 소식: 카테고리별 목록, 상세 페이지
+- 관리자: 회원 검색과 Excel 내보내기, TipTap 에디터로 소식 작성, 경품 확률과 재고 설정, 당첨자 관리
 
-## 핵심 기능
+## 4. 구성
 
-### 1. 사용자 사이트 (22개 페이지)
-
-[이미지 및 상세 확인 (외부앱 이동)](http://subdevpi.mywire.org:5000/pages)
-
-- **홈페이지** - 히어로 영상, 축제 소개, 프로그램, 캠페인 통계
-- **온라인 축제** - 퀴즈, 룰렛 이벤트, 응원 댓글, 가족 글쓰기 (탭 기반 SPA)
-- **사전참가 신청** - 다단계 폼 + Kakao 주소 검색 연동
-- **뉴스/공지** - 카테고리별 필터, 상세 페이지
-- **갤러리** - 이미지 그리드 + 라이트박스
-- **오시는 길** - Kakao Maps SDK 연동
-- **마이페이지** - 프로필, 비밀번호 변경, 계정 삭제
-- **인증** - 로그인, 회원가입, 비밀번호 찾기, OAuth
-
-### 2. 관리자 대시보드
-
-- **사용자 관리** - 검색/필터, 역할 변경, Excel 내보내기, 통계 차트
-- **뉴스 관리** - Tiptap WYSIWYG 에디터로 작성/수정/삭제
-- **온라인 축제 관리** - 퀴즈 참가자, 응원 댓글, 글쓰기, 당첨자 관리
-- **이벤트 관리** - 룰렛 상품 설정, 통계
-- **설정** - 날씨 배너 관리
-
-### 3. REST API (76개 엔드포인트)
-[REST API상세 확인 (외부앱 이동)](http://subdevpi.mywire.org:5000/apis)
-- **인증 API** (15개) - 회원가입, 로그인, OAuth, SMS/이메일 인증, 비밀번호 재설정
-- **관리자 API** (17개) - 사용자/콘텐츠 CRUD, 데이터 내보내기
-- **이벤트 API** (5개) - 룰렛, 상품, 참여 확인, 당첨자
-- **퀴즈 API** (4개) - 참가 등록/조회, 상태 확인
-- **커뮤니티 API** (6개) - 글쓰기, 응원 댓글, 좋아요
-- **뉴스 API** (3개) - 목록, 상세, 카테고리
-- **기타 API** (9개) - 사전등록, 캠페인 통계, 헬스체크
-
----
-
-## 아키텍처 및 설계
-
-### App Router 기반 라우트 그룹
+![시스템 구성](screenshots/architecture.webp)
 
 ```
 src/app/
-├── (site)/          # 사용자 사이트 (Route Group)
-├── (dashboard)/     # 관리자 대시보드 (Route Group)
-└── api/             # REST API 엔드포인트
+├── (site)/        사용자 페이지
+├── (dashboard)/   관리자 페이지
+└── api/           API Route
+src/lib/
+├── mysql/         커넥션 풀, 쿼리 함수
+├── auth/          세션 확인
+├── email/         Brevo 인증 메일, 허용 도메인 검사
+└── services/      회원, 소식, 캠페인 통계 조회
 ```
 
-- `(site)`, `(dashboard)` Route Group으로 레이아웃 분리
-- 사용자/관리자 페이지가 각각 독립된 레이아웃 사용
+운영 배포는 Vercel, 기관 담당자 확인용 개발 브랜치는 홈서버(라즈베리파이)에 따로 올렸습니다.
 
-### Server Component / Client Component 분리
+## 5. 기술 선택
 
-```tsx
-// Server Component - 서버에서 데이터 직접 패칭
-export default async function JoinCampaignsSection() {
-  const stats = await getCampaignStatsData()
-  return <StatsDisplay data={stats} />
-}
+| 기술 | 고른 이유 |
+|---|---|
+| Next.js (API Route 포함) | 화면과 API를 한 프로젝트에서 관리해 1명이 1개월 안에 만들 수 있는 구성으로 잡았습니다. |
+| 서버 세션 로그인 | 다른 기기에서 로그인하면 기존 기기를 바로 끊어야 했는데, 서버가 로그인 상태를 직접 갖고 있어야 가능해서 DB에 세션 토큰을 저장하는 방식을 골랐습니다. |
+| MySQL 트랜잭션 | 경품 재고처럼 여러 명이 동시에 바꾸는 값을 안전하게 차감해야 했습니다. |
 
-// Client Component - 인터랙션이 필요한 경우만
-'use client'
-export default function OnlineFestivalTabs() {
-  const [activeTab, setActiveTab] = useState('registration')
-  return <TabUI />
-}
+## 6. 구현하며 고려한 점
+
+### 6-1. 경품 재고 차감
+
+하루 한 번 참여하는 룰렛 이벤트에서, 남은 수량이 0보다 클 때만 1을 빼는 조건부 UPDATE를 MySQL 트랜잭션 안에서 실행했습니다. 바뀐 행이 없으면 롤백해서 수량보다 많이 나가지 않게 했습니다. 당첨 결과는 서버에서 먼저 정하고, 화면은 룰렛 애니메이션만 재생합니다.
+
+```sql
+UPDATE prizes
+   SET current_quantity = current_quantity - 1
+ WHERE id = ?
+   AND current_quantity > 0;
+-- affectedRows가 0이면 롤백
 ```
 
-### 컴포넌트 계층 구조
+### 6-2. 중복 가입 방지
 
-```
-Root Layout → Provider (Auth 등)
-├── Header / Footer (레이아웃 UI)
-├── Page (Server Component)
-│   ├── Section Components (서버/클라이언트 혼합)
-│   │   └── UI Components
-│   └── Form Components (react-hook-form)
-└── Admin Layout → Sidebar + Content
-```
+운영 중 같은 IP에서 비슷한 아이디로 가입하고 바로 탈퇴하는 패턴이 보여서 아래 규칙을 추가했습니다.
 
+- 허용한 이메일 도메인(Gmail, Naver, Daum 등)만 가입 가능. 가입 화면에 허용 도메인 안내
+- 연락처와 이메일의 해시 값을 기존 기록과 대조
+- 24시간 안에 10번 넘게 가입을 시도한 IP는 차단
+- 탈퇴 후 12시간은 다시 가입할 수 없음
 
-## 기타 세부 사항
+### 6-3. 중복 로그인 방지
 
-### 1. 성능 최적화
+- DB에 세션 토큰과 만료 시각을 저장하고 `httpOnly` 쿠키로 전달합니다.
+- 다른 기기에서 로그인하면 기존 세션이 끝나고, 끊긴 기기는 안내 메시지와 함께 로그인 화면으로 이동합니다.
 
-**Dynamic Import로 초기 로딩 최적화**
-```tsx
-const Introduction = dynamic(() => import('@/components/home/Introduction'), {
-  loading: () => <div className="min-h-80 bg-[#885ef9]" />
-})
-```
-- 홈페이지 6개 섹션 중 히어로를 제외한 5개를 Lazy Loading
-- 각 섹션에 색상 매칭 스켈레톤 제공으로 CLS(Layout Shift) 방지
-- 관리자 페이지는 모두 lazy load하여 초기 로드 부하 방지
+## 7. 결과
 
-**이미지 최적화**
-- Next.js Image 컴포넌트 + `sizes` 속성으로 뷰포트별 적정 크기 로드
-- AVIF/WebP 자동 포맷 변환 (`next.config.ts`에서 설정)
-- `quality={85}`로 용량/품질 균형
+- 사전접수와 온라인 참여(퀴즈, 룰렛, 응원 댓글, 글짓기) 약 400명 규모의 행사를 중단 없이 운영했습니다.
 
-**번들 최적화**
-```ts
-// next.config.ts
-experimental: {
-  optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'swiper', '@tiptap/react']
-}
-```
-- 대형 라이브러리 트리쉐이킹 최적화
-- Turbopack 번들러 사용
+## 8. 실행 방법
 
-**캐싱 전략**
-- 정적 자산 1년 캐시 (`max-age=31536000, immutable`)
-- 폰트 파일 1년 캐시
-
-### 2. MySQL 커넥션 풀 관리
-
-```ts
-// Vercel 서버리스 환경에 최적화된 커넥션 풀
-const pool = mysql.createPool({
-  connectionLimit: 10,    // Vercel 비용 절감
-  waitForConnections: true,
-  queueLimit: 0,
-  enableKeepAlive: true
-})
-```
-- **트랜잭션 타임아웃** (5초)
-
-### 3. 인증 시스템
-
-**다중 인증 방식 지원**
-- 전화번호 + 비밀번호 (자체 가입)
-- 네이버 OAuth 2.0
-
-**보안 계층**
-- MySQL 기록 기반 요청 제한 (사용자별 쿨다운, IP별 시도 횟수 집계)
-- SMS 인증 코드 발송 (NCP SENS)
-- 이메일 인증 코드 발송 (Brevo API)
-- 세션 토큰 기반 인증 (`httpOnly` 쿠키)
-- reCAPTCHA 통합
-- 비밀번호 강도 검증 정책
-- IP 추적 및 보안 이벤트 로깅
-- 계정 삭제 시 blacklist + 해시 기록 보존
-
-**AuthContext를 통한 전역 인증 상태**
-```tsx
-const { user, isLoading, login, logout, refreshUser } = useAuth()
-```
-- 마운트 시 자동 세션 복원 (`/api/auth/me`)
-- 재시도 로직 (최대 2회)
-- AbortSignal 타임아웃 처리
-
-
-### 4. 반응형 디자인 (Mobile-First)
-
-**3단계 반응형 탭 시스템** (온라인 축제)
-```tsx
-{/* 데스크톱: 가로 전체 탭 */}
-<div className="hidden md:flex">...</div>
-
-{/* 태블릿: 스크롤 가능한 축약 탭 */}
-<div className="hidden sm:flex md:hidden">...</div>
-
-{/* 모바일: 2줄 그리드 배치 */}
-<div className="sm:hidden">...</div>
+```bash
+npm install
+npm run dev
 ```
 
-**반응형 그리드**
-- 모바일 1열 → 태블릿 2열 → 데스크톱 3열
-- 갭, 폰트 크기, 패딩 모두 브레이크포인트별 조정
-- 헤더: xl 기준 데스크톱 네비게이션 ↔ 모바일 햄버거 메뉴
+`.env.local`에 아래 값이 필요합니다. (커밋하지 않음)
 
+| 항목 | 용도 |
+|---|---|
+| `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` | MySQL 접속 정보 (서버에서만 사용) |
+| `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` | 네이버 로그인 |
+| `NEXT_PUBLIC_KAKAO_JS_KEY` | 오시는 길 지도 |
+| `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME` | 가입 인증 메일 |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY` | 봇 방지 |
 
-### 5. API 설계
+## 9. 회고
 
-**계층화된 API 구조**
-```
-lib/api/
-├── auth-middleware.ts   # 인증 미들웨어
-├── response-builder.ts  # 표준화된 응답 포맷
-├── error-handler.ts     # 중앙 에러 처리
-├── rate-limit.ts        # Rate Limiting
-└── index.ts
-```
-
-**표준화된 응답**
-```ts
-// 모든 API가 동일한 응답 구조 사용
-interface ApiResponse<T> {
-  success: boolean
-  data?: T
-  error?: string
-  message?: string
-}
-```
-
-### 6. 관리자 대시보드
-
-- **사용자 통계 차트** - Recharts로 가입 추이 등 시각화
-- **데이터 내보내기** - xlsx 라이브러리로 Excel 파일 생성/다운로드
-- **Tiptap WYSIWYG 에디터** - 텍스트 에디터 적용
-
----
-
-## 커스텀 훅
-
-| Hook | 기능 |
-|------|------|
-| `useAuth()` | 전역 인증 상태 (로그인, 로그아웃, 세션 복원) |
-| `useUser()` | 사용자 정보 관리 |
-| `useQuiz()` | 퀴즈 참가 로직 |
-| `useInfiniteScroll()` | 무한 스크롤 페이징 |
-| `useIntersectionObserver()` | 뷰포트 교차 감지 (Lazy Loading) |
-| `useKakaoLoader()` | Kakao Maps SDK 동적 로딩 |
-| `useWritingForm()` | 글쓰기 폼 상태 관리 |
-| `useCooldown()` | 글쓰기 쿨다운 타이머 |
-| `useAbortController()` | API 요청 취소 관리 |
-| `useLoadingPrevention()` | 중복 요청 방지 |
-
----
-
-## 프로젝트 규모
-
-| 항목 | 수량 |
-|------|------|
-| 페이지 | 22개 (사용자) + 5개 (관리자) |
-| API 엔드포인트 | 76개 |
-| 컴포넌트 | 21개 카테고리, 100+ 파일 |
-| 커스텀 훅 | 10+ |
-| TypeScript 타입 정의 | 12개 모듈 |
-| 외부 API 연동 | (Daum, Naver, Brevo) |
-
----
-
-## 주요 기술적 도전과 해결
-
-### 1. 룰렛 이벤트 동시성 제어
-- **문제:** 동시에 여러 사용자가 룰렛 스핀 시 상품 재고 초과 문제
-- **해결:** MySQL 트랜잭션 안에서 남은 수량이 0보다 클 때만 차감하는 조건부 UPDATE를 실행하고, 바뀐 행이 없으면(`affectedRows === 0`) 롤백해 재고보다 많이 지급되지 않도록 처리. 결과는 서버에서 먼저 정하고 클라이언트는 애니메이션만 재생
-  ```sql
-  UPDATE prizes SET current_quantity = current_quantity - 1
-  WHERE id = ? AND current_quantity > 0
-  ```
-
-### 2. 대규모 폼 성능
-- **문제:** 등록 폼 필드, 실시간 검증 시 잦은 리렌더링
-- **해결:** React Hook Form의 비제어 컴포넌트 패턴으로 필요한 필드만 리렌더링
-
-### 3. 서버 세션 인증 기반 유저 관리 및 악성 사용자 대응
-
-**배경:**
-사업자 전화번호 이슈와 촉박한 일정으로 인해 SMS 인증 시스템을 초기 도입하지 못하고, 이메일 인증만으로 회원가입을 진행
-
-**악성 봇 패턴 발견 및 대응:**
-- 서비스 운영 중 동일 IP 가입, 동일한 패턴의 ID 등 악성 행위를 감지
-- 아래 기준으로 자동화된 악성 패턴을 탐지
-  - 24시간 내 동일 IP에서 10회 이상 가입 시도
-  - 계정 생성 후 1시간 이내 탈퇴를 3회 이상 반복
-  - 월 3회 이상 탈퇴 또는 누적 5회 이상 탈퇴 시 블랙리스트 자동 등록
-- 악의적 패턴이 확인된 사용자의 **세션을 모조리 중단**(DB의 `session_token`, `session_expires_at` NULL 처리)시키고 해당 계정을 제거
-- 제재 대상 사용자를 위한 **이의제기 UI 컴포넌트**를 추가하여, 오탐으로 인한 피해를 방지할 수 있는 경로를 제공
-
-**공식 이메일 도메인 화이트리스트 도입:**
-- 이후 공식 이메일 도메인(Gmail, Naver, Daum 등)으로만 가입을 받도록 화이트리스트 방식으로 전환
-- `allowed_email_domains` 테이블에서 `is_active = 1`인 도메인만 허용하고, 미등록 도메인은 가입 단계에서 차단
-- 회원가입 UI에서 **허용 도메인 안내 문구**를 노출하여, 사용자가 사전에 가입 가능한 이메일을 확인할 수 있도록 안내
-
-**관련 구현:**
-- 세션: DB 컬럼(`session_token`, `session_expires_at`) 기반 서버 세션 + `httpOnly` 쿠키, 7일 만료, 다른 기기 로그인 시 기존 세션 자동 무효화
-- 패턴 분석: `signup_deletion_patterns`, `user_blacklist`, `account_deletions` 테이블로 가입/탈퇴 이력 추적
-- 화이트리스트: `email-whitelist-checker.ts`에서 도메인 검증 후 인증 코드 발송 차단
+AI 페어 프로그래밍을 처음 도입한 프로젝트였습니다. 일정이 빠듯해 디자인 시안이 없는 페이지를 AI로 급하게 채웠고, 그 화면들이 그대로 들어간 점은 아쉽습니다. 이후 프로젝트부터는 화면을 직접 설계하거나 요구사항을 더 구체적으로 주는 방식으로 바꿨습니다.

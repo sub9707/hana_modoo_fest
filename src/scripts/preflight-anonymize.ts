@@ -28,17 +28,17 @@ const hr = (t: string) => log(`\n${'─'.repeat(72)}\n${t}\n${'─'.repeat(72)}`
 async function main() {
   loadEnv()
   const conn = await mysql.createConnection({
-    host: process.env.NEXT_PUBLIC_MYSQL_HOST,
-    port: process.env.NEXT_PUBLIC_MYSQL_PORT ? parseInt(process.env.NEXT_PUBLIC_MYSQL_PORT, 10) : 3306,
-    user: process.env.NEXT_PUBLIC_MYSQL_USER,
-    password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD,
-    database: process.env.NEXT_PUBLIC_MYSQL_DATABASE,
+    host: (process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST),
+    port: (process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT) ? parseInt((process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT), 10) : 3306,
+    user: (process.env.MYSQL_USER ?? process.env.NEXT_PUBLIC_MYSQL_USER),
+    password: (process.env.MYSQL_PASSWORD ?? process.env.NEXT_PUBLIC_MYSQL_PASSWORD),
+    database: (process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE),
     dateStrings: true
   })
 
   try {
     const [ver] = await conn.query<any[]>('SELECT VERSION() AS v, DATABASE() AS db')
-    log(`DB : ${ver[0].db} @ ${process.env.NEXT_PUBLIC_MYSQL_HOST}:${process.env.NEXT_PUBLIC_MYSQL_PORT}`)
+    log(`DB : ${ver[0].db} @ ${(process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST)}:${(process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT)}`)
     log(`엔진: ${ver[0].v}`)
 
     hr('1. users 컬럼 제약 (익명화 UPDATE 확정용)')

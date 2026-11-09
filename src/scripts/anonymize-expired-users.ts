@@ -60,11 +60,11 @@ function loadEnv() {
  */
 async function connect() {
   return mysql.createConnection({
-    host: process.env.NEXT_PUBLIC_MYSQL_HOST,
-    port: process.env.NEXT_PUBLIC_MYSQL_PORT ? parseInt(process.env.NEXT_PUBLIC_MYSQL_PORT, 10) : 3306,
-    user: process.env.NEXT_PUBLIC_MYSQL_USER,
-    password: process.env.NEXT_PUBLIC_MYSQL_PASSWORD,
-    database: process.env.NEXT_PUBLIC_MYSQL_DATABASE,
+    host: (process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST),
+    port: (process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT) ? parseInt((process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT), 10) : 3306,
+    user: (process.env.MYSQL_USER ?? process.env.NEXT_PUBLIC_MYSQL_USER),
+    password: (process.env.MYSQL_PASSWORD ?? process.env.NEXT_PUBLIC_MYSQL_PASSWORD),
+    database: (process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE),
     charset: 'utf8mb4',
     timezone: '+09:00',
     dateStrings: true,
@@ -99,7 +99,7 @@ async function main() {
   try {
     log('='.repeat(74))
     log(`하나모두 대축제 · 보관기간 만료 회원 익명화    [${EXECUTE ? '실행 모드' : 'DRY-RUN'}]`)
-    log(`DB: ${process.env.NEXT_PUBLIC_MYSQL_DATABASE} @ ${process.env.NEXT_PUBLIC_MYSQL_HOST}`)
+    log(`DB: ${(process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE)} @ ${(process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST)}`)
     log('='.repeat(74))
 
     // --- 0. 선행 조건 확인 -------------------------------------------------
