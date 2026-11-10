@@ -1,44 +1,45 @@
 import mysql from 'mysql2/promise'
 
-// 🚀 Vercel 최적화된 연결 설정
+const env = (key: string) => process.env[`MYSQL_${key}`] ?? process.env[`NEXT_PUBLIC_MYSQL_${key}`]
+
 const config = {
-  host: (process.env.MYSQL_HOST ?? process.env.NEXT_PUBLIC_MYSQL_HOST) || 'localhost',
-  port: (process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT) ? parseInt((process.env.MYSQL_PORT ?? process.env.NEXT_PUBLIC_MYSQL_PORT), 10) : 3306,
-  user: (process.env.MYSQL_USER ?? process.env.NEXT_PUBLIC_MYSQL_USER) || 'root',
-  password: (process.env.MYSQL_PASSWORD ?? process.env.NEXT_PUBLIC_MYSQL_PASSWORD) || '',
-  database: (process.env.MYSQL_DATABASE ?? process.env.NEXT_PUBLIC_MYSQL_DATABASE) || 'modohana_festival',
+  host: env('HOST') || 'localhost',
+  port: parseInt(env('PORT') || '3306', 10),
+  user: env('USER') || 'root',
+  password: env('PASSWORD') || '',
+  database: env('DATABASE') || 'modohana_festival',
   charset: 'utf8mb4',
   timezone: '+09:00',
   dateStrings: true,
   multipleStatements: false,
 
-  // 🚀 Vercel 비용 최적화된 연결 풀 설정
-  connectionLimit: 10, //   30 → 10으로 변경 (67% 비용 절감)
+  connectionLimit: 10,
   queueLimit: 0,
   waitForConnections: true,
-  
-  // 🚀 기본 성능 설정 (MySQL2 공식 지원)
+
   supportBigNumbers: true,
   bigNumberStrings: true,
 }
 
-// 연결 풀 생성 및 관리 (기존 로직 유지)
 declare global {
   var __mysql_pool: mysql.Pool | undefined
 }
 
-// 글로벌 풀 재사용 (기존 로직 유지)
+// 개발 환경의 HMR 로 모듈이 다시 로드돼도 풀을 새로 만들지 않도록 전역에 보관한다.
 const pool: mysql.Pool = global.__mysql_pool || mysql.createPool(config)
 
 if (process.env.NODE_ENV !== 'production') {
   global.__mysql_pool = pool
 }
 
+const SLOW_QUERY_MS = 150
+const SLOW_TRANSACTION_MS = 300
+const TRANSACTION_TIMEOUT_MS = 5000
+
 export function getPool(): mysql.Pool {
   return pool
 }
 
-// 🚀 성능 모니터링이 추가된 쿼리 함수 (기존 기능 모두 유지)
 export async function query(
   sql: string,
   params?: any[]
@@ -49,17 +50,15 @@ export async function query(
   try {
     const [rows] = await connection.execute(sql, params || [])
 
-    // 🚀 개발 환경에서 느린 쿼리 로깅 (임계값 최적화)
     if (process.env.NODE_ENV === 'development') {
       const duration = Date.now() - startTime
-      if (duration > 150) { //   100ms → 150ms (덜 민감하게 조정)
-        console.warn(`🐌 Slow query (${duration}ms):`, sql.substring(0, 100) + '...')
+      if (duration > SLOW_QUERY_MS) {
+        console.warn(`Slow query (${duration}ms):`, sql.substring(0, 100) + '...')
       }
     }
 
     return rows
   } catch (error) {
-    // 🚀 에러 로깅 최적화 (기존 기능 유지)
     console.error('Database query error:', {
       sql: sql.substring(0, 100) + '...',
       params: params?.map(p => typeof p === 'string' ? p.substring(0, 50) + '...' : p),
@@ -70,7 +69,6 @@ export async function query(
   }
 }
 
-// 🚀 성능 모니터링이 추가된 단일 결과 조회 함수 (기존 기능 완전 유지)
 export async function queryOne(
   sql: string,
   params?: any[]
@@ -79,7 +77,6 @@ export async function queryOne(
   return Array.isArray(rows) && rows.length > 0 ? rows[0] : null
 }
 
-// 🚀 트랜잭션 함수 개선 (Vercel 비용 최적화)
 export async function transaction<T>(
   callback: (connection: mysql.PoolConnection) => Promise<T>
 ): Promise<T> {
@@ -89,9 +86,8 @@ export async function transaction<T>(
   try {
     await connection.beginTransaction()
 
-    // 🚀 트랜잭션 타임아웃 최적화 (10초 → 5초)
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Transaction timeout')), 5000) //   10초 → 5초
+      setTimeout(() => reject(new Error('Transaction timeout')), TRANSACTION_TIMEOUT_MS)
     })
 
     const result = await Promise.race([
@@ -101,11 +97,10 @@ export async function transaction<T>(
 
     await connection.commit()
 
-    // 🚀 개발 환경에서 긴 트랜잭션 로깅 (기존 기능 유지)
     if (process.env.NODE_ENV === 'development') {
       const duration = Date.now() - startTime
-      if (duration > 300) { //   200ms → 300ms (덜 민감하게 조정)
-        console.warn(`🐌 Long transaction (${duration}ms)`)
+      if (duration > SLOW_TRANSACTION_MS) {
+        console.warn(`Long transaction (${duration}ms)`)
       }
     }
 
@@ -122,14 +117,13 @@ export async function transaction<T>(
   }
 }
 
-// 🚀 연결 풀 상태 모니터링 함수 (기존 기능 완전 유지)
+// mysql2 는 풀 상태를 공개 API 로 제공하지 않아 내부 필드를 읽는다.
 export function getPoolStatus() {
   try {
     const poolConfig = (pool as any).config
     const poolConnections = (pool as any)._allConnections
     const freeConnections = (pool as any)._freeConnections
 
-    // poolConfig가 undefined인 경우 기본값 반환 (기존 로직 유지)
     if (!poolConfig) {
       return {
         maxConnections: 'unknown',
@@ -159,121 +153,43 @@ export function getPoolStatus() {
   }
 }
 
-// 🚀 개발 환경에서 연결 풀 상태 주기적 로깅 (Vercel 비용 최적화)
+// 개발 환경에서는 5분마다 풀 상태를 확인해 활성 연결이 많을 때만 로그를 남긴다.
 if (process.env.NODE_ENV === 'development') {
-  let poolMonitoringInterval: NodeJS.Timeout | null = null
-
-  const startPoolMonitoring = () => {
-    // 기존 인터벌이 있으면 정리
-    if (poolMonitoringInterval) {
-      clearInterval(poolMonitoringInterval)
-    }
-
-    poolMonitoringInterval = setInterval(() => {
-      try {
-        const status = getPoolStatus()
-        // 🚀 더 엄격한 조건으로 로깅 (활성 연결이 3개 이상일 때만)
-        if (status.status === 'ok' && typeof status.activeConnections === 'number' && status.activeConnections > 3) {
-          console.log('📊 MySQL Pool Status:', status)
-        }
-      } catch (error) {
-        console.warn('Pool status monitoring stopped due to error:', error)
-        if (poolMonitoringInterval) {
-          clearInterval(poolMonitoringInterval)
-          poolMonitoringInterval = null
-        }
+  const monitoringInterval = setInterval(() => {
+    try {
+      const status = getPoolStatus()
+      if (status.status === 'ok' && typeof status.activeConnections === 'number' && status.activeConnections > 3) {
+        console.log('MySQL pool status:', status)
       }
-    }, 300000) //   30초 → 5분 (300초)으로 변경 (90% 비용 절감)
-  }
-
-  // 개발 서버 시작 시 모니터링 시작
-  startPoolMonitoring()
-
-  // 🚀 정리 함수 추가 (메모리 누수 방지)
-  const stopPoolMonitoring = () => {
-    if (poolMonitoringInterval) {
-      clearInterval(poolMonitoringInterval)
-      poolMonitoringInterval = null
+    } catch (error) {
+      console.warn('Pool status monitoring stopped due to error:', error)
+      clearInterval(monitoringInterval)
     }
-  }
-
-  // 🚀 Next.js 개발 환경에서 모듈 재로드 시 정리
-  if (typeof global !== 'undefined') {
-    // 전역 정리 함수 등록
-    global.__cleanup_pool_monitoring = stopPoolMonitoring
-  }
+  }, 5 * 60 * 1000)
 }
 
-// 🚀 헬스체크 함수 개선 (기존 기능 완전 유지)
 export async function healthCheck(): Promise<boolean> {
-  const startTime = Date.now()
   try {
     await query('SELECT 1 as health')
-    const duration = Date.now() - startTime
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`  DB Health Check: ${duration}ms`)
-    }
-
     return true
   } catch (error) {
-    console.error('❌ Database health check failed:', error)
+    console.error('Database health check failed:', error)
     return false
   }
 }
 
-// 🚀 연결 풀 정리 함수 (기존 기능 완전 유지)
 export async function closePool(): Promise<void> {
   if (!pool) return
   try {
-    // pool이 이미 종료된 상태인지 체크 (기존 로직 유지)
     if ((pool as any)._closed) return
     await pool.end()
-    console.log('🔌 Database connection pool closed')
   } catch (error) {
     console.error('Error closing database pool:', error)
   }
 }
 
-// 🚀 프로세스 종료 시 정리 (기존 기능 완전 유지)
 if (process.env.NODE_ENV === 'development' && typeof process !== 'undefined') {
   process.on('SIGTERM', closePool)
   process.on('SIGINT', closePool)
-  
-  // 🚀 추가: 정상 종료 시에도 풀 정리
   process.on('beforeExit', closePool)
-}
-
-// 🚀 추가 유틸리티 함수들 (기존에 없던 기능 - 성능 모니터링 강화)
-export function getConnectionStats() {
-  const status = getPoolStatus()
-  return {
-    ...status,
-    efficiency: status.totalConnections > 0 
-      ? Math.round((status.activeConnections / status.totalConnections) * 100) 
-      : 0,
-    timestamp: new Date().toISOString()
-  }
-}
-
-// 🚀 연결 풀 최적화를 위한 추가 함수
-export async function optimizePool(): Promise<void> {
-  if (process.env.NODE_ENV !== 'development') return
-  
-  try {
-    const status = getPoolStatus()
-    console.log('🔧 Pool optimization check:', status)
-    
-    // 유휴 연결이 너무 많으면 경고
-    if (status.freeConnections > 7) {
-      console.warn('⚠️ Too many idle connections. Consider reducing connectionLimit.')
-    }
-    
-    // 활성 연결이 한계에 가까우면 경고  
-    if (status.activeConnections > 8) {
-      console.warn('⚠️ High connection usage. Consider increasing connectionLimit or optimizing queries.')
-    }
-  } catch (error) {
-    console.error('Pool optimization check failed:', error)
-  }
 }
