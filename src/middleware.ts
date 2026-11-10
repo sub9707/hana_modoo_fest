@@ -146,7 +146,6 @@ async function updateUserActivity(userId: string): Promise<void> {
       globalPool = getPool()
     }
 
-    // MySQL의 NOW() 함수 사용
     await globalPool.execute(
       'UPDATE users SET last_activity_at = NOW() WHERE id = ?',
       [userId]
@@ -211,7 +210,7 @@ function getCookieOptions(secure: boolean = process.env.NODE_ENV === 'production
   }
 }
 
-//   개선된 무한 리다이렉트 감지 (쿠키 기반)
+// 짧은 시간 안에 리다이렉트가 반복되면 쿠키에 횟수를 기록해 루프를 끊는다
 function checkRedirectLoop(request: NextRequest): { isLoop: boolean; count: number } {
   const loopCookie = request.cookies.get('_redirect_loop')?.value
 
@@ -240,7 +239,6 @@ function checkRedirectLoop(request: NextRequest): { isLoop: boolean; count: numb
   }
 }
 
-//   리다이렉트 카운트 증가
 function incrementRedirectCount(response: NextResponse, currentCount: number): void {
   const data = {
     count: currentCount + 1,
@@ -256,7 +254,6 @@ function incrementRedirectCount(response: NextResponse, currentCount: number): v
   })
 }
 
-//   리다이렉트 카운트 초기화
 function clearRedirectCount(response: NextResponse): void {
   response.cookies.set('_redirect_loop', '', {
     httpOnly: true,
@@ -267,16 +264,13 @@ function clearRedirectCount(response: NextResponse): void {
   })
 }
 
-//   메인 미들웨어 함수
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl
 
-  // 정적 파일들은 미들웨어를 거치지 않음
   if (isStaticFile(pathname)) {
     return NextResponse.next()
   }
 
-  //   무한 리다이렉트 루프 감지 (쿠키 기반)
   const { isLoop, count } = checkRedirectLoop(request)
 
   if (isLoop) {
@@ -284,7 +278,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const response = NextResponse.redirect(new URL('/login?message=' +
       encodeURIComponent('세션 오류가 발생했습니다. 다시 로그인해주세요.'), request.url))
 
-    // 모든 인증 관련 쿠키 삭제
     response.cookies.set('session-token', '', {
       ...getCookieOptions(),
       expires: new Date(0),
@@ -298,9 +291,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.next()
   const sessionToken = request.cookies.get('session-token')?.value
 
-  // 로그인 페이지 접근 처리
   if (pathname === '/login') {
-    //   로그인 페이지에서는 리다이렉트 카운트 초기화
     clearRedirectCount(response)
 
     // 세션 만료 파라미터가 있으면 쿠키 강제 삭제
@@ -314,17 +305,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return response
   }
 
-  // 사용자 인증
   let user: MiddlewareUser | null = null
 
   if (sessionToken) {
     user = await authenticateUser(sessionToken)
 
-    //   세션 무효화 감지 (다른 기기 로그인 등)
+    // 토큰은 있지만 DB 에서 찾을 수 없다면 다른 기기 로그인 등으로 세션이 무효화된 것이다
     if (!user && sessionToken) {
       console.warn('[Middleware] 세션 무효화 감지 - 쿠키 삭제 및 강제 로그아웃')
 
-      // 보호된 경로에서 무효화된 세션 발견 시
       if (isProtectedPath(pathname)) {
         const loginUrl = createRedirectUrl(request, '/login', {
           callbackUrl: pathname,
@@ -334,20 +323,18 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
         const redirectResponse = NextResponse.redirect(loginUrl)
 
-        // 쿠키 삭제
         redirectResponse.cookies.set('session-token', '', {
           ...getCookieOptions(),
           expires: new Date(0),
           maxAge: 0
         })
 
-        // 리다이렉트 카운트 증가
         incrementRedirectCount(redirectResponse, count)
 
         return redirectResponse
       }
 
-      // 일반 페이지에서는 쿠키만 삭제
+      // 공개 페이지에서는 쿠키만 지우고 그대로 보여준다
       response.cookies.set('session-token', '', {
         ...getCookieOptions(),
         expires: new Date(0),
@@ -356,9 +343,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-
-
-  //   보호된 경로 체크
   if (isProtectedPath(pathname)) {
     if (!user) {
       const hadToken = !!sessionToken
@@ -373,7 +357,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
       const redirectResponse = NextResponse.redirect(loginUrl)
 
-      // 쿠키 삭제
       if (hadToken) {
         redirectResponse.cookies.set('session-token', '', {
           ...getCookieOptions(),
@@ -382,19 +365,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
         })
       }
 
-      //   리다이렉트 카운트 증가
       incrementRedirectCount(redirectResponse, count)
 
       return redirectResponse
     }
 
-    //   인증 성공 시 리다이렉트 카운트 초기화
     clearRedirectCount(response)
   }
 
-  // 권한 기반 접근 제어
   if (user) {
-    // 관리자 전용 경로
     if (isAdminPath(pathname)) {
       if (!hasRole(user.role, 'admin')) {
         console.warn('[Middleware] 관리자 권한 부족:', user.username)
@@ -405,7 +384,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // 편집자 이상 전용 경로  
     if (isEditorPath(pathname)) {
       if (!hasRole(user.role, 'editor')) {
         console.warn('[Middleware] 편집자 권한 부족:', user.username)
@@ -416,7 +394,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // 사용자 활동 시간 업데이트 (30분마다)
+    // 활동 시간은 30분 단위로만 갱신해 매 요청마다 UPDATE 가 일어나지 않게 한다
     const lastActivity = user.last_activity_at
     if (!lastActivity || (new Date().getTime() - lastActivity.getTime()) > 30 * 60 * 1000) {
       updateUserActivity(user.id).catch(err =>
