@@ -1,11 +1,10 @@
-// app/api/auth/oauth/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getClientIp } from '@/lib/utils/ip'
 
 // OAuth 설정 타입 정의
 interface OAuthConfig {
   clientId: string
-  clientSecret?: string  // 선택적으로 변경
+  clientSecret?: string  // 카카오는 Client Secret 없이도 동작
   authUrl: string
   tokenUrl: string
   userUrl: string
@@ -47,27 +46,24 @@ export async function GET(request: NextRequest) {
     }
   }
 
-
   if (!provider) {
-    console.log('No provider specified')
     return NextResponse.redirect(new URL('/register?message=SNS%20제공자가%20지정되지%20않았습니다', request.url))
   }
 
   if (!['naver', 'kakao'].includes(provider)) {
-    console.log('Invalid provider:', provider)
     return NextResponse.redirect(new URL(`/register?message=지원하지%20않는%20SNS%20제공자입니다:%20${provider}`, request.url))
   }
 
   const config = OAUTH_CONFIG[provider]
 
   if (!config.clientId) {
-    console.log('Missing client ID for provider:', provider)
+    console.error('Missing OAuth client ID for provider:', provider)
     return NextResponse.redirect(new URL('/register?message=SNS%20로그인%20설정이%20완료되지%20않았습니다', request.url))
   }
 
   // 네이버만 Client Secret 확인
   if (provider === 'naver' && !config.clientSecret) {
-    console.log('Missing client secret for Naver')
+    console.error('Missing OAuth client secret for Naver')
     return NextResponse.redirect(new URL('/register?message=네이버%20로그인%20설정이%20완료되지%20않았습니다', request.url))
   }
 
@@ -98,19 +94,13 @@ function initiateOAuth(
     state: `${state}:${provider}:${encodeURIComponent(redirect)}`
   })
 
-  // 네이버와 카카오 모두 scope 추가
   if (config.scope) {
     params.append('scope', config.scope)
   }
 
-  // 네이버 OAuth 기본 동작:
-  // - 첫 로그인: 동의 화면 표시 후 SocialRegistrationForm으로 이동
-  // - 이후 로그인: 자동 로그인 (동의 화면 없음)
-  // auth_type 파라미터를 추가하지 않음 = 기본 동작
-
+  // auth_type 을 지정하지 않으면 네이버는 최초 로그인 때만 동의 화면을 띄우고
+  // 이후에는 바로 로그인된다.
   const authUrl = `${config.authUrl}?${params.toString()}`
-
-  console.log(`[OAuth] ${provider} auth URL:`, authUrl)
 
   return NextResponse.redirect(authUrl)
 }
@@ -180,12 +170,9 @@ async function handleOAuthCallback(
       }
     }
 
-    // *** 3. 전화번호 중복 확인 추가 (핵심 수정 부분) ***
+    // 3. 동일한 전화번호로 이미 가입된 사용자 확인
     if (userResponse.userData.mobile) {
-      // 전화번호 정규화 (하이픈 제거)
       const normalizedPhone = userResponse.userData.mobile.replace(/-/g, '')
-
-      console.log(`Checking phone duplication for: ${normalizedPhone}`)
 
       const existingPhoneUser = await queryOne(
         'SELECT id, signup_method FROM users WHERE phone = ? AND deleted_at IS NULL',
@@ -259,17 +246,16 @@ async function getAccessToken(
       body: tokenParams.toString()
     })
 
-
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`❌ Token request failed (${response.status}):`, errorText)
+      console.error(`Token request failed (${response.status}):`, errorText)
       throw new Error(`Token request failed: ${response.status} - ${errorText}`)
     }
 
     const data = await response.json()
 
     if (!data.access_token) {
-      console.error('❌ No access token in response:', data)
+      console.error('No access token in response:', data)
       throw new Error('No access token received')
     }
 
@@ -279,7 +265,7 @@ async function getAccessToken(
       refreshToken: data.refresh_token
     }
   } catch (error) {
-    console.error(`🚨 ${provider} get access token error:`, error)
+    console.error(`${provider} get access token error:`, error)
     return { success: false }
   }
 }
@@ -389,7 +375,7 @@ async function handleExistingUserLogin(
       path: '/'
     })
 
-    // SNS 로그인 성공 시 특별한 플래그를 추가하여 클라이언트에서 인증 상태 새로고침
+    // 클라이언트가 이 플래그를 보고 인증 상태를 다시 불러온다
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL!
     const finalRedirectUrl = new URL(redirect, baseUrl)
     finalRedirectUrl.searchParams.set('auth_refresh', 'true')

@@ -135,8 +135,6 @@ export async function POST(request: NextRequest) {
       await cleanupExpiredVerifications()
     }
 
-    console.log(`[인증 성공] ${phone}, ID: ${verification.id}`)
-
     return successResponse({
       phone,
       verificationId: verification.id

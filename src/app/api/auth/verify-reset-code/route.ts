@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 실제 모드: 정상적인 인증 로직
-    // 인증 코드 조회 (기존 테이블 구조 사용)
+    // 인증 코드 조회
     const verification = await queryOne(
       `SELECT id, code, attempt_count, expires_at, verified 
        FROM phone_verifications 
@@ -175,8 +175,6 @@ export async function POST(request: NextRequest) {
       'UPDATE phone_verifications SET verified = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       [verification.id]
     )
-
-    console.log('[INFO] 비밀번호 찾기 인증 성공 - 전화번호:', phone, '사용자:', user.name)
 
     return NextResponse.json({
       success: true,
