@@ -9,7 +9,6 @@ import NetworkSection from './NetworkSection';
 function FestivalJoinGuide() {
     const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
-    // 이벤트 핸들러 메모이제이션으로 불필요한 리렌더링 방지
     const handleMouseEnter = useCallback((itemId: number) => {
         setHoveredItem(itemId);
     }, []);
@@ -18,7 +17,6 @@ function FestivalJoinGuide() {
         setHoveredItem(null);
     }, []);
 
-    // 클래스 생성 함수들을 메모이제이션
     const getTextClass = useCallback((itemId: number, isLeft: boolean) => {
         const baseClass = `text-3xl sm:text-6xl font-bold mb-2 cursor-pointer transition-all duration-400 ${styles.baseTextStyle}`;
 
@@ -49,14 +47,12 @@ function FestivalJoinGuide() {
         }
     }, [hoveredItem]);
 
-    // 정적 데이터 메모이제이션
     const specialBenefits = useMemo(() => [
         "사전 접수 신청 후 축제 참여시 기념품 제공",
         "온라인 캠페인 및 이벤트 참여자 1,111명에게 추첨을 통한 선물 제공",
         "자원봉사자 대상 활동 인정 시간 부여",
     ], []);
 
-    // 참여 방법 데이터 메모이제이션
     const participationSteps = useMemo(() => [
         {
             id: 1,
@@ -111,7 +107,7 @@ function FestivalJoinGuide() {
                     <NetworkSection />
                 </div>
 
-                {/* 참여 방법 영역 - 최적화된 렌더링 */}
+                {/* 참여 방법 */}
                 <div className="text-white text-center py-6 w-full relative my-25">
                     <h3 className="text-5xl sm:text-7xl font-bold mb-15 text-shadow-md">참여 방법</h3>
                     <div className="space-y-8">
@@ -144,7 +140,6 @@ function FestivalJoinGuide() {
                                         {step.subtitle}
                                     </p>
                                     
-                                    {/* 이미지 렌더링 최적화 */}
                                     {step.hasImage && (
                                         <div className={step.imageClass}>
                                             <Image 

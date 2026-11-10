@@ -15,8 +15,7 @@ interface PasswordChangeResponse {
 }
 
 /**
- * NextJS 15: Server Action으로 비밀번호 변경
- * 향상된 보안 검증 및 캐시 무효화 적용
+ * 현재 비밀번호를 확인한 뒤 비밀번호를 변경한다.
  */
 export async function changePassword(data: ChangePasswordData): Promise<PasswordChangeResponse> {
   try {
@@ -38,7 +37,6 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
       }
     }
 
-    // NextJS 15: cookies() 함수 사용 (async 필요)
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get('session-token')?.value
 
@@ -104,7 +102,7 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
       }
     }
 
-    // 새 솔트 생성 (보안 강화)
+    // 비밀번호를 바꿀 때마다 솔트도 새로 만든다
     const newSalt = randomBytes(16).toString('hex')
     const finalNewPasswordHash = createHash('sha256')
       .update(data.newPassword + newSalt)
@@ -127,7 +125,7 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
       ]
     )
 
-    // NextJS 15: 향상된 캐시 무효화
+    // 사용자 정보 캐시 무효화
     revalidateTag('user-info')
     revalidateTag(`user-${user.id}`)
 
@@ -150,7 +148,6 @@ export async function changePassword(data: ChangePasswordData): Promise<Password
 
 /**
  * 비밀번호 변경 로그 기록 (보안 감사용)
- * NextJS 15: 향상된 로깅 시스템
  */
 async function logPasswordChange(
   userId: string, 

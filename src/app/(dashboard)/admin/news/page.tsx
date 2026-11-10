@@ -8,7 +8,6 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-// NextJS 15: 메타데이터 생성
 export async function generateMetadata() {
   return {
     title: '공지사항 관리 | 관리자',

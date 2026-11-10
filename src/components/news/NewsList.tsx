@@ -75,7 +75,7 @@ export default function NewsList({
     }
   }, [])
 
-  // ✨ 개선된 카드 클릭 핸들러 (Optimistic UI)
+  // 목록 데이터로 상세 화면을 먼저 띄우고, 상세 데이터를 받아오면 교체한다
   const handleCardClick = useCallback(async (newsItem: NewsItem) => {
     if (!isMountedRef.current) return
 
@@ -86,7 +86,6 @@ export default function NewsList({
       return
     }
 
-    // ✨ Optimistic UI: 즉시 기본 데이터 표시
     setSelectedNews(newsItem)
     setLoadingDetail(true)
 
@@ -112,7 +111,7 @@ export default function NewsList({
         NEWS_DETAIL_CACHE.set(newsItem.id, detailData)
         manageCacheSize()
         
-        // ✨ 상세 데이터로 업데이트
+        // 상세 데이터로 교체
         setSelectedNews(detailData)
       } else {
         console.error('Failed to load news detail:', response.status)
@@ -163,7 +162,7 @@ export default function NewsList({
     return '전체 소식'
   }, [searchParams.search, searchParams.category])
 
-  // ✨ 상세 화면 with 로딩 오버레이
+  // 상세 화면 (상세 데이터 로딩 중에는 오버레이 표시)
   if (selectedNews) {
     return (
       <div className="relative">

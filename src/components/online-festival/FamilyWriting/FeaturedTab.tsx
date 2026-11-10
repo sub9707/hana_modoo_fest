@@ -7,7 +7,7 @@ interface FeaturedTabProps {
   writingTopics: WritingTopic[]
   featuredTopic: string
   currentUser: User | null
-  likingWritings: Set<string> // 🚀 새로 추가
+  likingWritings: Set<string>
   setFeaturedTopic: (topic: string) => void
   onLike: (writingId: string) => void
 }
@@ -17,7 +17,7 @@ export default function FeaturedTab({
   writingTopics,
   featuredTopic,
   currentUser,
-  likingWritings, // 🚀 새로 추가
+  likingWritings,
   setFeaturedTopic,
   onLike
 }: FeaturedTabProps) {
@@ -71,7 +71,7 @@ export default function FeaturedTab({
             onLike={onLike}
             showRanking={true}
             rankingIndex={index}
-            isLiking={likingWritings.has(entry.id)} // 🚀 새로 추가
+            isLiking={likingWritings.has(entry.id)}
           />
         ))}
       </div>

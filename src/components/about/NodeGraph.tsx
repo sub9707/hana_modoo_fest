@@ -52,7 +52,7 @@ const NodeGraph: React.FC = () => {
     // 화면 크기에 따른 연결선 길이 계산
     const getConnectionLength = useCallback(() => {
         const isMobile = svgBounds.width < 768; // 768px 미만을 모바일로 판단
-        return isMobile ? 150 : 300; // 모바일: 150, 데스크톱: 300 (250에서 증가)
+        return isMobile ? 150 : 300;
     }, [svgBounds.width]);
 
     // 연결 관계 (화면 크기에 따라 동적으로 길이 조정)
@@ -105,19 +105,19 @@ const NodeGraph: React.FC = () => {
             const timeSinceLastInteraction = currentTime - lastInteractionRef.current;
             const isIdle = timeSinceLastInteraction > 2000 && !isDragging; // 2초 후 idle 모드
 
-            // 동적 경계 계산 (텍스트가 잘리지 않도록 충분한 여백)
-            const margin = 40; // 5에서 40으로 대폭 증가 (텍스트 보호)
+            // 노드 라벨이 화면 밖으로 잘리지 않도록 여백을 둔다
+            const margin = 40;
             const minX = margin;
             const maxX = svgBounds.width - margin;
             const minY = margin;
             const maxY = svgBounds.height - margin;
 
-            // Idle 애니메이션을 위한 시간 증가 (극도로 느리게)
+            // Idle 애니메이션 진행 (거의 정지에 가까운 속도)
             if (isIdle) {
-                idleTimeRef.current += 0.001; // 0.005에서 0.001로 극도로 감소 (거의 정지 수준)
+                idleTimeRef.current += 0.001;
             }
 
-            // 스프링 포스 적용 (더 약하고 유연하게)
+            // 연결선 스프링 포스
             connections.forEach(conn => {
                 const node1 = newNodes.find(n => n.id === conn.from);
                 const node2 = newNodes.find(n => n.id === conn.to);
@@ -130,17 +130,16 @@ const NodeGraph: React.FC = () => {
 
                 if (distance === 0) return;
 
-                // 더 약한 스프링 포스와 유연한 거리 허용
                 let targetDistance = conn.length;
 
-                // Idle 상태에서는 타겟 거리에 부드러운 변화 추가 (극도로 작게)
+                // Idle 상태에서는 목표 거리를 아주 조금씩 흔든다
                 if (isIdle) {
-                    const waveOffset = Math.sin(idleTimeRef.current + conn.from.length * 0.1) * 1; // 3에서 1로 감소
+                    const waveOffset = Math.sin(idleTimeRef.current + conn.from.length * 0.1) * 1;
                     targetDistance += waveOffset;
                 }
 
                 const distanceError = distance - targetDistance;
-                const force = distanceError * 0.008; // 0.015에서 0.008로 대폭 감소 (탄성 약화)
+                const force = distanceError * 0.008;
 
                 // 거리 차이가 클 때만 강한 힘 적용
                 const forceMultiplier = Math.min(1, Math.abs(distanceError) / 100);
@@ -151,30 +150,30 @@ const NodeGraph: React.FC = () => {
 
                 // 드래그 중인 노드가 아닐 때만 힘 적용
                 if (!isDragging || !draggedNode || node1.id !== draggedNode.id) {
-                    node1.vx += fx * 0.25; // 0.4에서 0.25로 감소 (탄성 약화)
+                    node1.vx += fx * 0.25;
                     node1.vy += fy * 0.25;
                 }
                 if (!isDragging || !draggedNode || node2.id !== draggedNode.id) {
-                    node2.vx -= fx * 0.25; // 0.4에서 0.25로 감소 (탄성 약화)
+                    node2.vx -= fx * 0.25;
                     node2.vy -= fy * 0.25;
                 }
             });
 
-            // Idle 상태에서 각 노드에 개별적인 부드러운 움직임 추가 (극도로 느리게)
+            // Idle 상태에서는 노드마다 위상이 다른 미세한 움직임을 준다
             if (isIdle) {
                 newNodes.forEach((node, index) => {
                     if (isDragging && draggedNode && node.id === draggedNode.id) return;
 
                     const timeOffset = idleTimeRef.current + index * 1.2;
-                    const idleForceX = Math.sin(timeOffset * 0.8) * 0.005; // 0.02에서 0.005로 극도로 감소 (1/4)
-                    const idleForceY = Math.cos(timeOffset * 0.6 + index) * 0.003; // 0.01에서 0.003로 극도로 감소 (1/3)
+                    const idleForceX = Math.sin(timeOffset * 0.8) * 0.005;
+                    const idleForceY = Math.cos(timeOffset * 0.6 + index) * 0.003;
 
                     node.vx += idleForceX;
                     node.vy += idleForceY;
                 });
             }
 
-            // 노드 간 반발력 추가 (너무 가까워지지 않도록)
+            // 노드 간 반발력 (너무 가까워지지 않도록)
             newNodes.forEach((node1, i) => {
                 newNodes.forEach((node2, j) => {
                     if (i >= j) return;
@@ -185,7 +184,7 @@ const NodeGraph: React.FC = () => {
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     if (distance < 80 && distance > 0) {
-                        const repelForce = (80 - distance) * 0.01; // 0.02에서 0.01로 감소
+                        const repelForce = (80 - distance) * 0.01;
                         const fx = (dx / distance) * repelForce;
                         const fy = (dy / distance) * repelForce;
 
@@ -201,8 +200,8 @@ const NodeGraph: React.FC = () => {
             if (isDragging && draggedNode) {
                 const draggedNodeData = newNodes.find(n => n.id === draggedNode.id);
                 if (draggedNodeData) {
-                    // 목표 위치로 부드럽게 이동 (딜레이 효과) - 더 느리게
-                    const lerpFactor = 0.08; // 0.15에서 0.08로 감소
+                    // 목표 위치로 보간 이동해 약간 늦게 따라오는 느낌을 준다
+                    const lerpFactor = 0.08;
                     const dx = draggedNodeData.targetX - draggedNodeData.x;
                     const dy = draggedNodeData.targetY - draggedNodeData.y;
                     
@@ -221,13 +220,12 @@ const NodeGraph: React.FC = () => {
                     return;
                 }
 
-                // 더 강한 감쇠로 유체같은 움직임 - 탄성 약화를 위해 감쇠 증가
-                const dampingFactor = isIdle ? 0.98 : 0.93; // 0.90에서 0.93으로 증가 (더 빠른 정착)
+                const dampingFactor = isIdle ? 0.98 : 0.93;
                 node.vx *= dampingFactor;
                 node.vy *= dampingFactor;
 
                 // 속도 제한 (너무 빠르게 움직이지 않도록)
-                const maxVelocity = isIdle ? 0.8 : 8; // idle 상태 2에서 0.8로 대폭 감소
+                const maxVelocity = isIdle ? 0.8 : 8;
                 const currentVelocity = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
                 if (currentVelocity > maxVelocity) {
                     node.vx = (node.vx / currentVelocity) * maxVelocity;
@@ -331,7 +329,7 @@ const NodeGraph: React.FC = () => {
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        const margin = 40; // 5에서 40으로 증가 (텍스트 보호)
+        const margin = 40;
         const newX = mouseX - dragOffset.x;
         const newY = mouseY - dragOffset.y;
 
@@ -431,7 +429,7 @@ const NodeGraph: React.FC = () => {
         const touchX = touch.clientX - rect.left;
         const touchY = touch.clientY - rect.top;
 
-        const margin = 40; // 5에서 40으로 증가 (텍스트 보호)
+        const margin = 40;
         const newX = touchX - dragOffset.x;
         const newY = touchY - dragOffset.y;
 
@@ -523,7 +521,7 @@ const NodeGraph: React.FC = () => {
                                 key={node.id}
                                 transform={`translate(${node.x}, ${node.y})`}
                             >
-                                {/* 노드 텍스트 - 클릭 가능하게 수정 */}
+                                {/* 노드 텍스트 (클릭 가능) */}
                                 <text
                                     x="0"
                                     y="5"

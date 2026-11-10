@@ -8,7 +8,6 @@ import UserTable from './UserTable'
 import { User } from '@/types/auth'
 import { UserStats } from '@/lib/services/users-service'
 
-// 강화된 UserModal import
 const UserModal = React.lazy(() => import('./UserModal'))
 
 type SortField = 'name' | 'username' | 'company' | 'role' | 'created_at' | 'last_login_at'
@@ -295,7 +294,7 @@ export default function UsersManagementClient({
         sortOrder={sortOrder}
       />
 
-      {/* 강화된 회원 상세 보기 모달 */}
+      {/* 회원 상세 모달 */}
       <React.Suspense fallback={<div>Loading...</div>}>
         <UserModal
           user={selectedUser}

@@ -7,7 +7,7 @@ import { Clock, PenTool, Lock, Pen, CheckCircle } from 'lucide-react'
 interface CooldownState {
   canWrite: boolean
   remainingSeconds: number
-  nextWriteTime?: Date | null  // 선택적 속성으로 변경
+  nextWriteTime?: Date | null
 }
 
 interface WriteTabProps {

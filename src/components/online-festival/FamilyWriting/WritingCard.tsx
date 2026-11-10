@@ -9,7 +9,7 @@ interface WritingCardProps {
   showRanking?: boolean
   rankingIndex?: number
   isMyWriting?: boolean
-  isLiking?: boolean // 🚀 새로 추가
+  isLiking?: boolean
 }
 
 export default function WritingCard({ 
@@ -19,10 +19,9 @@ export default function WritingCard({
   showRanking = false, 
   rankingIndex, 
   isMyWriting = false,
-  isLiking = false // 🚀 새로 추가
+  isLiking = false
 }: WritingCardProps) {
-  // 🚀 is_liked가 undefined/null일 때 명시적으로 false로 처리
-  // API에서 0/1로 올 수도 있으므로 엄격한 Boolean 변환
+  // is_liked 는 API 에서 boolean 대신 0/1 로 내려올 수 있다
   const isLiked = entry.is_liked === true || entry.is_liked === 1
   
   return (
@@ -91,7 +90,7 @@ export default function WritingCard({
                 : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500 active:bg-red-100'
             } ${!currentUser || isLiking ? 'cursor-not-allowed opacity-50' : ''}`}
           >
-            {/* 🚀 로딩 중 애니메이션 */}
+            {/* 좋아요 처리 중 */}
             {isLiking ? (
               <>
                 <div className="w-4 h-4 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />

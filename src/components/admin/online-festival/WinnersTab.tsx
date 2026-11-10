@@ -239,7 +239,7 @@ export function WinnersTab() {
 
   return (
     <div className="space-y-6">
-      {/* 룰렛 이벤트 참여 통계 카드 (신규 추가) */}
+      {/* 룰렛 이벤트 참여 통계 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -316,37 +316,11 @@ export function WinnersTab() {
         </div>
       )}
 
-      {/* 기존 통계 카드 */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">총 당첨자 수</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              {prizeStats?.total_winners?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">수령 완료</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {prizeStats?.claimed_count?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-      </div> */}
-
       {/* 상품 확률 설정 */}
       <PrizeProbabilityManager onUpdate={() => {
         fetchPrizeStats()
         fetchRouletteStats()
       }} />
-
 
       {/* 검색 및 액션 바 */}
       <div className="flex justify-between items-center">

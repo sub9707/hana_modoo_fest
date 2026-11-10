@@ -23,9 +23,7 @@ const STYLES = {
   attachment: 'mt-3 text-xs text-gray-500',
 } as const
 
-// 메모이제이션된 NewsCard 컴포넌트
 function NewsCard({ news, onClick }: NewsCardProps) {
-  // 날짜 포맷 메모이제이션
   const { fullDate, shortDate } = useMemo(() => {
     return {
       fullDate: news.date,
@@ -33,7 +31,6 @@ function NewsCard({ news, onClick }: NewsCardProps) {
     }
   }, [news.date])
 
-  // 첨부파일 정보 메모이제이션
   const attachmentInfo = useMemo(() => {
     const count = news.attachments?.length || 0
     return {
@@ -43,7 +40,6 @@ function NewsCard({ news, onClick }: NewsCardProps) {
     }
   }, [news.attachments?.length])
 
-  // 메모이제이션된 렌더링
   return (
     <article
       onClick={onClick}
@@ -95,7 +91,7 @@ function NewsCard({ news, onClick }: NewsCardProps) {
           </p>
         )}
         
-        {/* 첨부파일 표시 (조건부 렌더링 최적화) */}
+        {/* 첨부파일 */}
         {attachmentInfo.hasAttachments && (
           <p className={STYLES.attachment}>{attachmentInfo.text}</p>
         )}
@@ -104,9 +100,8 @@ function NewsCard({ news, onClick }: NewsCardProps) {
   )
 }
 
-// React.memo로 불필요한 리렌더링 방지
+// 목록에 표시되는 필드만 비교해 무한 스크롤 시 기존 카드가 다시 렌더링되지 않게 한다
 export default memo(NewsCard, (prevProps, nextProps) => {
-  // 커스텀 비교 함수 (더 정밀한 메모이제이션)
   return (
     prevProps.news.id === nextProps.news.id &&
     prevProps.news.title === nextProps.news.title &&

@@ -16,7 +16,7 @@ export const metadata: Metadata = createPageMetadata(
 )
 
 export default async function ChangePasswordOptionsPage() {
-  const user = await getCurrentUser()  //   기존 함수 사용
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/login?redirect=/my-page/change-password-options')

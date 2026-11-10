@@ -41,7 +41,7 @@ export default function TabNavigation({ currentTab, setCurrentTab, currentUser }
         </div>
       </div>
 
-      {/* 데스크톱: 기존 레이아웃 */}
+      {/* 데스크톱 */}
       <div className="hidden sm:flex justify-center">
         <div className="bg-white/70 rounded-2xl p-2 flex flex-wrap gap-2">
           {tabs.map((tab) => (

@@ -111,7 +111,6 @@ export default function RandomEvent() {
       const response = await fetch('/api/event/winners/recent')
       const data = await response.json()
       if (data.success && data.data) {
-        // time_ago 속성 추가
         const winnersWithTimeAgo: RecentWinner[] = data.data.map((winner: any) => ({
           ...winner,
           time_ago: formatRelativeTime(winner.won_at)

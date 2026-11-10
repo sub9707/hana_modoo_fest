@@ -83,7 +83,7 @@ export function MyPageContent({ user }: MyPageContentProps) {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">마이페이지</h1>
         <div className="flex space-x-3">
-          {/* 비밀번호 변경 버튼 추가 (전화번호 가입자만) */}
+          {/* 비밀번호 변경은 전화번호 가입자만 가능 */}
           {user.signup_method === 'phone' && (
             <Link
               href="/my-page/change-password-options"

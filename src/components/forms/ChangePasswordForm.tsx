@@ -45,7 +45,7 @@ export function ChangePasswordForm({ isTestAccount = false }: ChangePasswordForm
     confirm: false
   })
 
-  // NextJS 15: 실시간 비밀번호 강도 검사
+  // 입력 중 실시간으로 계산하는 비밀번호 강도
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrengthResult | null>(null)
 
   // 비밀번호 강도 실시간 계산
@@ -149,7 +149,6 @@ export function ChangePasswordForm({ isTestAccount = false }: ChangePasswordForm
         })
 
         if (result.success) {
-          // NextJS 15: 향상된 사용자 피드백
           const successMessage = result.message || '비밀번호가 성공적으로 변경되었습니다.'
           
           // 성공 알림 표시
@@ -158,7 +157,7 @@ export function ChangePasswordForm({ isTestAccount = false }: ChangePasswordForm
           // 잠시 후 마이페이지로 이동
           setTimeout(() => {
             router.push('/my-page')
-            router.refresh() // NextJS 15: 캐시 갱신
+            router.refresh()
           }, 1500)
           
           // 폼 초기화

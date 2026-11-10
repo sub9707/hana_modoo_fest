@@ -45,7 +45,7 @@ interface SelectTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   className?: string
   isOpen?: boolean
   setIsOpen?: (open: boolean) => void
-  onValueChange?: (value: string) => void  // 추가
+  onValueChange?: (value: string) => void
 }
 
 export function SelectTrigger({ children, className = '', isOpen, setIsOpen, onValueChange, ...props }: SelectTriggerProps) {

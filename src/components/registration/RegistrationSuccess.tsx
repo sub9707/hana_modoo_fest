@@ -45,7 +45,7 @@ export default function RegistrationSuccess({ user, registration }: Registration
         return types[type as keyof typeof types] || type
     }
 
-    // 이미지 다운로드 (html2canvas 호환성 개선)
+    // 등록 카드를 이미지로 저장
     const downloadCard = async () => {
         if (!cardRef.current) return
 

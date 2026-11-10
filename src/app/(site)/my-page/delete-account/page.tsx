@@ -10,7 +10,6 @@ export const metadata: Metadata = createPageMetadata(
   { noIndex: true }
 )
 
-// NextJS 15: 동적 렌더링
 export const dynamic = 'force-dynamic'
 
 export default function DeleteAccountPage() {

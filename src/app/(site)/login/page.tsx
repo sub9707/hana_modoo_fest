@@ -44,7 +44,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   return (
     <PageLayout variant="gray" className="flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 -mt-16">
-        {/* 메시지 표시를 위한 Client Component 추가 */}
+        {/* 쿼리 파라미터로 전달된 안내 메시지 표시 */}
         <LoginMessageDisplay
           message={params.message}
           sessionExpired={params.session_expired}

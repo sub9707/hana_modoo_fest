@@ -11,7 +11,7 @@ export default function NewsDetail({ news, onBack }: NewsDetailProps) {
   const getCategoryColor = (_category: string) => 'text-gray-500'
 
   const renderContent = () => {
-    // 더 관대한 조건으로 변경
+    // contentType 이 누락된 예전 글도 태그가 있으면 HTML 로 렌더링한다
     if (news.contentType === 'html' || news.content.includes('<')) {
       return (
         <div

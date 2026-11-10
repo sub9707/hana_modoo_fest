@@ -22,7 +22,6 @@ export default function LoginMessageDisplay({ message, sessionExpired }: LoginMe
 
   useEffect(() => {
     if (!hasShownAlert && (message || sessionExpired)) {
-      //   어떤 경우든 alert 표시
       if (sessionExpired === 'true' || message?.includes('세션') || message?.includes('다른 기기')) {
         alert('세션이 만료되었습니다.\n다시 로그인해주세요.')
       } else if (message) {
@@ -30,7 +29,7 @@ export default function LoginMessageDisplay({ message, sessionExpired }: LoginMe
       }
       setHasShownAlert(true)
       
-      //   URL 파라미터 제거 (깨끗한 로그인 페이지)
+      // 새로고침 시 같은 알림이 다시 뜨지 않도록 쿼리 파라미터를 지운다
       router.replace('/login', { scroll: false })
     }
   }, [message, sessionExpired, hasShownAlert, router])

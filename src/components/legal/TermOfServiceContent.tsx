@@ -98,7 +98,7 @@ export default function TermsOfServiceContent() {
         </div>
       </section>
 
-      {/* 제4조: 회원가입 - 핵심! */}
+      {/* 제4조: 회원가입 */}
       <section id="section4" className="pt-10 border-t border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           제4조 (회원가입)

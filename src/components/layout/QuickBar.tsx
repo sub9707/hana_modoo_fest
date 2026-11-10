@@ -26,7 +26,6 @@ export default function QuickBar() {
       navigator.vibrate(50)
     }
 
-    // Next.js 15 useTransition 활용
     startTransition(() => {
       router.push(href)
     })

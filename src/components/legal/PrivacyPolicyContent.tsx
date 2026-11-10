@@ -1,6 +1,5 @@
 import { Shield, Lock, Eye, Trash2, UserCheck, Phone, Mail, AlertTriangle } from 'lucide-react'
 
-// NextJS 15 Server Component로 구현
 export default function PrivacyPolicyContent() {
     return (
         <div className="space-y-8 text-gray-700 leading-relaxed">
