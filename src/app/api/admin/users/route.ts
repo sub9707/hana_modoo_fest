@@ -9,14 +9,6 @@ export async function GET(request: NextRequest) {
 
     const users = await getAllUsers()
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Admin Users API - 첫 번째 사용자 샘플:', {
-        name: users[0]?.name,
-        username: users[0]?.username,
-        signup_method: users[0]?.signup_method
-      })
-    }
-
     return successResponse(users)
   } catch (error) {
     return handleApiError(error, 'GET /api/admin/users')

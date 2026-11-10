@@ -8,7 +8,6 @@ export async function getCurrentUser() {
   const sessionToken = cookieStore.get('session-token')?.value
 
   if (!sessionToken) {
-    console.log('[getCurrentUser] 세션 토큰 없음')
     return null
   }
 
@@ -22,21 +21,17 @@ export async function getCurrentUser() {
     )
 
     if (!user) {
-      console.log('[getCurrentUser] 세션 토큰으로 사용자 찾을 수 없음:', sessionToken.substring(0, 8))
       return null
     }
 
     // 세션 만료 확인
     if (user.session_expires_at && new Date(user.session_expires_at) < new Date()) {
-      console.log('[getCurrentUser] 세션 만료됨')
       await query(
         'UPDATE users SET session_token = NULL, session_expires_at = NULL WHERE id = ?',
         [user.id]
       )
       return null
     }
-
-    console.log('[getCurrentUser] 사용자 인증 성공:', user.name)
 
     return {
       id: user.id,
@@ -79,13 +74,12 @@ export async function checkUserRole(requiredRole: Role): Promise<boolean> {
   return roleHierarchy[user.role as Role] >= roleHierarchy[requiredRole]
 }
 
-// NextJS 15: 사용자 세션 검증
 export async function validateSession(): Promise<boolean> {
   const user = await getCurrentUser()
   return !!user
 }
 
-// NextJS 15: 사용자 권한별 리다이렉트
+// 로그인하지 않았으면 예외를 던진다
 export async function requireAuth() {
   const user = await getCurrentUser()
   if (!user) {

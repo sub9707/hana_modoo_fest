@@ -50,9 +50,7 @@ export default function WeatherNotice() {
     try {
       const response = await fetch('/api/public/weather-banner')
       const result = await response.json()
-      
-      console.log('날씨 배너 API 응답:', result)
-      
+
       if (result.success && result.data) {
         const newSettings = {
           weather: result.data.weather || 'sunny',
@@ -60,8 +58,7 @@ export default function WeatherNotice() {
           airQuality: result.data.airQuality || 'normal',
           customMessage: result.data.customMessage || DEFAULT_MESSAGE
         }
-        
-        console.log('설정된 값:', newSettings)
+
         setSettings(newSettings)
       }
     } catch (error) {

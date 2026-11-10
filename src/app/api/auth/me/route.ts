@@ -50,7 +50,6 @@ export async function GET(request: NextRequest) {
     // 캐시 확인 (같은 세션 토큰에 대한 최근 요청)
     const cached = userCache.get(sessionToken)
     if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-      console.log('[me] Cache HIT')
       return NextResponse.json(
         { user: cached.user },
         {
@@ -69,7 +68,7 @@ export async function GET(request: NextRequest) {
 
       console.warn('[me] Auth error:', result.error)
 
-      // ⚠️ 캐시에서 제거
+      // 캐시에서 제거
       userCache.delete(sessionToken)
 
       if (result.error.includes('무효화') || result.error.includes('만료')) {
@@ -99,7 +98,7 @@ export async function GET(request: NextRequest) {
       timestamp: Date.now()
     })
 
-    // 캐시 크기 제한 (메모리 누수 방지)
+    // 캐시가 무한히 커지지 않도록 크기 제한
     if (userCache.size > 100) { 
       const oldestKey = userCache.keys().next().value
       if (typeof oldestKey === 'string') {
