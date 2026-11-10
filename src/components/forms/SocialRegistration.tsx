@@ -177,11 +177,6 @@ export default function SocialRegistration({
   }
 
   const handleSubmit = async (data: SocialUserInfoFormData) => {
-    console.log('=== Form Submit Started ===')
-    console.log('Form Data:', data)
-    console.log('Form Errors:', form.formState.errors)
-    console.log('Social Data:', socialData)
-
     if (!socialData) {
       setError('SNS 인증 정보를 찾을 수 없습니다.')
       return
@@ -202,7 +197,7 @@ export default function SocialRegistration({
         birthDate: socialData.birthyear && socialData.birthday
           ? (() => {
               // 네이버 birthday 형식 처리: "02-15" 또는 "0215"
-              const birthday = socialData.birthday.replace(/-/g, '') // 하이픈 제거
+              const birthday = socialData.birthday.replace(/-/g, '')
               const month = birthday.substring(0, 2)
               const day = birthday.substring(2, 4)
               return `${socialData.birthyear}-${month}-${day}`
@@ -219,33 +214,22 @@ export default function SocialRegistration({
         autoGenerate: true
       }
 
-      console.log('=== Final Data to Send ===')
-      console.log(JSON.stringify(finalData, null, 2))
-
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData)
       })
 
-      console.log('=== API Response ===')
-      console.log('Status:', response.status)
-      console.log('Status Text:', response.statusText)
-
       const result = await response.json()
-      console.log('Result:', result)
 
       if (response.ok) {
-        console.log('  Registration successful')
         if (result.user && result.autoLogin) {
-          console.log('  Auto-login successful, setting user in context')
           login(result.user)
           const finalRedirect = originalRedirect && originalRedirect !== '/my-page' ? originalRedirect : '/'
           const redirectUrl = new URL(finalRedirect, window.location.origin)
           redirectUrl.searchParams.set('signup_success', 'true')
           router.push(redirectUrl.pathname + redirectUrl.search)
         } else {
-          console.log('Auto-login failed, redirecting to login')
           router.push('/login?message=가입완료. 로그인해주세요.')
         }
       } else {
@@ -355,11 +339,7 @@ export default function SocialRegistration({
         <form 
           onSubmit={form.handleSubmit(
             handleSubmit,
-            (errors) => {
-              console.error('=== Form Validation Failed ===')
-              console.error('Errors:', errors)
-              setError('입력 정보를 확인해주세요.')
-            }
+            () => setError('입력 정보를 확인해주세요.')
           )} 
           className="space-y-6"
         >
@@ -658,12 +638,6 @@ export default function SocialRegistration({
             <button
               type="submit"
               disabled={isLoading}
-              onClick={() => {
-                console.log('=== Submit Button Clicked ===')
-                console.log('Current Form Values:', form.getValues())
-                console.log('Form Is Valid:', form.formState.isValid)
-                console.log('Form Errors:', form.formState.errors)
-              }}
               className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             >
               {isLoading ? (
