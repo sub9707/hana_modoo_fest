@@ -1,5 +1,3 @@
-// types/admin.ts
-
 export interface Registration {
   id: string;
   name: string;

@@ -176,7 +176,6 @@ export function useQuiz() {
   }, [startTime])
 
   return {
-    // 기존 상태
     currentQuiz,
     selectedAnswer,
     showResult,
@@ -188,20 +187,15 @@ export function useQuiz() {
     isCorrect,
     showCelebration,
     shakeCard,
-    
-    // 새로운 상태
     isPerfectScore,
     hasParticipated,
     canShowRegisterButton,
     isRegistering,
-    
-    // 기존 액션
+
     handleAnswerSelect,
     handleAnswerSubmit,
     handleNextQuiz,
     resetQuiz,
-    
-    // 새로운 액션
     registerResult,
     getCompletionTime,
     checkParticipationStatus

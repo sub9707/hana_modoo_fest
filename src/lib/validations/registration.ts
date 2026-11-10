@@ -113,7 +113,7 @@ export const registrationSearchSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20)
 }).partial()
 
-// 등록번호 검증 스키마 (숫자 1~5자리로 수정)
+// 등록번호 검증 스키마 (숫자 1~5자리)
 export const registrationNumberSchema = z
   .string({ message: '등록번호를 입력해주세요.' })
   .min(1, '등록번호를 입력해주세요.')

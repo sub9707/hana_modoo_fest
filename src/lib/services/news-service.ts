@@ -1,4 +1,3 @@
-// lib/news-service.ts - 업데이트된 뉴스 서비스
 import { query, queryOne, transaction } from '../mysql/connection'
 import { NewsItem, NewsListResponse, NewsSearchParams, NewsAttachment, NewsEditorImage } from '@/types/Board'
 
@@ -49,12 +48,10 @@ export class NewsService {
         queryParams.push(cursor)
       }
 
-      // WHERE 절 추가
       if (conditions.length > 0) {
         sql += ' WHERE ' + conditions.join(' AND ')
       }
 
-      // GROUP BY 추가
       sql += ' GROUP BY n.id'
 
       // 정렬 조건
@@ -140,11 +137,11 @@ export class NewsService {
   }
 
 /**
- * 뉴스 상세 조회 (최적화 버전)
+ * 뉴스 상세 조회
  */
 static async getNewsById(id: string): Promise<NewsItem | null> {
   try {
-    // 단일 JOIN 쿼리로 통합
+    // 첨부파일·에디터 이미지 개수까지 한 번에 조회
     const sql = `
       SELECT 
         n.*,
@@ -163,7 +160,7 @@ static async getNewsById(id: string): Promise<NewsItem | null> {
       return null
     }
 
-    // 조회수 증가는 비동기로 처리 (응답 속도 향상)
+    // 조회수 증가는 응답을 기다리게 하지 않는다
     query('UPDATE news_items SET views = views + 1 WHERE id = ?', [id])
       .catch(err => console.error('Failed to increment views:', err))
 

@@ -1,4 +1,3 @@
-// libs/users-service.ts
 import { query, queryOne, transaction } from '@/lib/mysql/connection'
 import { randomUUID } from 'crypto'
 import { anonymizeUserRow, getNextAnonymizationSequence } from '@/lib/services/anonymization-service'
@@ -38,7 +37,7 @@ export interface UserStats {
 }
 
 /**
- * 모든 사용자 목록 조회 (수정됨 - signup_method, email, profile_image 포함)
+ * 모든 사용자 목록 조회
  */
 export async function getAllUsers(): Promise<User[]> {
   try {
@@ -88,7 +87,7 @@ export async function getAllUsers(): Promise<User[]> {
 }
 
 /**
- * ID로 사용자 조회 (수정됨 - email, profile_image 포함)
+ * ID로 사용자 조회
  */
 export async function getUserById(userId: string): Promise<User | null> {
   try {
@@ -386,7 +385,7 @@ export async function getUserStats(): Promise<UserStats> {
 }
 
 /**
- * 사용자 검색 (수정됨 - signup_method, email, profile_image 포함)
+ * 사용자 검색
  */
 export async function searchUsers(searchTerm: string): Promise<User[]> {
   try {
@@ -440,7 +439,7 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
 }
 
 /**
- * 역할별 사용자 조회 (수정됨 - signup_method, email, profile_image 포함)
+ * 역할별 사용자 조회
  */
 export async function getUsersByRole(role: Role): Promise<User[]> {
   try {
@@ -490,7 +489,7 @@ export async function getUsersByRole(role: Role): Promise<User[]> {
 }
 
 /**
- * 특정 기간 내 가입한 사용자 조회 (수정됨 - signup_method, email, profile_image 포함)
+ * 특정 기간 내 가입한 사용자 조회
  */
 export async function getUsersByDateRange(startDate: Date, endDate: Date): Promise<User[]> {
   try {
@@ -640,13 +639,13 @@ export async function getDailySignupStats(): Promise<DailySignupData[]> {
 }
 
 /**
- * 사용자 통계 조회 (확장)
+ * 사용자 통계 + 일별 가입 추이 조회
  */
 export async function getUserStatsExtended(): Promise<UserStats & { dailySignups: DailySignupData[] }> {
   try {
     const [basicStats, dailySignups] = await Promise.all([
       getUserStats(),
-      getDailySignupStats() // 기본값: 2025년 11월
+      getDailySignupStats()
     ]);
 
     return {

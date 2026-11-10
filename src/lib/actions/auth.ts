@@ -102,7 +102,7 @@ export async function loginAction(formData: FormData) {
             [user.id]
         )
 
-        // 세션 토큰 생성 및 저장 (IP 추가)
+        // 세션 토큰 생성 및 저장 (로그인 IP 함께 기록)
         const sessionToken = generateSessionToken()
         await query(
             `UPDATE users SET 
@@ -222,7 +222,7 @@ export async function getCurrentUserAction() {
             return { error: '세션이 만료되었습니다. 다시 로그인해주세요.' }
         }
 
-        // 민감한 정보 제거하고 완전한 사용자 정보 반환
+        // 세션 정보는 클라이언트에 내려주지 않는다
         const { session_expires_at, ...safeUser } = user
 
         return {

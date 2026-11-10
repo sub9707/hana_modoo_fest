@@ -10,8 +10,8 @@ export interface PasswordStrengthResult {
 }
 
 /**
- * 비밀번호 강도 점수 계산 (클라이언트/서버 공용 유틸리티)
- * NextJS 15: 별도 유틸리티 파일로 분리하여 Server Action 충돌 방지
+ * 비밀번호 강도 점수 계산
+ * 'use server' 파일은 async 함수만 export 할 수 있어 클라이언트/서버 공용으로 분리했다.
  */
 export function calculatePasswordStrength(password: string): PasswordStrengthResult {
   let score = 0

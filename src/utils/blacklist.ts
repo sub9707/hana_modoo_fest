@@ -1,4 +1,3 @@
-// lib/utils/blacklist.ts
 import { createHash } from 'crypto'
 import { queryOne, query } from '@/lib/mysql/connection'
 

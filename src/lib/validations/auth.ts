@@ -15,7 +15,7 @@ export const loginSchema = z.object({
 })
 
 /**
- * 비밀번호 변경 스키마 - NextJS 15 최적화
+ * 비밀번호 변경 스키마
  */
 export const changePasswordSchema = z.object({
   currentPassword: z
@@ -228,7 +228,7 @@ export const AUTH_ERRORS = {
 } as const
 
 /**
- * NextJS 15: 향상된 검증 헬퍼 함수
+ * 검증 실패 응답 생성
  */
 export function createValidationError(message: string, path?: string[]) {
   return {

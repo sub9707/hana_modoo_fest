@@ -80,7 +80,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch (error) {
         console.error('Error loading user:', error)
 
-        // ⚠️ 재시도 로직 (최대 2회)
+        // 네트워크 오류는 최대 2회까지 재시도
         if (mounted && retryCount < maxRetries) {
           retryCount++
           console.warn(`재시도중... (${retryCount}/${maxRetries})`)

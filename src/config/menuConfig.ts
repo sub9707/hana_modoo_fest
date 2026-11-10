@@ -1,4 +1,3 @@
-// config/menuConfig.ts
 import {
   Users,
   Bell,
