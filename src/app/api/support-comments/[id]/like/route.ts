@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { transaction } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
 
-// 좋아요 토글 API (디버깅 버전)
+// 좋아요 토글
 export async function PATCH(
   request: NextRequest,
   context: { params: any }
@@ -39,7 +39,6 @@ export async function PATCH(
       const commentData = (rows as any[])[0]
       const hasLike = commentData.like_id !== null
       const isLiked = !hasLike
-
 
       if (hasLike) {
         // 좋아요 취소

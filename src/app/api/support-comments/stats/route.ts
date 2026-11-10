@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 
-// 댓글 통계 조회 (단일 쿼리로 최적화)
+// 댓글 통계 조회
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
   

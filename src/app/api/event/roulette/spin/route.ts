@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // fallback으로 마지막 상품 선택 (안전장치)
+        // 부동소수점 오차로 선택되지 않으면 마지막 상품으로 처리
         if (!selectedPrize) {
           selectedPrize = {
             ...activePrizes[activePrizes.length - 1],

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { query, queryOne } from '@/lib/mysql/connection'
 import { createSensClient } from '@/lib/sens/client'
 
-// 관리자 권한 확인 (기존 미들웨어 활용)
+// 관리자 권한 확인
 async function checkAdminAuth(request: NextRequest): Promise<{ authorized: boolean; user?: any }> {
   const sessionToken = request.cookies.get('session-token')?.value
   

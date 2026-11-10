@@ -1,4 +1,3 @@
-// app/api/writings/[id]/like/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { query, transaction } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'

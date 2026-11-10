@@ -1,4 +1,3 @@
-// app/api/event/winners/my/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { query } from '@/lib/mysql/connection'

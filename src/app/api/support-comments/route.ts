@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import { getCurrentUser } from '@/lib/mysql/server'
 
-// 댓글 목록 조회 (타입 변환 수정)
+// 댓글 목록 조회
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
@@ -40,10 +40,8 @@ export async function GET(request: NextRequest) {
       LIMIT ? OFFSET ?
     `, [user?.id || null, limit, offset])
 
-    //   문자열, 숫자 모두 처리하는 boolean 변환
+    // MySQL 에서 '1' / 1 / null 등으로 오는 값을 boolean 으로 맞춘다
     comments.forEach((comment: any) => {
-      // '1', 1, true 모두 true로 변환
-      // '0', 0, false, null, undefined 모두 false로 변환
       comment.isLiked = Boolean(Number(comment.isLiked))
     })
 

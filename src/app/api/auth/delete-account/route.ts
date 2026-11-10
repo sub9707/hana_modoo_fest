@@ -1,4 +1,3 @@
-// app/api/auth/delete-account/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
         [sessionToken]
       )
 
-      // Explicitly type as RowDataPacket[]
       const userRows = rows as import('mysql2').RowDataPacket[];
       if (userRows.length === 0) {
         throw new Error('사용자를 찾을 수 없습니다')

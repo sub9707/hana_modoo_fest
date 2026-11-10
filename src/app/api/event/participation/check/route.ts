@@ -1,4 +1,3 @@
-// app/api/event/participation/check/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/mysql/server'
 import { queryOne } from '@/lib/mysql/connection'

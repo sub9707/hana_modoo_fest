@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 6. 데이터베이스에 인증 정보 저장 (기존 테이블 구조 사용)
+    // 6. 데이터베이스에 인증 정보 저장
     await saveVerificationCode(phone, verificationCode, clientIp, userAgent)
 
     // 7. SMS 발송 로그 기록 (선택사항, 테이블이 있는 경우만)
@@ -225,7 +225,7 @@ function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
-// 인증 코드 저장 (기존 테이블 구조 사용)
+// 인증 코드 저장
 async function saveVerificationCode(
   phone: string, 
   code: string, 
@@ -240,7 +240,7 @@ async function saveVerificationCode(
     [phone]
   )
 
-  // 새 인증 코드 저장 (기존 테이블 구조 사용)
+  // 새 인증 코드 저장
   await query(
     `INSERT INTO phone_verifications (phone, code, ip_address, user_agent, expires_at)
      VALUES (?, ?, ?, ?, ?)`,

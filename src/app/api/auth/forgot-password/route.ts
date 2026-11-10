@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 7. 데이터베이스에 인증 정보 저장 (기존 phone_verifications 테이블 사용)
+    // 7. 데이터베이스에 인증 정보 저장
     await savePasswordResetCode(phone, verificationCode, clientIp, userAgent)
 
     // 8. 요청 제한 카운터 업데이트 (개발 모드가 아닐 때만)
@@ -257,7 +257,7 @@ async function savePasswordResetCode(
     [phone]
   )
 
-  // 새 인증 코드 저장 (기존 테이블 구조 사용)
+  // 새 인증 코드 저장
   await query(
     `INSERT INTO phone_verifications (phone, code, ip_address, user_agent, expires_at)
      VALUES (?, ?, ?, ?, ?)`,

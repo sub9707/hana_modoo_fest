@@ -1,4 +1,3 @@
-// app/api/event/winners/recent/route.ts
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/mysql/connection'
 import type { ApiResponse, RecentWinner } from '@/types/event'

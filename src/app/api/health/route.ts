@@ -1,5 +1,3 @@
-// app/api/health/route.ts 수정된 버전
-
 import { NextResponse } from 'next/server'
 import { healthCheck } from '@/lib/mysql/connection'
 import { checkSensHealth, checkCredentials } from '@/lib/sens/health'
@@ -63,7 +61,7 @@ export async function GET() {
     let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
     let load: 'low' | 'medium' | 'high' = 'low'
     
-    // 🚀 테스트 환경에서는 더 관대한 기준 적용
+    // 테스트 환경에서는 더 관대한 기준 적용
     if (!dbHealthy) {
       overallStatus = 'unhealthy'
       load = 'high'
@@ -78,7 +76,7 @@ export async function GET() {
       load = 'medium'
     }
 
-    // 🚀 테스트 환경에서는 강제로 'low' 설정 옵션
+    // 테스트 환경에서는 강제로 'low' 로 설정할 수 있다
     if (isTestEnv && process.env.FORCE_LOW_LOAD === 'true') {
       load = 'low'
       overallStatus = 'healthy'
@@ -104,7 +102,7 @@ export async function GET() {
           apiConnection: sensStatus?.details?.apiConnection || false,
           responseTime: sensStatus?.details?.responseTime ? `${sensStatus.details.responseTime}ms` : undefined,
           error: sensError,
-          // 🚀 테스트 환경에서는 SENS 무시됨을 표시
+          // 테스트 환경에서는 SENS 상태를 무시했음을 표시
           ignoredInTest: isTestEnv && !sensHealthy
         }
       },
@@ -165,7 +163,7 @@ export async function GET() {
   }
 }
 
-// SENS 전용 헬스체크 엔드포인트 (기존과 동일)
+// SENS 전용 헬스체크
 export async function POST() {
   try {
     const sensHealth = await checkSensHealth()

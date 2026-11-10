@@ -24,7 +24,6 @@ const phoneRegistrationSchema = z.object({
   birthDate: z.string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, '올바른 날짜 형식이 아닙니다'),
   company: z.string().optional(),
-  // 주소 필드 추가
   address: z.string().min(1, '주소를 입력해주세요'),
   addressDetail: z.string().optional(),
   zipCode: z.string().min(5, '우편번호를 입력해주세요'),
