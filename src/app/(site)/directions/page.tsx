@@ -4,7 +4,6 @@ import WeatherNotice from '@/components/directions/WeatherNotice'
 import ParkingSection from '@/components/directions/ParkingSection';
 import TransportationSection from '@/components/directions/TransportationSection';
 import DirectionsMap from '@/components/directions/DirectionsMap';
-import AccessibilitySection from '@/components/directions/AccessibilitySection';
 import PageLayout from '@/components/layout/PageLayout'
 import { FESTIVAL, PAGE_SEO, createPageMetadata } from '@/constants'
 
@@ -17,7 +16,7 @@ export const metadata: Metadata = createPageMetadata(
   }
 );
 
-// 행사장 정보 데이터 (FESTIVAL 상수 활용)
+// 행사장 정보
 const venueData = {
   name: FESTIVAL.location.name,
   address: FESTIVAL.location.fullAddress,
@@ -46,9 +45,6 @@ export default function DirectionsPage() {
 
       {/* 주차 안내 */}
       <ParkingSection />
-
-      {/* 접근성 & 편의시설 */}
-      {/* <AccessibilitySection /> */}
     </PageLayout>
   )
 }
