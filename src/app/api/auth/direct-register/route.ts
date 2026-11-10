@@ -8,11 +8,7 @@ import { directRegistrationSchema } from '@/lib/validations/registration'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
-    console.log('=== Registration Data ===')
-    console.log('Email:', body.email)
-    console.log('All data:', body)
-    
+
     // 입력값 검증
     const validation = directRegistrationSchema.safeParse(body)
     if (!validation.success) {
@@ -106,10 +102,7 @@ export async function POST(request: NextRequest) {
     // 사용자 생성
     const userId = uuidv4()
 
-    console.log('=== Inserting User ===')
-    console.log('Email to insert:', data.email)
-
-    // NOW() 함수를 사용하여 MySQL 서버의 현재 시간으로 설정
+    // 시각 컬럼은 MySQL 서버 시간(NOW())으로 기록
     await query(
       `INSERT INTO users (
         id, name, username, email, password_hash, password_salt, 
@@ -124,8 +117,6 @@ export async function POST(request: NextRequest) {
         'user', sessionToken, 'phone'
       ]
     )
-
-    console.log('User inserted successfully')
 
     // 쿠키 설정
     const cookieStore = await cookies()
@@ -142,8 +133,6 @@ export async function POST(request: NextRequest) {
       `SELECT id, name, username, phone, role, email FROM users WHERE id = ?`,
       [userId]
     )
-
-    console.log('User retrieved:', user)
 
     return NextResponse.json({
       success: true,
