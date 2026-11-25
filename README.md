@@ -16,6 +16,7 @@
 | 링크 | [데모](https://hana-modoo-fest.vercel.app/), [상세 설명](https://subdevpi.mywire.org/portfolio/모두하나대축제) |
 
 이 저장소는 행사 종료 후 정리한 데모 버전입니다. 행사 기간에 쓰던 Redis는 데모 버전에서 뺐습니다.
+로그인 화면의 "테스트 계정으로 로그인" 버튼은 데모를 둘러보기 위한 체험용 계정입니다.
 
 ## 2. 화면
 

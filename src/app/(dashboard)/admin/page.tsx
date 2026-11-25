@@ -42,8 +42,6 @@ export default function AdminPage() {
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
           <dt className="text-gray-500">(주)하우두유두</dt>
           <dd className="tabular-nums">02-322-9775</dd>
-          <dt className="text-gray-500">개발 담당</dt>
-          <dd className="tabular-nums">010-9404-3714</dd>
         </dl>
       </section>
     </div>
